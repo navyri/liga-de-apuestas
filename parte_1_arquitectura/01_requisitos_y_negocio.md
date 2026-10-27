@@ -2,8 +2,8 @@
 **Caso:** La Gran Liga de Apuestas de Medianos EIA  
 **Organización:** Salchipapa Maker Racing S.A.S.  
 **Artefacto:** `P1-ART-002`  
-**Versión:** `v1.0`  
-**Estado:** `[x]` Completado y aprobado por el usuario  
+**Versión:** `v1.1`  
+**Estado:** `[x]` Verificado y consolidado (P1-1.1 aprobado por usuario; P1-1.2 a P1-1.5 completados por revisión autónoma)  
 
 ---
 
@@ -48,4 +48,108 @@ El PDF establece de forma numerada y taxativa exactamente **nueve capacidades pr
 
 ### 4. Regla Estricta del Cierre de Apuestas
 - **Independencia de Intervención Humana:**  
-  El cierre de apuestas está fijado exactamente a la hora de inicio de la carrera según el **reloj del servidor** (PDF pág. 3). **No depende de una orden manual ni de un botón accionado por el Operador de Carrera**. Cualquier solicitud recibida tras la marca de tiempo de cierre del servidor es rechazada irrevocablemente, independientemente de la latencia del cliente o de cuándo fue despachada por el usuario. El mecanismo técnico exacto (programador interno, flags en memoria, checks atómicos en motor de base de datos) se definirá y justificará formalmente en las etapas de diseño.
+  El cierre de apuestas está fijado exactamente a la hora de inicio de la carrera según el **reloj del servidor** (PDF pág. 3). **No depende de una orden manual ni de un botón accionado por el Operador de Carrera**. Cualquier solicitud recibida tras la marca de tiempo de cierre del servidor es rechazada irrevocablemente, independientemente de la latencia del cliente o de cuándo fue despachada por el usuario.
+
+---
+
+## P1-1.2: REGLAS DEL NEGOCIO Y CICLO DE CARRERA
+
+### 1. Modelo de Premios: Apuesta Mutua (Pari-Mutuel) (PDF pág. 3)
+El sistema opera bajo un esquema estricto de bolsa común (*Pari-Mutuel*):
+- **Bolsa Bruta ($B$):** Sumatoria total de los montos apostados por todos los usuarios en la carrera $c$:
+  $$B = \sum_{i=1}^{N} \text{monto}_i$$
+- **Retención de la Casa ($R$):** La casa (Salchipapa Maker Racing S.A.S.) retiene exactamente el **10%** de la bolsa total:
+  $$R = 0.10 \times B$$
+- **Bolsa Neta Distribuible ($B_{\text{neta}}$):** Fondo total destinado a premiar a los apostadores ganadores (**90%** de la bolsa):
+  $$B_{\text{neta}} = 0.90 \times B$$
+- **Reparto Proporcional a Ganadores:** Si el mediano ganador es $M_w$, el conjunto de apuestas ganadoras es $G = \{a \mid a.\text{mediano} = M_w\}$. La masa total apostada al ganador es:
+  $$T_w = \sum_{a \in G} a.\text{monto}$$
+  El premio asignado a una apuesta individual ganadora $a_k \in G$ se calcula en estricta proporción a su contribución individual:
+  $$\text{Premio}(a_k) = B_{\text{neta}} \times \left( \frac{a_k.\text{monto}}{T_w} \right) = \frac{0.90 \times B}{T_w} \times a_k.\text{monto}$$
+- **Fijación de la Cuota Definitiva:** La cuota final oficial por unidad apostada ($Q_w$) queda sellada matemáticamente en el instante en que cesan las apuestas:
+  $$Q_w = \frac{B_{\text{neta}}}{T_w} = \frac{0.90 \times B}{T_w}$$
+  Por esta razón, **el premio final solo se conoce cuando se cierran las apuestas** y se certifica el ganador oficial (PDF pág. 3).
+
+### 2. Cuotas Estimadas en Vivo (PDF pág. 3)
+- Mientras la carrera permanece en estado `ABIERTA`, la plataforma calcula y expone a los apostadores una **cuota estimada** para cada mediano $m$:
+  $$Q_{\text{estimada}}(m) = \frac{0.90 \times B_{\text{actual}}}{T_m}$$
+  donde $T_m$ es el total acumulado sobre el mediano $m$ hasta ese instante.
+- Estas cuotas varían dinámicamente con cada nueva apuesta que ingresa.
+- **Naturaleza informativa:** La cuota mostrada es estrictamente una estimación proyectada; no constituye una cuota fija garantizada al momento de apostar.
+
+### 3. Ciclo de Vida Formal de una Carrera (PDF pág. 3)
+El PDF define formalmente una máquina de estados determinista para cada carrera:
+
+```text
+  [PROGRAMADA] ──► [ABIERTA] ──► [CERRADA] ──► [EN_CURSO] ──► [FINALIZADA] ──► [LIQUIDADA]
+        │              │             │              │
+        └──────────────┴─────────────┴──────────────┴──────────────► [CANCELADA]
+                                                                        (Devolución 100%)
+```
+
+#### Transiciones y Efectos de Estado:
+1. `PROGRAMADA`: Carrera configurada con fecha, hora, pista, distancia y participantes. No admite apuestas.
+2. `ABIERTA`: Ventana formal de admisión de apuestas. Se calculan cuotas estimadas.
+3. `CERRADA`: Cese estricto e irrevocable de recepción de apuestas al llegar la hora de inicio (reloj del servidor). Bolsa común fijada.
+4. `EN_CURSO`: Competencia deportiva en desarrollo. Las apuestas permanecen congeladas y selladas.
+5. `FINALIZADA`: Conclusión de la carrera en pista. El sistema queda a la espera de la recepción del resultado oficial verificado.
+6. `LIQUIDADA`: Resultado oficial procesado, ganadores identificados, premios calculados y acreditados en las billeteras de los usuarios.
+7. `CANCELADA`: Transición de excepción posible **desde cualquier estado anterior a `FINALIZADA`**. Provoca la devolución íntegra (100%) de los montos apostados a todos los usuarios participantes.
+
+### 4. Regla de Múltiples Apuestas por Usuario (PDF pág. 3)
+- Un usuario tiene autorización expresa de emitir múltiples apuestas en la misma carrera.
+- Puede apostar varias veces por el mismo mediano (ej. dos apuestas de 100 EIA Coins separadas) o diversificar apostando a distintos medianos.
+- **Distinción arquitectónica fundamental:** Un nuevo envío de apuesta con un nuevo identificador de intención constituye una operación de negocio legítima y debe ser procesada. La deduplicación debe actuar estrictamente sobre reintentos de una misma transacción (`idempotency_key` u `operation_id`).
+
+---
+
+## P1-1.3: PARÁMETROS CRÍTICOS DE CARGA, LATENCIA, DURABILIDAD, LIQUIDACIÓN Y RETENCIÓN
+
+Con base en la sección *"El problema de las cargas masivas"* (PDF pág. 8) y la tabla de *"Supuestos de diseño"* (PDF págs. 8-9), se consolidan los parámetros cuantitativos obligatorios del sistema:
+
+| Parámetro / Dimensión | Criterio Cuantitativo Explícito | Requisito Fuente | Implicación de Diseño Arquitectónico |
+| :--- | :--- | :--- | :--- |
+| **Usuarios Concurrentes (Normal)** | 500 usuarios conectados simultáneamente | PDF pág. 8 | Carga base manejable con recursos mínimos y configuración liviana. |
+| **Usuarios Concurrentes (Pico Máximo)** | 100.000 usuarios conectados en la final de la Copa Intersemestral | PDF pág. 8 | Requiere escalamiento horizontal elástico en capa de entrada y lectura eficiente. |
+| **Pico de Transacciones de Apuesta** | **10.000 apuestas por segundo** sostenidas durante los 30 segundos previos al cierre | PDF pág. 8 | Carga transaccional crítica: 300.000 apuestas en 30 segundos. Demanda bufferizado, procesamiento eficiente y particionamiento. |
+| **Latencia de Respuesta al Apostar** | **< 1 segundo** para notificar al usuario si la apuesta fue aceptada o rechazada | PDF pág. 9 | Límite estricto de latencia percibida por el usuario. Prohíbe arquitecturas de espera indefinida. |
+| **Durabilidad y Pérdida de Datos** | **Cero tolerancia a pérdida:** ninguna apuesta aceptada ni movimiento de billetera puede perderse | PDF pág. 9 | Persistencia con confirmación atómica y write-ahead log o almacenamiento con réplicas durables. |
+| **Tiempo Máximo de Liquidación** | **< 15 minutos** para pagar todos los premios tras la publicación del resultado oficial | PDF pág. 9 | Liquidación de más de 1.000.000 de apuestas (PDF pág. 6) distribuida mediante procesamiento por lotes/paralelo; prohíbe peticiones síncronas HTTP masivas monolíticas. |
+| **Frescura de Estadísticas** | Métricas operativas con tolerancia de minutos de retraso; reportes premium hasta un día | PDF pág. 9 | Desacoplamiento analítico: permite procesamiento en streaming/batch fuera de la ruta crítica transaccional. |
+| **Retención de Auditoría** | Conservación inalterable durante **al menos 5 años** | PDF pág. 9 | Almacenamiento histórico inmutable, optimizado para consulta de solo lectura por auditores. |
+
+---
+
+## P1-1.4: INVARIANTES DEL SISTEMA (SALDO, DUPLICACIÓN, CIERRE Y AUDITORÍA)
+
+Los invariantes son condiciones formales de corrección que el sistema jamás puede violar bajo ninguna circunstancia de carga, concurrencia o fallo:
+
+1. **Invariante de Moneda y No Doble Gasto (PDF pág. 6, 15):**
+   - *Regla:* Un EIA Coin no puede ser gastado dos veces.
+   - *Invariante:* $\text{Saldo}(u) \ge 0 \quad \forall u \in \text{Usuarios}$. El saldo contable de un usuario nunca puede ser negativo, aun cuando envíe múltiples apuestas en paralelo desde pestañas o conexiones simultáneas.
+2. **Invariante de Cierre Temporal Estricto (PDF pág. 3, 5, 8, 9, 15):**
+   - *Regla:* Cierre según reloj del servidor a la hora programada $T_{\text{inicio}}$.
+   - *Invariante:* Si $t_{\text{recepción}}(\text{apuesta}) \ge T_{\text{inicio}}$, entonces $\text{Estado}(\text{apuesta}) = \text{RECHAZADA}$. Ninguna apuesta puede ser admitida en la bolsa mutua después del corte del servidor, sin importar cuándo la despachó el cliente.
+3. **Invariante de Integridad Pari-Mutuel (PDF pág. 3):**
+   - *Regla:* Conservación matemática estricta de la bolsa.
+   - *Invariante:* $\sum \text{Premios Acreditados} + \text{Comisión Casa (10%)} = B_{\text{total}}$. El sistema no puede emitir premios que superen el fondo recaudado ni retener más del porcentaje establecido.
+4. **Invariante de No Duplicación por Idempotencia (PDF pág. 9, 15):**
+   - *Regla:* Pulsaciones múltiples ("APOSTAR" repetido 4 veces) no multiplican el débito ni la apuesta.
+   - *Invariante:* $\forall \text{operación } op$, el efecto sobre la billetera y sobre las apuestas aceptadas debe ocurrir exactamente una vez para una misma clave lógica de idempotencia:
+     $$f(f(op)) = f(op)$$
+5. **Invariante de Registro Inmutable y Solo Lectura en Auditoría (PDF pág. 7, 8):**
+   - *Regla:* Trazabilidad absoluta de eventos contables y de resultados.
+   - *Invariante:* Toda mutación sobre saldos, creación de apuestas, cambios de estado de carreras o resultados genera un registro inmutable append-only. El rol Auditor posee permisos exclusivos de solo lectura y no puede mutar ni suprimir registros.
+
+---
+
+## P1-1.5: IDENTIFICACIÓN DE AMBIGÜEDADES, PREGUNTAS ABIERTAS Y RIESGOS TÉCNICOS
+
+Para preservar la pureza metodológica, se formaliza la clasificación de elementos no definidos en el PDF:
+
+| Código | Categoría | Descripción | Impacto en el Diseño | Propuesta o Estrategia de Resolución |
+| :--- | :--- | :--- | :--- | :--- |
+| **P1-PA-001** | Pregunta Abierta | **Política de Redondeo y Remanentes de la Bolsa:** Al dividir $0.90 \times B$ entre las apuestas ganadoras, pueden generarse fracciones indivisibles de EIA Coins. | Posible descuadre contable si no se especifica el manejo de decimales. | **Propuesta técnica para P1-5:** Redondeo al entero inferior (*floor*) de cada premio individual y acumulación del residuo fraccionario en la cuenta de la casa o fondo de reserva del torneo. |
+| **P1-PA-002** | Pregunta Abierta | **Escenario sin Ganadores:** El PDF no estipula el destino del 90% de la bolsa si ningún apostador eligió al mediano que cruzó la meta en primer lugar. | Vacío de negocio sobre retención o devolución. | **Propuesta técnica para P1-5:** Devolución íntegra (100%) a los apostadores participantes en esa carrera o acumulación (*rollover*) para la siguiente carrera. Se presentará a elección del usuario en P1-5. |
+| **P1-RIE-001** | Riesgo / Desafío Técnico | **Tensión Latencia vs Concurrencia Extrema:** Responder en menos de 1 segundo mientras ingresan 10.000 apuestas/s en 30 segundos. | Riesgo de contención en base de datos al validar saldo y debitar bajo concurrencia. | Mitigación en P1-3, P1-5 y P1-6 mediante particionamiento por usuario, estructuras en memoria para validación rápida y aislamiento de colas. |
+| **P1-RIE-002** | Riesgo de Conectividad | **Incertidumbre de Red en el Cliente:** Un timeout de red no significa que la apuesta no fue procesada. | Riesgo de que el usuario reintente creyendo que falló. | Mitigación mediante `idempotency-key` obligatoria generada por el cliente antes de despachar la solicitud. |
