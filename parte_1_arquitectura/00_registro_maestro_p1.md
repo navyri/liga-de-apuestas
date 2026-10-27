@@ -83,13 +83,13 @@
 - [x] **P1-6.10** Plan conceptual de métricas y validación. *(Completado y consolidado)*.
 
 ### ETAPA P1-7 — Seguridad y costos
-- [ ] **P1-7.1** Autenticación, autorización y roles.
-- [ ] **P1-7.2** APIs, bots y límites de tasa.
-- [ ] **P1-7.3** Cifrado y credenciales.
-- [ ] **P1-7.4** Operaciones administrativas y auditoría.
-- [ ] **P1-7.5** Componentes públicos y privados.
-- [ ] **P1-7.6** Infraestructura y servicios administrados.
-- [ ] **P1-7.7** Justificación de costos y complejidad.
+- [x] **P1-7.1** Autenticación, autorización y roles. *(Completado y consolidado)*.
+- [x] **P1-7.2** APIs, bots y límites de tasa. *(Completado y consolidado)*.
+- [x] **P1-7.3** Cifrado y credenciales. *(Completado y consolidado)*.
+- [x] **P1-7.4** Operaciones administrativas y auditoría. *(Completado y consolidado)*.
+- [x] **P1-7.5** Componentes públicos y privados. *(Completado con topología DMZ vs VPC privada)*.
+- [x] **P1-7.6** Infraestructura y servicios administrados. *(Completado y justificado)*.
+- [x] **P1-7.7** Justificación de costos y complejidad. *(Completado bajo directriz de Dyllan)*.
 
 ### ETAPA P1-8 — Diagramas y ADR
 - [ ] **P1-8.1** Diagrama general.
@@ -151,13 +151,14 @@
 
 | ID Artefacto | Nombre del Artefacto | Versión | Estado | Descripción / Contenido |
 | :--- | :--- | :--- | :--- | :--- |
-| **P1-ART-001** | Registro Maestro P1 | v1.9 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001 a 005), trazabilidad y bitácora. |
+| **P1-ART-001** | Registro Maestro P1 | v2.0 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001 a 005), trazabilidad y bitácora. |
 | **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio consolidadas. |
 | **P1-ART-003** | Arquitectura y Componentes | v1.0 | `[x]` Consolidado | Comparación de estilos, justificación de descartes, desglose de boundaries, módulos vs despliegues y modelo de escalamiento. |
 | **P1-ART-004** | Flujo Crítico y Comunicación Síncrona | v1.2 | `[x]` Consolidado | Secuencia integral de apuesta-descuento, consistencia local ACID, tabla síncrona formal y protocolo de incertidumbre de red vs latencia. |
 | **P1-ART-005** | Mensajería y Comunicación Asíncrona | v1.1 | `[x]` Consolidado | Comparativa de brokers, catálogo canónico en español, topología de tópicos, particionamiento de liquidación por lotes y Transactional Outbox corregido. |
 | **P1-ART-006** | Datos, Persistencia e Idempotencia | v1.0 | `[x]` Consolidado | Esquema OLTP vs OLAP, consistencia fuerte vs eventual, bloqueo `FOR UPDATE`, 3 casos de idempotencia, mayores restos y política de sin ganadores. |
 | **P1-ART-007** | Escalabilidad y Manejo de Fallos | v1.0 | `[x]` Consolidado | Análisis de ráfaga de 10k ops/s, presupuesto de latencia (<1s), cierre estricto, Casos A, B y C (opcional) de fallos y plan de validación. |
+| **P1-ART-008** | Seguridad, RBAC y Costos | v1.0 | `[x]` Consolidado | Matriz RBAC, rate limiting multinivel, gestión de credenciales, segmentación DMZ vs VPC privada y optimización económica de Dyllan. |
 | **P1-ADR-001** | ADR-001: Estilo Arquitectónico | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la adopción de la Arquitectura Híbrida y descarte de alternativas. |
 | **P1-ADR-002** | ADR-002: Broker de Mensajería | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la selección de Apache Kafka como broker único y patrón Transactional Outbox. |
 | **P1-ADR-003** | ADR-003: Consistencia e Idempotencia | v1.0 | `[x]` Aprobado | Registro formal de decisión para consistencia local ACID, idempotencia por apuesta, mayores restos y reembolso ante ausencia de ganadores. |
@@ -205,6 +206,7 @@
 - **2026-10-27 (Sesión Inicial - Paso 12):** Elaboración técnica integral de la Etapa P1-5 en `P1-ART-006 v0.1` (`05_datos_e_idempotencia.md`): esquema de almacenamiento (OLTP en núcleo, OLAP analítico, WORM auditoría), consistencia fuerte vs eventual, prevención de saldo negativo con bloqueo de fila `FOR UPDATE`, idempotencia en 3 operaciones críticas, deduplicación de eventos y formulación de opciones para redondeo (`P1-PA-001`) y ausencia de ganadores (`P1-PA-002`).
 - **2026-10-27 (Sesión Inicial - Paso 13):** Inspección del repositorio de referencia del profesor `mlops2026` (`P1-HEC-003`). Incorporación de la política de mayores restos (`P1-DEC-003`) y ausencia de ganadores con reembolso 100% y motivo `SIN_APUESTAS_GANADORAS` (`P1-DEC-004`). Corrección de afirmaciones técnicas: Transactional Outbox desglosado en relay y at-least-once, particionamiento de liquidación por lotes (`batch_id`) con orden de bloqueo por usuario, idempotencia de premios vinculada a la apuesta (`P1-DEC-005`), delimitación rigurosa de WORM frente a replicación, y aclaración del estado incierto en cliente. Redacción de `P1-ADR-003`. Cierre formal de la Etapa P1-5 (9/9 tareas en `[x]`).
 - **2026-10-27 (Sesión Inicial - Paso 14):** Elaboración y consolidación de la Etapa P1-6 en `P1-ART-007 v1.0` (`06_escalabilidad_y_fallos.md`): análisis de cuellos de botella ante 100k usuarios y 10k apuestas/s, desglose de componentes que escalan vs los que no, presupuesto de latencia (<1s), cierre atómico en motor, liquidación masiva en 6-9 min, durabilidad RPO=0/RTO<30s, análisis de fallos Caso A (notificaciones), Caso B (billetera), resolución forense del Caso C opcional (corrección de foto de llegada) y plan de validación de métricas. Cierre formal de la Etapa P1-6 (10/10 tareas en `[x]`).
+- **2026-10-27 (Sesión Inicial - Paso 15):** Elaboración y consolidación de la Etapa P1-7 en `P1-ART-008 v1.0` (`07_seguridad_y_costos.md`): matriz formal RBAC (4 roles), protección de APIs y rate limiting por usuario/IP, cifrado en tránsito TLS 1.3 y reposo KMS, registro de acciones administrativas, aislamiento de red (DMZ pública vs VPC privada) y optimización de infraestructura cumpliendo la directriz de costos de Dyllan. Cierre formal de la Etapa P1-7 (7/7 tareas en `[x]`).
 
 ---
 
