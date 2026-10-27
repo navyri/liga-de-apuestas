@@ -1,31 +1,90 @@
-# Liga de Apuestas de Medianos EIA — Diseño de Arquitectura de Software
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=210&color=6B0F1A&text=MEDIANOS%20EIA&fontColor=F4ECE4&fontSize=58&fontAlignY=32&desc=Diseño%20de%20Arquitectura%20Distribuida%20·%20Salchipapa%20Maker%20Racing%20S.A.S.&descColor=E8B4B8&descAlignY=58"/>
+</p>
 
-Este repositorio contiene la **Parte 1** del proyecto académico de Arquitectura de Software (Universidad EIA) para la empresa ficticia **Salchipapa Maker Racing S.A.S.**
+<p align="center">
+  <img src="https://64.media.tumblr.com/3254f08405664a04d3c5a65f765eb8c9/61bf168659dda322-50/s2048x3072/36c765a65bc72096e27e85823017367c0b9b48b2.pnj" alt="Ilustración conceptual de estrategia y competición en la academia" width="650"/>
+</p>
 
-## Objetivo Académico y Alcance
-- **Alcance estricto de diseño:** Este trabajo comprende exclusivamente el análisis de requisitos, diseño de arquitectura distribuida, justificación técnica, elaboración de diagramas, redacción de registros de decisiones arquitectónicas (ADR) y preparación de la sustentación técnica.
-- **Sin implementación ejecutable:** Conforme al enunciado oficial (`Trabajo de Arquitectura de Software.pdf`), **no se implementa la plataforma**, código de aplicación, pipelines ni infraestructura ejecutable en esta parte.
-- **Git como herramienta organizativa:** El versionado en este repositorio se utiliza con fines estrictamente documentales, de trazabilidad y gobernanza de entregables.
+<p align="center">
+  <img src="https://img.shields.io/badge/Alcance-Diseño%20Arquitectónico-540B13?style=flat-square&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Créditos-EIA%20Coins%20(Ficticios)-6B0F1A?style=flat-square&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Concurrencia-100k%20usuarios-A82336?style=flat-square&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Pico-10k%20apuestas%2Fs-8B1E2D?style=flat-square&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Latencia-%3C%201%20segundo-540B13?style=flat-square&logoColor=white"/>
+</p>
 
-## Organización de la Documentación
-Toda la documentación técnica se gestiona en el directorio `parte_1_arquitectura/`:
+**La Gran Liga de Carreras de Medianos EIA** es un proyecto académico de diseño y justificación de arquitectura de software para la empresa **Salchipapa Maker Racing S.A.S.**
+
+El sistema modela una plataforma de apuestas mutuas (*pari-mutuel*) sobre competiciones de medianos, orientada a soportar una carga base de 500 usuarios y picos de hasta **100.000 usuarios concurrentes** con ráfagas de **10.000 apuestas por segundo** durante los 30 segundos previos al cierre de cada carrera.
+
+> **Aclaración institucional:** Los **EIA Coins** son créditos exclusivamente ficticios dentro del marco académico del enunciado: no poseen valor monetario, no se compran ni se canjean por dinero real. El alcance del trabajo corresponde íntegramente al análisis, diseño y sustentación técnica de la arquitectura distribuida, sin implementación física de la plataforma.
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"/>
+</p>
+
+## Requisitos y Atributos de Calidad
+
+| Parámetro | Valor Objetivo | Implicación Arquitectónica |
+|---|---|---|
+| Usuarios concurrentes (normal) | 500 sesiones activas | Operación base con recursos de infraestructura controlados |
+| Usuarios concurrentes (final) | 100.000 sesiones simultáneas | Escalamiento elástico en borde e interfaces de consulta |
+| Pico transaccional | 10.000 apuestas/s en 30 s | Ingesta masiva (300.000 transacciones) con particionamiento de balance |
+| Latencia de respuesta | < 1 segundo | Confirmación o rechazo determinista sin degradación de cola |
+| Durabilidad de datos | Cero pérdida | Persistencia transaccional estricta en apuestas y balance |
+| Liquidación masiva | < 15 minutos para > 1.000.000 apuestas | Procesamiento asíncrono en lotes paralelos |
+| Retención para auditoría | Mínimo 5 años | Almacenamiento histórico inmutable con permisos de solo lectura |
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"/>
+</p>
+
+## Reglas de Negocio e Invariantes
+
+- **Modelo Pari-Mutuel:** Las apuestas consolidan una bolsa común. La casa retiene una comisión del 10% y el 90% restante se distribuye proporcionalmente entre las apuestas ganadoras. La cuota final queda fijada exactamente al cierre de la carrera.
+- **Cierre por Reloj del Servidor:** Las apuestas cierran en el instante exacto fijado para el inicio de la carrera según la hora del servidor. Toda solicitud recibida con posterioridad es rechazada irrevocablemente.
+- **Integridad de Saldo:** Prohibición absoluta de saldo negativo o doble gasto de EIA Coins ante apuestas concurrentes de un mismo usuario.
+- **Idempotencia Transaccional:** Múltiples solicitudes idénticas originadas por reintentos de red o pulsaciones repetidas generan un único efecto contable y una sola apuesta registrada.
+- **Desacoplamiento Operativo:** Las fallas en canales externos de notificación no bloquean la admisión ni confirmación de apuestas.
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"/>
+</p>
+
+## Estructura del Repositorio
+
 ```text
-parte_1_arquitectura/
-├── 00_registro_maestro_p1.md              # Registro maestro: checklist, trazabilidad, supuestos y bitácora
-├── 01_requisitos_y_negocio.md             # Etapa P1-1: Actores, roles, reglas de negocio y cargas
-├── 02_arquitectura_y_componentes.md       # [Previsto] Etapa P1-2: Estilo y división de servicios
-├── 03_flujo_critico_y_comunicacion.md     # [Previsto] Etapa P1-3: Flujo de apuesta y tabla síncrona
-├── 04_mensajeria_y_eventos.md             # [Previsto] Etapa P1-4: Broker, tabla de eventos y topología
-├── 05_datos_e_idempotencia.md             # [Previsto] Etapa P1-5: Persistencia, consistencia y transacciones
-├── 06_escalabilidad_y_fallos.md           # [Previsto] Etapa P1-6: Cargas masivas y análisis de fallos
-├── 07_seguridad_y_costos.md               # [Previsto] Etapa P1-7: RBAC, zonas de red y costos
-├── 08_diagramas_y_adrs/                   # [Previsto] Etapa P1-8: Diagramas de arquitectura y ADRs
-├── 09_presentacion_diapositivas.md        # [Previsto] Etapa P1-9: Presentación (máx. 20 diapositivas)
-└── 10_guia_sustentacion.md                # [Previsto] Etapa P1-10: Banco de preguntas y cambio en vivo
+liga-de-apuestas/
+├── .gitignore
+├── README.md
+└── parte_1_arquitectura/
+    ├── 00_registro_maestro_p1.md          # Trazabilidad, bitácora y control de decisiones
+    ├── 01_requisitos_y_negocio.md         # Análisis de dominio, actores, roles e invariantes
+    ├── 02_arquitectura_y_componentes.md   # Evaluación de estilos arquitectónicos y límites
+    ├── 03_flujo_critico_y_comunicacion.md # Flujo de apuesta y contratos síncronos
+    ├── 04_mensajeria_y_eventos.md         # Diseño de mensajería, eventos y topología
+    ├── 05_datos_e_idempotencia.md         # Modelo de datos, consistencia y transacciones
+    ├── 06_escalabilidad_y_fallos.md       # Carga masiva y análisis de escenarios de fallo
+    ├── 07_seguridad_y_costos.md           # Esquema RBAC, segmentación y optimización
+    ├── 08_diagramas_y_adrs/               # Diagramas Mermaid y registros formales ADR
+    ├── 09_presentacion_diapositivas.md    # Estructura de presentación ejecutiva
+    └── 10_guia_sustentacion.md            # Defensa técnica y absorción de cambios en vivo
 ```
 
-## Estado Actual
-- **Fuente de verdad:** `Trabajo de Arquitectura de Software.pdf` (Universidad EIA, 20 páginas).
-- **Etapa P1-0 (Lectura y organización):** Completada y aprobada formalmente.
-- **Etapa P1-1 (Negocio y requisitos):** En desarrollo. P1-1.1 (Actores, roles y capacidades) completado y aprobado.
-- **Registro Maestro:** Disponible y versionado en [`parte_1_arquitectura/00_registro_maestro_p1.md`](parte_1_arquitectura/00_registro_maestro_p1.md).
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"/>
+</p>
+
+## Documentación Técnica
+
+| Documento | Estado | Enlace |
+|---|---|---|
+| Registro Maestro y Trazabilidad | Activo | [00_registro_maestro_p1.md](parte_1_arquitectura/00_registro_maestro_p1.md) |
+| Análisis de Requisitos y Dominio | Consolidado | [01_requisitos_y_negocio.md](parte_1_arquitectura/01_requisitos_y_negocio.md) |
+| Arquitectura y Componentes | En elaboración | [02_arquitectura_y_componentes.md](parte_1_arquitectura/02_arquitectura_y_componentes.md) |
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>

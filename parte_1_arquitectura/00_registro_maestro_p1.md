@@ -36,7 +36,7 @@
 - [x] **P1-1.5** Ambigüedades y supuestos. *(Completado y verificado por revisión autónoma)*.
 
 ### ETAPA P1-2 — Arquitectura y componentes
-- [ ] **P1-2.1** Comparar estilos arquitectónicos.
+- [~] **P1-2.1** Comparar estilos arquitectónicos. *(Elaborado en P1-ART-003; pendiente de decisión de estilo en P1-2.2)*.
 - [ ] **P1-2.2** Elegir estilo y descartar justificadamente al menos dos alternativas.
 - [ ] **P1-2.3** Definir responsabilidades y límites.
 - [ ] **P1-2.4** Distinguir módulos, despliegues y propiedad de datos.
@@ -146,8 +146,9 @@
 
 | ID Artefacto | Nombre del Artefacto | Versión | Estado | Descripción / Contenido |
 | :--- | :--- | :--- | :--- | :--- |
-| **P1-ART-001** | Registro Maestro P1 | v1.1 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones, hechos, supuestos, preguntas abiertas, trazabilidad y bitácora. |
-| **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.0 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio (P1-1.1 cerrado con aprobación del usuario). |
+| **P1-ART-001** | Registro Maestro P1 | v1.2 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones, hechos, supuestos, preguntas abiertas, trazabilidad y bitácora. |
+| **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio (P1-1.1 cerrado con aprobación del usuario; P1-1.2 a P1-1.5 consolidados). |
+| **P1-ART-003** | Arquitectura y Componentes | v0.1 | `[~]` Elaborado | Comparación técnica de los 4 estilos arquitectónicos frente a los retos del caso y propuesta de boundaries para decisión. |
 
 ---
 
@@ -184,6 +185,7 @@
 - **2026-10-27 (Sesión Inicial - Paso 4):** Reclasificación en el Registro Maestro: `P1-SUP-001/002` a hechos explícitos (`P1-HEC-001/002`), `P1-SUP-003/004` a preguntas abiertas (`P1-PA-001/002`), y `P1-CON-001` a desafío técnico (`P1-RIE-001`). Corrección y verificación formal del recuento exacto de tareas (72 totales: 4 aprobadas, 1 en progreso, 67 pendientes).
 - **2026-10-27 (Sesión Inicial - Paso 5):** Aprobación del usuario para P1-1.1 y cambio a política de autonomía con versionado real en GitHub. Inicialización del repositorio local en `main`, configuración del remoto oficial `https://github.com/navyri/liga-de-apuestas.git`, creación de `README.md` y `.gitignore`. Commit inicial `3b58a4b` publicado exitosamente.
 - **2026-10-27 (Sesión Inicial - Paso 6):** Desarrollo y revisión autónoma de los subpasos P1-1.2, P1-1.3, P1-1.4 y P1-1.5 en `P1-ART-002 v1.1`. Cierre formal de la Etapa P1-1 (5/5 tareas en `[x]`). Actualización de matriz de trazabilidad y conteos de progreso.
+- **2026-10-27 (Sesión Inicial - Paso 7):** Elaboración de `P1-2.1` en `P1-ART-003 v0.1` (`02_arquitectura_y_componentes.md`): comparación de 4 estilos frente a coherencia, cierre, latencia, ráfaga de 10k ops/s, liquidación y costos. Actualización del README principal con identidad visual adaptada, badges reales e índice completo.
 
 ---
 

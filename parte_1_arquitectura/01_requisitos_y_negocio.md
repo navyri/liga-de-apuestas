@@ -139,7 +139,11 @@ Los invariantes son condiciones formales de corrección que el sistema jamás pu
      $$f(f(op)) = f(op)$$
 5. **Invariante de Registro Inmutable y Solo Lectura en Auditoría (PDF pág. 7, 8):**
    - *Regla:* Trazabilidad absoluta de eventos contables y de resultados.
-   - *Invariante:* Toda mutación sobre saldos, creación de apuestas, cambios de estado de carreras o resultados genera un registro inmutable append-only. El rol Auditor posee permisos exclusivos de solo lectura y no puede mutar ni suprimir registros.
+   - *Invariante:* Toda mutación sobre saldos, creación de apuestas, cambios de estado de carreras o resultados genera un registro inmutable.
+   - *Aclaración conceptual:*
+     - **Append-only:** Propiedad estructural del modelo de datos donde se permite insertar nuevos registros cronológicos de eventos sin modificar ni sobrescribir los registros preexistentes.
+     - **Solo lectura:** Política de permisos y control de acceso asignada al rol Auditor en el plano de autorización.
+     - La protección física y lógica efectiva contra alteraciones (como firmas criptográficas, inmutabilidad a nivel de almacenamiento o políticas WORM) se diseñará y justificará formalmente en las etapas de persistencia y seguridad.
 
 ---
 
