@@ -2,87 +2,132 @@
 **Caso:** La Gran Liga de Apuestas de Medianos EIA  
 **Organización:** Salchipapa Maker Racing S.A.S.  
 **Artefacto:** `P1-ART-003`  
-**Versión:** `v0.1` (Borrador técnico para decisión)  
-**Estado:** `[~]` Elaborado pendiente de decisión del usuario para P1-2.2  
+**Versión:** `v1.0`  
+**Estado:** `[x]` Consolidado (Estilo arquitectónico aprobado por el usuario; desglose de límites y componentes verificado por revisión autónoma)  
 
 ---
 
-## P1-2.1: COMPARACIÓN TÉCNICA DE ESTILOS ARQUITECTÓNICOS
+## P1-2.1 Y P1-2.2: DECISIÓN 1 — ESTILO ARQUITECTÓNICO APROBADO
 
-### 1. Marco Metodológico de Comparación
-Para responder a la **Decisión 1** del PDF (pág. 13), se evalúan cuatro estilos arquitectónicos fundamentales:
-1. **Monolito Tradicional (Monolito no modular / acoplado):** Todo el sistema se compila, empaqueta y ejecuta como un único artefacto desplegable con acoplamiento interno en código y base de datos compartida.
-2. **Monolito Modular:** Sistema estructurado internamente en módulos funcionales con límites estrictos, interfaces públicas bien definidas y bajo acoplamiento en código. Puede desplegarse como un único proceso o replicarse horizontalmente en múltiples instancias idénticas, compartiendo esquemas lógicos o una base de datos centralizada.
-3. **Microservicios Puros:** Descomposición total de las 9 capacidades del negocio en servicios autónomos e independientes, cada uno como una unidad de despliegue aislada y con su propia base de datos privada (*database-per-service*).
-4. **Arquitectura Híbrida (Monolito Modular Central + Servicios Especializados Desacoplados):** Núcleo transaccional de alta cohesión (carreras, apuestas, billetera) organizado como módulos con boundaries estrictos, complementado con componentes o servicios autónomos extraídos específicamente para cargas con ciclos de vida y perfiles de escalamiento asimétricos (ej. analítica/estadísticas y procesamiento de notificaciones).
+### 1. Dirección Arquitectónica Aprobada: Arquitectura Híbrida
+Se adopta formalmente una **Arquitectura Híbrida** estructurada a partir de un **Núcleo Modular Transaccional (Core Modular)** complementado con **Componentes y Workers Asíncronos Desacoplados**.
 
-> [!IMPORTANT]
-> **Distinción Conceptual Clave:**
-> - **Módulo Lógico:** Límite de encapsulamiento a nivel de código y lógica de dominio (ej. módulo de billetera, módulo de carreras).
-> - **Unidad Desplegable:** Proceso en ejecución independiente en el sistema operativo o contenedor (un monolito modular puede desplegarse en $N$ instancias idénticas detrás de un balanceador de carga; no equivale a "una sola instancia").
-> - **Base de Datos:** Almacén de persistencia físico o lógico (instancia de BD, esquema, o réplica). El rendimiento depende del modelo de concurrencia y de datos, no del estilo arquitectónico por sí solo.
+> **Fundamento metodológico y precisión de garantías:**  
+> La elección de este estilo **no garantiza por sí sola** el cumplimiento de la respuesta en menos de un segundo, la absorción de 10.000 apuestas/s ni el cierre exacto. Su mérito radica en que **elimina dependencias de red distribuidas intermedias en la ruta crítica** y simplifica el plano de consistencia al permitir transacciones locales para el débito y la apuesta, facilitando el diseño de los mecanismos específicos de concurrencia, particionamiento, durabilidad e idempotencia que se validarán en las etapas posteriores.
 
----
+### 2. Estructura General del Estilo Aprobado
+1. **Núcleo Transaccional Modular (Core Monolith replicable):**
+   - Agrupa con límites estrictos de módulo: *Usuarios/Autenticación*, *Medianos*, *Carreras*, *Apuestas* y *Billetera de EIA Coins*.
+   - **Frontera transaccional estricta:** La verificación de saldo, la deducción de EIA Coins y la persistencia de la apuesta admitida se diseñan para ejecutarse dentro de una **misma transacción local atómica**, suprimiendo la necesidad de protocolos de coordinación distribuida (2PC o Sagas con compensación) en la ruta crítica de admisión.
+2. **Componentes y Workers Desacoplados de la Ruta Crítica:**
+   - **Servicio Autónomo de Notificaciones:** Desacoplado físicamente para que cualquier fallo o lentitud en canales externos (push, correo) jamás bloquee el flujo de admisión de apuestas.
+   - **Pipeline y Servicio de Analítica / Estadísticas:** Desacoplado del motor transaccional, alimentado por eventos para no canibalizar recursos de base de datos durante las consultas analíticas pesadas.
+   - **Proceso / Worker de Liquidación Masiva y Devoluciones:** Proceso especializado que procesa el cálculo y dispersión masiva de premios fuera del hilo interactivo de los usuarios.
 
-### 2. Evaluación de los Estilos frente a los Desafíos del Caso
+### 3. Justificación del Descarte de Alternativas (Obligatorio PDF pág. 13)
 
-#### A. Coherencia entre Apuesta y Descuento
-- **Monolito Tradicional / Monolito Modular:** Permite ejecutar la comprobación de saldo, la deducción de EIA Coins y la inserción de la apuesta dentro de una **transacción ACID local** en la base de datos relacional. Garantiza consistencia fuerte sin necesidad de protocolos de coordinación distribuida (evita fallos de red intermedios entre apuesta y billetera).
-- **Microservicios Puros:** Al separar "Apuestas" y "Billetera" en servicios y bases de datos independientes, la operación requiere coordinación distribuida (patrón Saga con compensación o 2PC). Una falla en el servicio de billetera tras registrar la apuesta exige transacciones compensatorias complejas, aumentando el riesgo de inconsistencia temporal o saldo negativo si no se aísla adecuadamente bajo alta concurrencia.
-- **Arquitectura Híbrida:** Si las capacidades transaccionales críticas (apuestas y billetera) residen dentro del mismo límite o comparten un mecanismo transaccional atómico local, se preserva la consistencia fuerte ACID para el débito y registro, eliminando la complejidad de sagas en la ruta crítica de 1 segundo.
+#### A. Descarte de Microservicios Puros
+- **Justificación técnica:** Una descomposición en microservicios independientes con bases de datos privadas para cada capacidad introduce una sobrecarga significativa de coordinación distribuida. Exigiría implementar orquestación o coreografía de Sagas y transacciones compensatorias complejas únicamente para sincronizar el débito en billetera con el registro de la apuesta, incrementando el riesgo de condiciones de carrera y exposición a saldo negativo bajo concurrencia masiva.
+- **Criterio de gobernanza y costo:** La complejidad operativa (service discovery, distributed tracing, mTLS, múltiples esquemas de despliegue y particionamiento) resulta desproporcionada frente a las necesidades operativas de Salchipapa Maker Racing S.A.S., contraviniendo la regla rectora de Dyllan sobre evitar costos y complejidad innecesarios (PDF pág. 12, 19, 20). *(Nota: El descarte se fundamenta en la complejidad de consistencia, operación y costo, no en una incapacidad intrínseca de rendimiento).*
 
-#### B. Cierre Estricto de Apuestas (según reloj del servidor)
-- **Monolito / Monolito Modular:** La validación de tiempo se ejecuta directamente contra la marca temporal del servidor de aplicaciones o el motor de base de datos local en el instante de la transacción: `IF server_time >= race.start_time THEN REJECT`. Cero desfase de red entre servicios para verificar el corte.
-- **Microservicios Puros:** Requiere sincronización precisa de relojes (NTP) entre múltiples instancias de servicios distintos o consultas remotas de estado entre el servicio de apuestas y el servicio de carreras, introduciendo latencia de red y riesgo de admitir apuestas desfasadas por retraso en la propagación de eventos de cierre.
-- **Arquitectura Híbrida:** El núcleo transaccional valida la regla de corte en memoria o en el registro de carrera local en microsegundos, asegurando el rechazo irrevocable e independiente de intervención humana.
-
-#### C. Pico de 10.000 Apuestas por Segundo durante 30 Segundos (300.000 apuestas)
-- **Monolito Tradicional:** Puede escalar horizontalmente sus instancias web/API, pero la base de datos centralizada sufre contención extrema en bloqueos de fila de saldo si muchos usuarios apuestan en paralelo. El acoplamiento interno de código dificulta optimizar la ruta crítica sin afectar el resto del sistema.
-- **Monolito Modular:** Puede desplegarse en un grupo escalado de instancias idénticas optimizadas. Los límites de módulos permiten implementar particionamiento lógico o buffers específicos para apuestas. Sin embargo, si todas las capacidades (incluida analítica pesada) comparten el mismo pool de recursos de BD, las consultas complejas pueden canibalizar la capacidad transaccional del pico de apuestas.
-- **Microservicios Puros:** Permite escalar masivamente solo el servicio de apuestas. No obstante, si el servicio de apuestas debe consultar síncronamente al servicio de billetera y al de usuarios 10.000 veces por segundo por HTTP/gRPC, se produce una cascada de llamadas de red (10k req/s $\times$ saltos de red = alta latencia y saturación de conexiones distribuidas).
-- **Arquitectura Híbrida:** Aísla el pico permitiendo que las unidades que reciben la carga escalen horizontalmente, manteniendo la validación de apuesta y saldo con mínima latencia de red (comunicación in-process o mensajería de alta velocidad) y aislando completamente las cargas pesadas de estadísticas y notificaciones para que no consuman recursos del flujo transaccional.
-
-#### D. Respuesta en Menos de 1 Segundo al Usuario
-- **Monolito / Monolito Modular:** Al no requerir saltos de red adicionales entre módulos de negocio para validar usuario, carrera, saldo y apuesta, el tiempo de procesamiento interno es típicamente del orden de decenas de milisegundos ($< 50\text{ ms}$), dejando un amplio margen para la latencia de red del cliente ($< 1\text{ s}$).
-- **Microservicios Puros:** Cada salto de red (API Gateway $\to$ Servicio Apuestas $\to$ Servicio Billetera $\to$ Servicio Carreras) agrega serialización, deserialización, latencia de red y riesgo de cola en cada salto. Bajo 10.000 req/s, la amplificación de colas en servicios aguas abajo puede degradar rápidamente la latencia por encima de 1 segundo (problema del eslabón más lento / *tail latency*).
-- **Arquitectura Híbrida:** Minimiza los saltos de red en la ruta crítica del usuario a lo estrictamente necesario (API Gateway $\to$ Núcleo de Apuestas/Billetera), resolviendo la aceptación/rechazo en milisegundos y difiriendo el resto (notificaciones, analítica) a procesos asíncronos.
-
-#### E. Liquidación Masiva (< 15 minutos para > 1.000.000 de apuestas)
-- **Monolito Tradicional:** Ejecutar el cálculo y actualización de 1 millón de registros dentro del hilo principal del monolito puede bloquear las transacciones operativas y degradar la base de datos.
-- **Monolito Modular:** Puede ejecutar un worker en un proceso separado pero reutilizando la lógica del módulo de premios y billetera. Requiere diseñar la liquidación en lotes paralelos (*chunking*).
-- **Microservicios Puros:** El servicio de premios debe emitir 1 millón de llamadas HTTP o mensajes individuales al servicio de billetera. Si se hace mediante peticiones HTTP síncronas una por una (desaconsejado explícitamente en el PDF pág. 6), se saturaría la red y se excedería el límite de 15 minutos ($1.000.000 / 900\text{ s} \approx 1.111\text{ ops/s}$ sostenidas de acreditación). Exige mensajería asíncrona particionada.
-- **Arquitectura Híbrida:** Permite desacoplar la liquidación mediante un proceso/worker especializado que consume el evento de carrera finalizada, calcula los premios y despacha la acreditación en lotes concurrentes particionados por usuario, cumpliendo holgadamente el plazo de 15 minutos sin impactar las lecturas de los apostadores.
-
-#### F. Fallos, Operación y Costos (Regla de Dyllan: "No infraestructura de Netflix")
-- **Monolito Tradicional:** Operación muy económica y simple, pero frágil: una fuga de memoria en analítica o un colapso en el procesamiento de notificaciones puede tumbar todo el sitio.
-- **Monolito Modular:** Excelente balance de costos. Infraestructura compartida eficiente (servidores o contenedores estándar, una o dos instancias de BD administradas con réplicas de lectura). Alta mantenibilidad gracias a los límites de código claros.
-- **Microservicios Puros:** Costo operativo y financiero desmedido para este caso. 9 microservicios con sus propias bases de datos, service discovery, distributed tracing, API gateways complejos, mTLS y balanceadores violan directamente la restricción de Dyllan (PDF pág. 12, 19, 20: *"crear 42 microservicios, 17 bases de datos... es una excelente manera de conseguir que Dyllan despida al equipo"*).
-- **Arquitectura Híbrida:** Cumple estrictamente la regla de costos: consolida la mayoría de las capacidades en un servicio modular desplegable (evitando sobrecostos de múltiples clústeres y bases de datos aisladas), y solo segrega en componentes autónomos lo que estrictamente lo justifica por asimetría de carga o desacoplamiento de fallos (notificaciones y analítica).
+#### B. Descarte del Monolito Tradicional (Acoplado / No modular)
+- **Justificación técnica:** Un monolito convencional sin fronteras modulares estrictas propaga fallos entre dominios dispares: una degradación en el despacho de notificaciones externas puede agotar el pool de hilos o conexiones HTTP, bloqueando la recepción de apuestas legítimas.
+- **Contención de recursos:** La ingesta diaria de millones de registros analíticos y la ejecución de consultas pesadas de tendencias competirían directamente por los mismos recursos de memoria y bloqueos de almacenamiento que el pico de apuestas previo al cierre.
 
 ---
 
-### 3. Matriz Comparativa Justificada (Sin puntuaciones arbitrarias)
+## P1-2.3: DEFINICIÓN DE RESPONSABILIDADES, LÍMITES Y UBICACIÓN DE CAPACIDADES
 
-| Criterio de Decisión | Monolito Tradicional | Monolito Modular | Microservicios Puros | Arquitectura Híbrida (Recomendada) |
+A continuación se formaliza la ubicación arquitectónica de las nueve capacidades del negocio, integrando expresamente los dominios de **Resultados**, **Liquidación de Premios**, **Devoluciones** y **Auditoría / Control de Fraude**:
+
+```text
+ ┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                              ZONA PRIVADA / NÚCLEO TRANSACCIONAL                             │
+ │                                                                                              │
+ │   ┌──────────────────────────────────────────────────────────────────────────────────────┐   │
+ │   │                   NÚCLEO MODULAR COHESIVO (Unidad Desplegable Web/API)               │   │
+ │   │                                                                                      │   │
+ │   │  [Módulo Usuarios/Auth]       [Módulo Medianos]          [Módulo Carreras]           │   │
+ │   │  - Credenciales y RBAC        - Ficha de competidor      - Ciclo de estados          │   │
+ │   │  - Validación de sesión       - Historial y estado       - Verificación hora cierre  │   │
+ │   │                                                          - Registro resultado oficial│   │
+ │   │                                                                                      │   │
+ │   │  [Módulo Apuestas] ◄──────── (Transacción Local ACID) ────────► [Módulo Billetera]   │   │
+ │   │  - Admisión y filtros                                    - Saldo de EIA Coins        │   │
+ │   │  - Idempotencia de intención                             - Débito inmediato          │   │
+ │   │  - Registro de apuesta                                   - Anti-doble gasto          │   │
+ │   └──────────────────────────────────────────┬───────────────────────────────────────────┘   │
+ │                                              │ Eventos de Dominio / Outbox                   │
+ └──────────────────────────────────────────────┼───────────────────────────────────────────────┘
+                                                ▼
+ ┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                      COMPONENTES Y WORKERS FUERA DE LA RUTA CRÍTICA                          │
+ │                                                                                              │
+ │   ┌────────────────────────┐  ┌────────────────────────┐  ┌──────────────────────────────┐   │
+ │   │   WORKER LIQUIDACIÓN   │  │ SERVICIO NOTIFICACIONES│  │     SERVICIO ANALÍTICA       │   │
+ │   │    Y DEVOLUCIONES      │  │  (Unidad Desplegable)  │  │    (Unidad Desplegable)      │   │
+ │   │ (Proceso Especializado)│  │                        │  │                              │   │
+ │   │ - Detección ganadores  │  │ - Consumo de eventos   │  │ - Ingesta masiva diaria      │   │
+ │   │ - Cálculo Pari-Mutuel  │  │ - Enrutamiento multican│  │ - Agregación de tendencias   │   │
+ │   │ - Dispersión en lotes  │  │ - Reintentos aislados  │  │ - Almacén analítico dedicado │   │
+ │   │ - Dispersión reembolsos│  │ - Falla no frena Core  │  │ - Reportes premium diferidos │   │
+ │   └───────────┬────────────┘  └────────────────────────┘  └──────────────────────────────┘   │
+ │               │                                                                              │
+ │               ▼ Acreditación en Billetera                                                    │
+ │   ┌──────────────────────────────────────────────────────────────────────────────────────┐   │
+ │   │              MÓDULO DE AUDITORÍA Y CONTROL DE FRAUDE (Transversal)                   │   │
+ │   │ - Registro append-only inmutable de apuestas, transacciones, resultados y premios     │   │
+ │   │ - Consola de consulta de Solo Lectura para el rol Auditor                            │   │
+ │   │ - Detección asíncrona de anomalías de cierre y concurrencia por dispositivo          │   │
+ │   └──────────────────────────────────────────────────────────────────────────────────────┘   │
+ └──────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Tabla de Ubicación y Frontera Transaccional de Responsabilidades
+
+| Capacidad / Responsabilidad | Módulo Lógico | Unidad Desplegable | Frontera Transaccional | Justificación de Ubicación |
 | :--- | :--- | :--- | :--- | :--- |
-| **Coherencia Apuesta-Descuento** | Muy alta (ACID local directa). | Muy alta (ACID local modular). | Baja (requiere transacciones distribuidas o Sagas complejas). | Alta / Muy alta (transacción local en núcleo o mensajería atómica). |
-| **Latencia en Ruta Crítica (< 1 s)** | Óptima (cero saltos de red internos). | Óptima (cero saltos de red internos). | Riesgo alto (múltiples saltos de red HTTP/gRPC bajo carga). | Óptima (salto único en borde, procesamiento atómico). |
-| **Resiliencia ante Fallos de Notificaciones** | Pobre (falla de notificaciones puede bloquear la petición si no se aísla). | Media/Alta (requiere aislamiento estricto de hilos/colas internas). | Muy alta (aislamiento físico total de procesos y fallas). | Muy alta (componente de notificaciones físicamente desacoplado). |
-| **Aislamiento de Analítica (Millones de regs.)** | Muy bajo (consultas pesadas saturan la BD transaccional). | Medio (requiere réplicas de lectura dedicadas). | Total (almacén analítico completamente segregado). | Total (ingesta de eventos hacia almacén analítico especializado). |
-| **Costo y Complejidad Operativa (Regla Dyllan)** | Mínimo costo, pero alto riesgo de deuda técnica y bloqueo. | Mínimo a moderado (excelente ratio costo/eficiencia). | Máximo (infraestructura desproporcionada para el problema). | Moderado y controlado (máximo rendimiento sin sobrecosto). |
+| **Usuarios y Autenticación** | `UsersModule` | Núcleo Modular (Core) | Dentro de frontera | Autenticación y validación de permisos de sesión en memoria/borde sin llamadas remotas. |
+| **Medianos** | `RacersModule` | Núcleo Modular (Core) | Lectura local / Caché | Datos maestros de baja volatilidad consultados directamente al validar la apuesta. |
+| **Carreras (Programación y Cierre)** | `RacesModule` | Núcleo Modular (Core) | Dentro de frontera | El control del reloj del servidor y el estado de la carrera (`ABIERTA`/`CERRADA`) deben validarse atómicamente al recibir la apuesta. |
+| **Apuestas (Admisión e Idempotencia)** | `BetsModule` | Núcleo Modular (Core) | **Ruta crítica transaccional** | Debe coordinarse atómicamente con la billetera para admitir la jugada. |
+| **Billetera de EIA Coins (Débito)** | `WalletModule` | Núcleo Modular (Core) | **Ruta crítica transaccional** | Descuento atómico junto a la apuesta para garantizar que no exista saldo negativo. |
+| **Recepción de Resultado Oficial** | `RacesModule` | Núcleo Modular (Core) | Transaccional administrativa | Sellado formal del ganador oficial por el Operador, disparando el evento de cierre de ciclo. |
+| **Liquidación de Premios** | `SettlementModule` | Worker de Liquidación | **Fuera de la ruta crítica** | El cálculo sobre más de 1.000.000 de apuestas y la acreditación masiva se ejecutan asíncronamente en lotes para no bloquear peticiones HTTP. |
+| **Devoluciones por Cancelación** | `SettlementModule` | Worker de Liquidación | **Fuera de la ruta crítica** | Si la carrera pasa a `CANCELADA`, un proceso batch dispersa el 100% de los reembolsos a las billeteras de manera controlada. |
+| **Notificaciones** | `NotificationService` | Servicio Autónomo | **Fuera de la ruta crítica** | Su fallo no debe afectar el registro transaccional; consume eventos de dominio mediante colas. |
+| **Estadísticas y Analítica** | `AnalyticsService` | Servicio Autónomo | **Fuera de la ruta crítica** | Procesa millones de eventos diarios en un almacén optimizado para lecturas agregadas sin sobrecargar la base de datos operativa. |
+| **Auditoría y Control de Fraude** | `AuditModule` | Núcleo Core + Almacén Inmutable | Híbrida (Registro local + Análisis asíncrono) | Las mutaciones generan un registro de auditoría append-only atómico; el análisis forense y la consulta de solo lectura se ejecutan en réplica dedicada. |
 
 ---
 
-### 4. Propuesta de Decisión y Alternativas Descartadas (Para consulta de aprobación)
+## P1-2.4: DISTINCIÓN ENTRE MÓDULOS, UNIDADES DESPLEGABLES Y PROPIEDAD DE DATOS
 
-#### A. Estilo Recomendado: Arquitectura Híbrida (Monolito Modular Transaccional + Servicios Asíncronos Desacoplados)
-- **Núcleo Transaccional Modular (Core Monolith):** Agrupa las capacidades fuertemente cohesivas: *Usuarios/Auth*, *Medianos*, *Carreras*, *Apuestas* y *Billetera*. Se organiza internamente mediante módulos desacoplados con límites estrictos. Maneja la validación y el descuento atómico de EIA Coins sin latencias de red distribuidas, garantizando respuesta en menos de 1 segundo y prevención de saldo negativo.
-- **Servicio de Notificaciones Autónomo:** Desacoplado físicamente del flujo de apuestas (PDF pág. 7: *"Una falla en el sistema de notificaciones no debería impedir que una apuesta sea registrada"*). Consume eventos asíncronos y gestiona sus propios reintentos y canales externos (push, correo).
-- **Servicio / Pipeline de Analítica y Estadísticas:** Desacoplado físicamente del motor transaccional. Consume eventos de plataforma y alimenta un almacén optimizado para consultas agregadas y reportes premium sin degradar la base de datos de apuestas.
-- **Worker de Liquidación Masiva:** Proceso especializado que ejecuta el cálculo y dispersión masiva de premios sin bloquear el tráfico interactivo de los usuarios.
+Para evitar acoplamientos ocultos y respetar la regla de Dyllan, se formalizan las tres dimensiones arquitectónicas:
 
-#### B. Alternativas Descartadas Obligatorias (PDF pág. 13)
-1. **Descarte de Microservicios Puros (Microservicios de grano fino para cada capacidad):**
-   - *Razón técnica:* Introducir 9 microservicios con bases de datos segregadas para un sistema de medianos generaría una sobrecarga innecesaria de red (latencia acumulada de llamadas gRPC/REST) que pondría en grave riesgo la respuesta en menos de 1 segundo bajo 10.000 apuestas/s. Además, exigiría implementar transacciones distribuidas (Sagas) para el débito de saldo y registro de apuesta, elevando el riesgo de condiciones de carrera y saldo negativo. Viola directamente la directriz de costo y sobredimensionamiento de Dyllan (PDF pág. 12, 19, 20).
-2. **Descarte del Monolito Tradicional (No modular / monolito clásico enredado):**
-   - *Razón técnica:* Carece de límites arquitectónicos formales. La ingesta masiva de analítica diaria (millones de registros) y la generación de reportes competirían por los mismos bloqueos de recursos y memoria que el pico de 10.000 apuestas/s. Asimismo, una falla o lentitud en los proveedores externos de notificaciones (correo/push) podría saturar el pool de conexiones de la aplicación y bloquear la aceptación de apuestas, violando el requisito explícito de desacoplamiento de fallos (PDF pág. 7).
+1. **Módulos Lógicos (Estructura de Código):**  
+   Encapsulan lógica de negocio, entidades y reglas en paquetes con interfaces explícitas. Un módulo no puede consultar directamente las tablas internas de otro módulo ni mutar sus estructuras en memoria; toda interacción interna se realiza mediante contratos de interfaz de dominio.
+2. **Unidades Desplegables (Procesos en Ejecución):**
+   - **`core-api`:** Servicio web/API escalable que contiene el Núcleo Modular Transaccional. Recibe el tráfico de apostadores y operadores.
+   - **`settlement-worker`:** Proceso en segundo plano dedicado a la liquidación masiva de premios y dispersión de devoluciones.
+   - **`notification-service`:** Demonio/consumidor independiente para despacho de mensajes multicanal.
+   - **`analytics-service`:** Pipeline y API de consulta analítica especializada.
+3. **Propiedad y Almacenamiento de Datos:**
+   - **Base de Datos Operativa Transaccional (OLTP):** Propiedad exclusiva del Núcleo Modular. Aloja esquemas aislados para usuarios, carreras, apuestas, billetera y libro contable. Soporta transacciones ACID locales.
+   - **Almacén Analítico e Histórico (OLAP):** Propiedad exclusiva del servicio de analítica. Esquema desnormalizado optimizado para consultas agregadas masivas y retención histórica de 5 años.
+   - **Aislamiento de Recursos:** El almacén analítico se encuentra físicamente separado del almacén transaccional operativo, impidiendo que la generación de reportes premium degrade el rendimiento de las apuestas.
+
+---
+
+## P1-2.5: ESTRATEGIA DE ESCALAMIENTO INDEPENDIENTE Y MITIGACIÓN DE CUELLOS DE BOTELLA
+
+### 1. Escalamiento Horizontal del Núcleo Modular (`core-api`)
+- El Núcleo Modular se despliega en **múltiples instancias idénticas** detrás de un balanceador de carga con terminación TLS.
+- Las instancias son completamente *stateless* a nivel de sesión HTTP (autenticación mediante tokens criptográficos verificables localmente sin consulta de sesión a base de datos).
+
+### 2. Cuellos de Botella del Almacenamiento Compartido y Mitigaciones
+- **Desafío:** Al tener múltiples instancias de `core-api` concurriendo sobre la misma base de datos operativa durante el pico de 10.000 apuestas/s, el cuello de botella físico se traslada a los bloqueos de fila de saldo de billetera y contención en la tabla de apuestas.
+- **Estrategia de mitigación arquitectónica:**
+  1. *Particionamiento lógico por usuario:* Las actualizaciones de saldo se bloquean estrictamente a nivel del registro individual de cada usuario (`SELECT FOR UPDATE` sobre la fila del usuario), evitando bloqueos de tabla. Como un usuario emite un número finito de apuestas, la contención ocurre por usuario y no globalmente.
+  2. *Separación de lecturas y escrituras:* Las consultas masivas de cuotas estimadas, catálogo de medianos y perfiles de carreras son atendidas mediante réplicas de lectura y mecanismos de almacenamiento en caché en memoria, reservando el nodo primario de base de datos exclusivamente para inserciones de apuestas y débitos.
+  3. *Aislamiento del Worker de Liquidación:* Durante la liquidación masiva posterior al cierre, el worker procesa las acreditaciones en bloques (*chunks*) con límites de concurrencia para no saturar las conexiones ni bloquear la base de datos transaccional si hay otra carrera abierta en paralelo.

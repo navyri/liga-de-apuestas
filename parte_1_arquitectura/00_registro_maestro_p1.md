@@ -36,11 +36,11 @@
 - [x] **P1-1.5** Ambigüedades y supuestos. *(Completado y verificado por revisión autónoma)*.
 
 ### ETAPA P1-2 — Arquitectura y componentes
-- [~] **P1-2.1** Comparar estilos arquitectónicos. *(Elaborado en P1-ART-003; pendiente de decisión de estilo en P1-2.2)*.
-- [ ] **P1-2.2** Elegir estilo y descartar justificadamente al menos dos alternativas.
-- [ ] **P1-2.3** Definir responsabilidades y límites.
-- [ ] **P1-2.4** Distinguir módulos, despliegues y propiedad de datos.
-- [ ] **P1-2.5** Definir escalamiento independiente.
+- [x] **P1-2.1** Comparar estilos arquitectónicos. *(Completado y consolidado)*.
+- [x] **P1-2.2** Elegir estilo y descartar justificadamente al menos dos alternativas. *(Aprobado formalmente por el usuario: P1-DEC-001)*.
+- [x] **P1-2.3** Definir responsabilidades y límites. *(Completado y verificado por revisión autónoma)*.
+- [x] **P1-2.4** Distinguir módulos, despliegues y propiedad de datos. *(Completado y verificado por revisión autónoma)*.
+- [x] **P1-2.5** Definir escalamiento independiente. *(Completado y verificado por revisión autónoma)*.
 
 ### ETAPA P1-3 — Flujo crítico y comunicación síncrona
 - [ ] **P1-3.1** Flujo completo de aceptación/rechazo de apuesta.
@@ -119,8 +119,8 @@
 ---
 
 ## 2. REGISTRO DE DECISIONES ARQUITECTÓNICAS (ADR) Y DECISIONES TÉCNICAS
-- **Decisiones aprobadas:** Ninguna hasta el momento.
-- **Decisiones propuestas:** Ninguna en esta etapa (se explorarán y justificarán a partir de P1-2).
+- **P1-DEC-001 (Aprobada por el usuario):** Adopción de la **Arquitectura Híbrida** (Núcleo Modular Transaccional para usuarios, medianos, carreras, apuestas y billetera, con servicios/workers desacoplados para notificaciones, analítica y liquidación masiva). Descarte formal de Microservicios Puros y Monolito Tradicional. Formalizada en `P1-ADR-001`.
+- **Decisiones propuestas pendientes:** Ninguna en esta etapa (se abordarán comunicaciones y brokers en P1-3 y P1-4).
 
 ---
 
@@ -146,9 +146,10 @@
 
 | ID Artefacto | Nombre del Artefacto | Versión | Estado | Descripción / Contenido |
 | :--- | :--- | :--- | :--- | :--- |
-| **P1-ART-001** | Registro Maestro P1 | v1.2 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones, hechos, supuestos, preguntas abiertas, trazabilidad y bitácora. |
-| **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio (P1-1.1 cerrado con aprobación del usuario; P1-1.2 a P1-1.5 consolidados). |
-| **P1-ART-003** | Arquitectura y Componentes | v0.1 | `[~]` Elaborado | Comparación técnica de los 4 estilos arquitectónicos frente a los retos del caso y propuesta de boundaries para decisión. |
+| **P1-ART-001** | Registro Maestro P1 | v1.3 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001), hechos, supuestos, trazabilidad y bitácora. |
+| **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio consolidadas. |
+| **P1-ART-003** | Arquitectura y Componentes | v1.0 | `[x]` Consolidado | Comparación de estilos, justificación de descartes, desglose de boundaries, módulos vs despliegues y modelo de escalamiento. |
+| **P1-ADR-001** | ADR-001: Estilo Arquitectónico | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la adopción de la Arquitectura Híbrida y descarte de alternativas. |
 
 ---
 
@@ -186,6 +187,7 @@
 - **2026-10-27 (Sesión Inicial - Paso 5):** Aprobación del usuario para P1-1.1 y cambio a política de autonomía con versionado real en GitHub. Inicialización del repositorio local en `main`, configuración del remoto oficial `https://github.com/navyri/liga-de-apuestas.git`, creación de `README.md` y `.gitignore`. Commit inicial `3b58a4b` publicado exitosamente.
 - **2026-10-27 (Sesión Inicial - Paso 6):** Desarrollo y revisión autónoma de los subpasos P1-1.2, P1-1.3, P1-1.4 y P1-1.5 en `P1-ART-002 v1.1`. Cierre formal de la Etapa P1-1 (5/5 tareas en `[x]`). Actualización de matriz de trazabilidad y conteos de progreso.
 - **2026-10-27 (Sesión Inicial - Paso 7):** Elaboración de `P1-2.1` en `P1-ART-003 v0.1` (`02_arquitectura_y_componentes.md`): comparación de 4 estilos frente a coherencia, cierre, latencia, ráfaga de 10k ops/s, liquidación y costos. Actualización del README principal con identidad visual adaptada, badges reales e índice completo.
+- **2026-10-27 (Sesión Inicial - Paso 8):** Aprobación del usuario para la Arquitectura Híbrida (`P1-DEC-001`). Incorporación de precisiones: apuesta-descuento en transacción local, matización de garantías de rendimiento, reajuste de motivos de descarte de microservicios, e inclusión explícita de Resultados, Liquidación, Devoluciones y Auditoría. Elaboración y verificación de `P1-2.3`, `P1-2.4` y `P1-2.5`. Redacción de `P1-ADR-001`. Cierre formal de la Etapa P1-2 (5/5 tareas en `[x]`).
 
 ---
 
