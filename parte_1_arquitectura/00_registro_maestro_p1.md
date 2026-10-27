@@ -60,15 +60,15 @@
 - [x] **P1-4.8** Publicación confiable entre persistencia y mensajería. *(Completado con Transactional Outbox)*.
 
 ### ETAPA P1-5 — Datos e idempotencia
-- [ ] **P1-5.1** Almacenamiento y propiedad.
-- [ ] **P1-5.2** Consistencia fuerte y eventual.
-- [ ] **P1-5.3** Concurrencia y prevención de saldo negativo.
-- [ ] **P1-5.4** Idempotencia en al menos tres operaciones.
-- [ ] **P1-5.5** Reintentos frente a apuestas legítimas nuevas.
-- [ ] **P1-5.6** Premios, comisión y devoluciones.
-- [ ] **P1-5.7** Supuestos de redondeo y ausencia de ganadores.
-- [ ] **P1-5.8** Histórico, analítica y auditoría de cinco años.
-- [ ] **P1-5.9** Justificar transacciones, outbox o sagas donde se necesiten.
+- [~] **P1-5.1** Almacenamiento y propiedad. *(Elaborado en P1-ART-006)*.
+- [~] **P1-5.2** Consistencia fuerte y eventual. *(Elaborado en P1-ART-006)*.
+- [~] **P1-5.3** Concurrencia y prevención de saldo negativo. *(Elaborado en P1-ART-006)*.
+- [~] **P1-5.4** Idempotencia en al menos tres operaciones. *(Elaborado en P1-ART-006)*.
+- [~] **P1-5.5** Reintentos frente a apuestas legítimas nuevas. *(Elaborado en P1-ART-006)*.
+- [~] **P1-5.6** Premios, comisión y devoluciones. *(Elaborado en P1-ART-006)*.
+- [~] **P1-5.7** Supuestos de redondeo y ausencia de ganadores. *(Pendiente de decisión del usuario: P1-PA-001 y P1-PA-002)*.
+- [~] **P1-5.8** Histórico, analítica y auditoría de cinco años. *(Elaborado en P1-ART-006)*.
+- [~] **P1-5.9** Justificar transacciones, outbox o sagas donde se necesiten. *(Elaborado en P1-ART-006)*.
 
 ### ETAPA P1-6 — Escalabilidad y fallos
 - [ ] **P1-6.1** Analizar 100.000 usuarios y 10.000 apuestas/s durante 30 segundos.
@@ -146,11 +146,12 @@
 
 | ID Artefacto | Nombre del Artefacto | Versión | Estado | Descripción / Contenido |
 | :--- | :--- | :--- | :--- | :--- |
-| **P1-ART-001** | Registro Maestro P1 | v1.6 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001/002), trazabilidad y bitácora. |
+| **P1-ART-001** | Registro Maestro P1 | v1.7 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001/002), trazabilidad y bitácora. |
 | **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio consolidadas. |
 | **P1-ART-003** | Arquitectura y Componentes | v1.0 | `[x]` Consolidado | Comparación de estilos, justificación de descartes, desglose de boundaries, módulos vs despliegues y modelo de escalamiento. |
 | **P1-ART-004** | Flujo Crítico y Comunicación Síncrona | v1.1 | `[x]` Consolidado | Secuencia integral de apuesta-descuento, consistencia local ACID, tabla síncrona formal y protocolo de incertidumbre de red. |
 | **P1-ART-005** | Mensajería y Comunicación Asíncrona | v1.0 | `[x]` Consolidado | Comparativa de brokers, catálogo canónico en español, tabla de eventos, topología de tópicos, particionamiento de liquidación y Transactional Outbox. |
+| **P1-ART-006** | Datos, Persistencia e Idempotencia | v0.1 | `[~]` Elaborado | Esquema OLTP vs OLAP, consistencia fuerte vs eventual, bloqueo de billetera, 3 casos de idempotencia y propuestas de redondeo/sin ganadores. |
 | **P1-ADR-001** | ADR-001: Estilo Arquitectónico | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la adopción de la Arquitectura Híbrida y descarte de alternativas. |
 | **P1-ADR-002** | ADR-002: Broker de Mensajería | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la selección de Apache Kafka como broker único y patrón Transactional Outbox. |
 
@@ -194,6 +195,7 @@
 - **2026-10-27 (Sesión Inicial - Paso 9):** Elaboración y consolidación autónoma de la Etapa P1-3 en `P1-ART-004 v1.0` (`03_flujo_critico_y_comunicacion.md`): secuencia atómica de apuesta y débito, tabla síncrona formal (Decisión 3), validación atómica de hora de cierre y protocolo de incertidumbre de red / timeouts con idempotency keys. Cierre de P1-3 (5/5 tareas en `[x]`).
 - **2026-10-27 (Sesión Inicial - Paso 10):** Elaboración de `P1-4.1` en `P1-ART-005 v0.1` (`04_mensajeria_y_eventos.md`): comparación técnica de RabbitMQ, Kafka, Ambos y Ninguno frente al pico de 10k eventos/s, múltiples consumidores independientes y reproducción para auditoría. Preparación para la consulta de la Decisión 5 (`P1-4.2`).
 - **2026-10-27 (Sesión Inicial - Paso 11):** Aprobación del usuario para Apache Kafka (`P1-DEC-002`) con precisiones de descarte proporcional, matización de tasas de eventos vs apuestas, delimitación de Kafka frente a auditoría a 5 años e idempotencia en replay. Ajuste en `P1-ART-004 v1.1` sobre estados de incertidumbre vs garantías de latencia. Consolidación de `P1-4.3` a `P1-4.8` en `P1-ART-005 v1.0` (eventos canónicos en español, tabla formal, topología con particionamiento de liquidación y Transactional Outbox). Redacción de `P1-ADR-002`. Cierre formal de la Etapa P1-4 (8/8 tareas en `[x]`).
+- **2026-10-27 (Sesión Inicial - Paso 12):** Elaboración técnica integral de la Etapa P1-5 en `P1-ART-006 v0.1` (`05_datos_e_idempotencia.md`): esquema de almacenamiento (OLTP en núcleo, OLAP analítico, WORM auditoría), consistencia fuerte vs eventual, prevención de saldo negativo con bloqueo de fila `FOR UPDATE`, idempotencia en 3 operaciones críticas, deduplicación de eventos y formulación de opciones para redondeo (`P1-PA-001`) y ausencia de ganadores (`P1-PA-002`).
 
 ---
 
