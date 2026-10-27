@@ -92,14 +92,14 @@
 - [x] **P1-7.7** Justificación de costos y complejidad. *(Completado bajo directriz de Dyllan)*.
 
 ### ETAPA P1-8 — Diagramas y ADR
-- [ ] **P1-8.1** Diagrama general.
-- [ ] **P1-8.2** Diferenciación síncrona/asíncrona.
-- [ ] **P1-8.3** Secuencia completa de apuesta y descuento.
-- [ ] **P1-8.4** Diagrama de mensajería.
-- [ ] **P1-8.5** ADR 1.
-- [ ] **P1-8.6** ADR 2.
-- [ ] **P1-8.7** ADR 3.
-- [ ] **P1-8.8** Revisión cruzada de artefactos.
+- [x] **P1-8.1** Diagrama general. *(Completado en Mermaid: P1-ART-009A)*.
+- [x] **P1-8.2** Diferenciación síncrona/asíncrona. *(Completado y verificado en diagrama general)*.
+- [x] **P1-8.3** Secuencia completa de apuesta y descuento. *(Completado en Mermaid: P1-ART-009B)*.
+- [x] **P1-8.4** Diagrama de mensajería. *(Completado en Mermaid: P1-ART-009C)*.
+- [x] **P1-8.5** ADR 1. *(Completado y aprobado: P1-ADR-001 Estilo Arquitectónico)*.
+- [x] **P1-8.6** ADR 2. *(Completado y aprobado: P1-ADR-002 Broker de Mensajería)*.
+- [x] **P1-8.7** ADR 3. *(Completado y aprobado: P1-ADR-003 Consistencia e Idempotencia)*.
+- [x] **P1-8.8** Revisión cruzada de artefactos. *(Completado y verificado entre todos los documentos)*.
 
 ### ETAPA P1-9 — Entrega
 - [ ] **P1-9.1** Arquitectura que implementaríamos hoy.
@@ -151,7 +151,7 @@
 
 | ID Artefacto | Nombre del Artefacto | Versión | Estado | Descripción / Contenido |
 | :--- | :--- | :--- | :--- | :--- |
-| **P1-ART-001** | Registro Maestro P1 | v2.0 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001 a 005), trazabilidad y bitácora. |
+| **P1-ART-001** | Registro Maestro P1 | v2.1 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001 a 005), trazabilidad y bitácora. |
 | **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio consolidadas. |
 | **P1-ART-003** | Arquitectura y Componentes | v1.0 | `[x]` Consolidado | Comparación de estilos, justificación de descartes, desglose de boundaries, módulos vs despliegues y modelo de escalamiento. |
 | **P1-ART-004** | Flujo Crítico y Comunicación Síncrona | v1.2 | `[x]` Consolidado | Secuencia integral de apuesta-descuento, consistencia local ACID, tabla síncrona formal y protocolo de incertidumbre de red vs latencia. |
@@ -159,6 +159,9 @@
 | **P1-ART-006** | Datos, Persistencia e Idempotencia | v1.0 | `[x]` Consolidado | Esquema OLTP vs OLAP, consistencia fuerte vs eventual, bloqueo `FOR UPDATE`, 3 casos de idempotencia, mayores restos y política de sin ganadores. |
 | **P1-ART-007** | Escalabilidad y Manejo de Fallos | v1.0 | `[x]` Consolidado | Análisis de ráfaga de 10k ops/s, presupuesto de latencia (<1s), cierre estricto, Casos A, B y C (opcional) de fallos y plan de validación. |
 | **P1-ART-008** | Seguridad, RBAC y Costos | v1.0 | `[x]` Consolidado | Matriz RBAC, rate limiting multinivel, gestión de credenciales, segmentación DMZ vs VPC privada y optimización económica de Dyllan. |
+| **P1-ART-009A**| Diagrama General de Arquitectura | v1.0 | `[x]` Consolidado | Diagrama Mermaid general con clientes, gateway, módulos core, BDs, Kafka y diferenciación síncrona/asíncrona. |
+| **P1-ART-009B**| Diagrama de Secuencia de Apuesta | v1.0 | `[x]` Consolidado | Diagrama Mermaid de secuencia paso a paso: rate limiting, ACID local, outbox, commit y respuesta determinista. |
+| **P1-ART-009C**| Topología de Mensajería | v1.0 | `[x]` Consolidado | Diagrama Mermaid de tópicos Kafka, particiones, claves de partición y grupos de consumidores independientes. |
 | **P1-ADR-001** | ADR-001: Estilo Arquitectónico | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la adopción de la Arquitectura Híbrida y descarte de alternativas. |
 | **P1-ADR-002** | ADR-002: Broker de Mensajería | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la selección de Apache Kafka como broker único y patrón Transactional Outbox. |
 | **P1-ADR-003** | ADR-003: Consistencia e Idempotencia | v1.0 | `[x]` Aprobado | Registro formal de decisión para consistencia local ACID, idempotencia por apuesta, mayores restos y reembolso ante ausencia de ganadores. |
@@ -207,6 +210,7 @@
 - **2026-10-27 (Sesión Inicial - Paso 13):** Inspección del repositorio de referencia del profesor `mlops2026` (`P1-HEC-003`). Incorporación de la política de mayores restos (`P1-DEC-003`) y ausencia de ganadores con reembolso 100% y motivo `SIN_APUESTAS_GANADORAS` (`P1-DEC-004`). Corrección de afirmaciones técnicas: Transactional Outbox desglosado en relay y at-least-once, particionamiento de liquidación por lotes (`batch_id`) con orden de bloqueo por usuario, idempotencia de premios vinculada a la apuesta (`P1-DEC-005`), delimitación rigurosa de WORM frente a replicación, y aclaración del estado incierto en cliente. Redacción de `P1-ADR-003`. Cierre formal de la Etapa P1-5 (9/9 tareas en `[x]`).
 - **2026-10-27 (Sesión Inicial - Paso 14):** Elaboración y consolidación de la Etapa P1-6 en `P1-ART-007 v1.0` (`06_escalabilidad_y_fallos.md`): análisis de cuellos de botella ante 100k usuarios y 10k apuestas/s, desglose de componentes que escalan vs los que no, presupuesto de latencia (<1s), cierre atómico en motor, liquidación masiva en 6-9 min, durabilidad RPO=0/RTO<30s, análisis de fallos Caso A (notificaciones), Caso B (billetera), resolución forense del Caso C opcional (corrección de foto de llegada) y plan de validación de métricas. Cierre formal de la Etapa P1-6 (10/10 tareas en `[x]`).
 - **2026-10-27 (Sesión Inicial - Paso 15):** Elaboración y consolidación de la Etapa P1-7 en `P1-ART-008 v1.0` (`07_seguridad_y_costos.md`): matriz formal RBAC (4 roles), protección de APIs y rate limiting por usuario/IP, cifrado en tránsito TLS 1.3 y reposo KMS, registro de acciones administrativas, aislamiento de red (DMZ pública vs VPC privada) y optimización de infraestructura cumpliendo la directriz de costos de Dyllan. Cierre formal de la Etapa P1-7 (7/7 tareas en `[x]`).
+- **2026-10-27 (Sesión Inicial - Paso 16):** Elaboración y consolidación de la Etapa P1-8 de Diagramas Oficiales y Revisión Cruzada: creación de `P1-ART-009A` (Diagrama General en Mermaid con diferenciación síncrona/asíncrona), `P1-ART-009B` (Diagrama de Secuencia de Apuesta completa) y `P1-ART-009C` (Topología de Mensajería Kafka con productores, tópicos, particiones y grupos). Verificación cruzada integral con los 3 ADRs aprobados. Cierre formal de la Etapa P1-8 (8/8 tareas en `[x]`).
 
 ---
 
