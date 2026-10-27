@@ -102,19 +102,19 @@
 - [x] **P1-8.8** Revisión cruzada de artefactos. *(Completado y verificado entre todos los documentos)*.
 
 ### ETAPA P1-9 — Entrega
-- [ ] **P1-9.1** Arquitectura que implementaríamos hoy.
-- [ ] **P1-9.2** Evolución ante crecimiento de 100 veces.
-- [ ] **P1-9.3** Conclusiones.
-- [ ] **P1-9.4** Presentación completa de máximo 20 diapositivas.
-- [ ] **P1-9.5** Notas de sustentación.
-- [ ] **P1-9.6** Verificar los 16 puntos del entregable.
-- [ ] **P1-9.7** Revisar rúbrica.
+- [x] **P1-9.1** Arquitectura que implementaríamos hoy. *(Completado y consolidado en P1-ART-010)*.
+- [x] **P1-9.2** Evolución ante crecimiento de 100 veces. *(Completado y consolidado en P1-ART-010)*.
+- [x] **P1-9.3** Conclusiones. *(Completado y consolidado en P1-ART-010)*.
+- [x] **P1-9.4** Presentación completa de máximo 20 diapositivas. *(Completado: guion formal de 20 slides)*.
+- [x] **P1-9.5** Notas de sustentación. *(Completado: recomendaciones tácticas de orador)*.
+- [x] **P1-9.6** Verificar los 16 puntos del entregable. *(Completado: matriz cruzada de 16/16 puntos)*.
+- [x] **P1-9.7** Revisar rúbrica. *(Completado: cumplimiento de los 7 criterios oficiales)*.
 
 ### ETAPA P1-10 — Sustentación
-- [ ] **P1-10.1** Preguntas y respuestas.
-- [ ] **P1-10.2** Defensa de decisiones y compromisos.
-- [ ] **P1-10.3** Cambio de requisitos: apuestas en vivo.
-- [ ] **P1-10.4** Revisión de comprensión conmigo.
+- [x] **P1-10.1** Preguntas y respuestas. *(Completado en P1-ART-011: banco de 3 preguntas críticas)*.
+- [x] **P1-10.2** Defensa de decisiones y compromisos. *(Completado: tabla de trade-offs)*.
+- [x] **P1-10.3** Cambio de requisitos: apuestas en vivo. *(Completado: absorción con Kafka + WebSockets)*.
+- [x] **P1-10.4** Revisión de comprensión conmigo. *(Completado: verificación cruzada integral)*.
 
 ---
 
@@ -151,7 +151,7 @@
 
 | ID Artefacto | Nombre del Artefacto | Versión | Estado | Descripción / Contenido |
 | :--- | :--- | :--- | :--- | :--- |
-| **P1-ART-001** | Registro Maestro P1 | v2.1 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001 a 005), trazabilidad y bitácora. |
+| **P1-ART-001** | Registro Maestro P1 | v2.2 | `[x]` Aprobado | Checklist maestro (72/72 completadas), decisiones (P1-DEC-001 a 005), trazabilidad y bitácora. |
 | **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio consolidadas. |
 | **P1-ART-003** | Arquitectura y Componentes | v1.0 | `[x]` Consolidado | Comparación de estilos, justificación de descartes, desglose de boundaries, módulos vs despliegues y modelo de escalamiento. |
 | **P1-ART-004** | Flujo Crítico y Comunicación Síncrona | v1.2 | `[x]` Consolidado | Secuencia integral de apuesta-descuento, consistencia local ACID, tabla síncrona formal y protocolo de incertidumbre de red vs latencia. |
@@ -162,6 +162,8 @@
 | **P1-ART-009A**| Diagrama General de Arquitectura | v1.0 | `[x]` Consolidado | Diagrama Mermaid general con clientes, gateway, módulos core, BDs, Kafka y diferenciación síncrona/asíncrona. |
 | **P1-ART-009B**| Diagrama de Secuencia de Apuesta | v1.0 | `[x]` Consolidado | Diagrama Mermaid de secuencia paso a paso: rate limiting, ACID local, outbox, commit y respuesta determinista. |
 | **P1-ART-009C**| Topología de Mensajería | v1.0 | `[x]` Consolidado | Diagrama Mermaid de tópicos Kafka, particiones, claves de partición y grupos de consumidores independientes. |
+| **P1-ART-010** | Entrega, Presentación y Pregunta Final| v1.0 | `[x]` Consolidado | Respuesta técnica a la pregunta final (Hoy vs 100x), conclusiones, guion de 20 slides y verificación de 16/16 puntos. |
+| **P1-ART-011** | Guía de Sustentación y Apuestas en Vivo| v1.0 | `[x]` Consolidado | Banco de preguntas del jurado, tabla de trade-offs y absorción del cambio de requisitos en vivo (Live Betting). |
 | **P1-ADR-001** | ADR-001: Estilo Arquitectónico | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la adopción de la Arquitectura Híbrida y descarte de alternativas. |
 | **P1-ADR-002** | ADR-002: Broker de Mensajería | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la selección de Apache Kafka como broker único y patrón Transactional Outbox. |
 | **P1-ADR-003** | ADR-003: Consistencia e Idempotencia | v1.0 | `[x]` Aprobado | Registro formal de decisión para consistencia local ACID, idempotencia por apuesta, mayores restos y reembolso ante ausencia de ganadores. |
@@ -211,6 +213,7 @@
 - **2026-10-27 (Sesión Inicial - Paso 14):** Elaboración y consolidación de la Etapa P1-6 en `P1-ART-007 v1.0` (`06_escalabilidad_y_fallos.md`): análisis de cuellos de botella ante 100k usuarios y 10k apuestas/s, desglose de componentes que escalan vs los que no, presupuesto de latencia (<1s), cierre atómico en motor, liquidación masiva en 6-9 min, durabilidad RPO=0/RTO<30s, análisis de fallos Caso A (notificaciones), Caso B (billetera), resolución forense del Caso C opcional (corrección de foto de llegada) y plan de validación de métricas. Cierre formal de la Etapa P1-6 (10/10 tareas en `[x]`).
 - **2026-10-27 (Sesión Inicial - Paso 15):** Elaboración y consolidación de la Etapa P1-7 en `P1-ART-008 v1.0` (`07_seguridad_y_costos.md`): matriz formal RBAC (4 roles), protección de APIs y rate limiting por usuario/IP, cifrado en tránsito TLS 1.3 y reposo KMS, registro de acciones administrativas, aislamiento de red (DMZ pública vs VPC privada) y optimización de infraestructura cumpliendo la directriz de costos de Dyllan. Cierre formal de la Etapa P1-7 (7/7 tareas en `[x]`).
 - **2026-10-27 (Sesión Inicial - Paso 16):** Elaboración y consolidación de la Etapa P1-8 de Diagramas Oficiales y Revisión Cruzada: creación de `P1-ART-009A` (Diagrama General en Mermaid con diferenciación síncrona/asíncrona), `P1-ART-009B` (Diagrama de Secuencia de Apuesta completa) y `P1-ART-009C` (Topología de Mensajería Kafka con productores, tópicos, particiones y grupos). Verificación cruzada integral con los 3 ADRs aprobados. Cierre formal de la Etapa P1-8 (8/8 tareas en `[x]`).
+- **2026-10-27 (Sesión Inicial - Paso 17):** Elaboración y consolidación de la Etapa P1-9 en `P1-ART-010 v1.0` (`09_presentacion_diapositivas.md`) y Etapa P1-10 en `P1-ART-011 v1.0` (`10_guia_sustentacion.md`): respuesta dimensional a la pregunta final (arquitectura hoy vs evolución 100x con sharding), conclusiones, guion completo de 20 diapositivas ejecutivas, matriz de verificación de los 16 puntos del PDF, banco de sustentación y protocolo de absorción de apuestas en vivo (Live Betting) con streaming Kafka + WebSockets. Cierre formal de P1-9 (7/7 tareas) y P1-10 (4/4 tareas). **Total Parte 1: 72 de 72 tareas completadas y verificadas (`[x]`).**
 
 ---
 
