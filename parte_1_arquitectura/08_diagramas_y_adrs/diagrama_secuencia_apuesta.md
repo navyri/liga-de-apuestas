@@ -77,6 +77,6 @@ sequenceDiagram
     KAFKA-->>-RELAY: ACK (Confirmado por Kafka)
     RELAY->>DB: UPDATE outbox_events SET status='PUBLISHED'
     
-    KAFKA-.->>+NOTIF: Consumo por Consumer Group 'notificaciones'
-    NOTIF-->>-U: Notificación Push / Correo ("¡Apuesta aceptada!")
+    KAFKA--)NOTIF: Consumo por Consumer Group 'notificaciones'
+    NOTIF-->>U: Notificación Push / Correo ("¡Apuesta aceptada!")
 ```

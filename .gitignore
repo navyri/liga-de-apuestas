@@ -17,3 +17,6 @@ $RECYCLE.BIN/
 *.pdf
 *.docx
 *.csv
+
+# Carpeta interna de gestión, checklist operativo y handoffs
+/.interno/

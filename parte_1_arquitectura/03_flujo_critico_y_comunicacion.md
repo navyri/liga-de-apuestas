@@ -80,18 +80,24 @@ Al haber adoptado la Arquitectura Híbrida (`P1-DEC-001`), la coherencia entre l
 
 ## P1-3.3: VALIDACIONES Y MECANISMO DE CIERRE ESTRICTO
 
-Para dar cumplimiento formal al requisito `P1-REQ-002`, el cierre de apuestas no depende de señales de red externas ni de operadores humanos:
-1. **Autoridad Absoluta del Reloj del Servidor:** La base de datos y los servidores de aplicación sincronizan su reloj mediante NTP de alta precisión.
-2. **Evaluación en el Motor de Base de Datos:** La condición de inserción de la apuesta incluye una restricción lógica atómica:
-   ```sql
-   INSERT INTO bets (id, user_id, race_id, racer_id, amount, created_at)
-   SELECT :bet_id, :user_id, :race_id, :racer_id, :amount, NOW()
-   FROM races
-   WHERE races.id = :race_id 
-     AND races.status = 'ABIERTA' 
-     AND NOW() < races.start_time;
-   ```
-   Si la carrera ya no cumple la condición temporal o de estado en el instante exacto del commit, la inserción afecta 0 filas, provocando el rechazo inmediato de la jugada.
+### 1. Definición Formal del Momento de Aceptación
+Una apuesta **solo se considera aceptada por el sistema** en el instante exacto en que la transacción local de base de datos ejecuta un `COMMIT` exitoso. Si en cualquier punto previo al commit la transacción falla, se revierte o supera la hora de corte, la apuesta se considera **rechazada de forma determinista**, sin que se registre la jugada ni se debite el saldo.
+
+### 2. Tratamiento de Esperas por Bloqueos y Concurrencia al Cierre
+- **El Escenario Crítico:** Un usuario despacha una solicitud de apuesta a las `11:59:59.950` para una carrera que inicia a las `12:00:00.000`. Al ingresar a la base de datos, la solicitud queda en espera (*lock wait*) debido a que otra transacción concurrente sobre el mismo usuario está ejecutándose. Para cuando la transacción adquiere el bloqueo de fila, el reloj del servidor marca las `12:00:00.050`.
+- **Regla Inflexible de Rechazo:** Aunque la petición HTTP haya llegado a la infraestructura antes del corte, **si al momento de evaluar la sentencia atómica en el motor la hora del servidor alcanzó o superó `start_time`, la apuesta es irrevocablemente rechazada**.
+- **Mecanismo Atómico Conjunto (Hora + Estado + Saldo):**
+  La validación no se delega a una lectura aislada previa de `CLOCK_TIMESTAMP()`. Se ejecuta como condición de inserción y bloqueo dentro de la misma sentencia:
+  ```sql
+  -- Inserción atómica condicionada al reloj exacto y estado de carrera
+  INSERT INTO bets (id, user_id, race_id, racer_id, amount, created_at)
+  SELECT :bet_id, :user_id, :race_id, :racer_id, :amount, CLOCK_TIMESTAMP()
+  FROM races
+  WHERE races.id = :race_id 
+    AND races.status = 'ABIERTA' 
+    AND CLOCK_TIMESTAMP() < races.start_time;
+  ```
+  Si la carrera transicionó a `CANCELADA` o `CERRADA`, o si la espera por bloqueos hizo que `CLOCK_TIMESTAMP() >= start_time`, la sentencia afecta exactamente **0 filas**. El backend detecta `rows_affected == 0`, ejecuta `ROLLBACK` de la transacción y retorna de inmediato `HTTP 409 Conflict (RACE_CLOSED_OR_NOT_OPEN)` al cliente. Esto garantiza que ninguna espera por contención degrade la regla del corte del servidor.
 
 ---
 

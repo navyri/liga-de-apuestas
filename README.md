@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/Créditos-EIA%20Coins%20(Ficticios)-6B0F1A?style=flat-square&logoColor=white"/>
   <img src="https://img.shields.io/badge/Concurrencia-100k%20usuarios-A82336?style=flat-square&logoColor=white"/>
   <img src="https://img.shields.io/badge/Pico-10k%20apuestas%2Fs-8B1E2D?style=flat-square&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Latencia-%3C%201%20segundo-540B13?style=flat-square&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Latencia-Objetivo%20%3C%201s-540B13?style=flat-square&logoColor=white"/>
 </p>
 
 **La Gran Liga de Carreras de Medianos EIA** es un proyecto académico de diseño y justificación de arquitectura de software para la empresa **Salchipapa Maker Racing S.A.S.**
@@ -32,10 +32,10 @@ El sistema modela una plataforma de apuestas mutuas (*pari-mutuel*) sobre compet
 | Usuarios concurrentes (normal) | 500 sesiones activas | Operación base con recursos de infraestructura controlados |
 | Usuarios concurrentes (final) | 100.000 sesiones simultáneas | Escalamiento elástico en borde e interfaces de consulta |
 | Pico transaccional | 10.000 apuestas/s en 30 s | Ingesta masiva (300.000 transacciones) con particionamiento de balance |
-| Latencia de respuesta | < 1 segundo | Confirmación o rechazo determinista sin degradación de cola |
-| Durabilidad de datos | Cero pérdida | Persistencia transaccional estricta en apuestas y balance |
-| Liquidación masiva | < 15 minutos para > 1.000.000 apuestas | Procesamiento asíncrono en lotes paralelos |
-| Retención para auditoría | Mínimo 5 años | Almacenamiento histórico inmutable con permisos de solo lectura |
+| Latencia de respuesta | Objetivo < 1 segundo | Confirmación determinista estimada en 330-660 ms; Transactional Outbox |
+| Durabilidad de datos | Cero pérdida | Persistencia transaccional ACID local con replicación síncrona de WAL |
+| Liquidación masiva | Objetivo < 15 min (> 1.000.000 apuestas) | Reparto global previo y dispersión paralela en lotes de acreditación |
+| Retención para auditoría | Mínimo 5 años | Almacenamiento inmutable WORM / Object Lock con permisos de solo lectura |
 
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"/>
@@ -43,10 +43,10 @@ El sistema modela una plataforma de apuestas mutuas (*pari-mutuel*) sobre compet
 
 ## Reglas de Negocio e Invariantes
 
-- **Modelo Pari-Mutuel:** Las apuestas consolidan una bolsa común. La casa retiene una comisión del 10% y el 90% restante se distribuye proporcionalmente entre las apuestas ganadoras. La cuota final queda fijada exactamente al cierre de la carrera.
+- **Modelo Pari-Mutuel:** Las apuestas consolidan una bolsa común. La casa retiene una comisión del 10% y el 90% restante se distribuye proporcionalmente entre las apuestas ganadoras mediante el algoritmo de mayores restos. La cuota final queda fijada exactamente al cierre de la carrera.
 - **Cierre por Reloj del Servidor:** Las apuestas cierran en el instante exacto fijado para el inicio de la carrera según la hora del servidor. Toda solicitud recibida con posterioridad es rechazada irrevocablemente.
-- **Integridad de Saldo:** Prohibición absoluta de saldo negativo o doble gasto de EIA Coins ante apuestas concurrentes de un mismo usuario.
-- **Idempotencia Transaccional:** Múltiples solicitudes idénticas originadas por reintentos de red o pulsaciones repetidas generan un único efecto contable y una sola apuesta registrada.
+- **Integridad de Saldo:** Prohibición absoluta de saldo negativo o doble gasto de EIA Coins ante apuestas concurrentes de un mismo usuario (`SELECT FOR UPDATE` + `CHECK (balance >= 0)`).
+- **Idempotencia Transaccional:** Múltiples solicitudes idénticas originadas por reintentos de red o pulsaciones repetidas generan un único efecto contable y una sola apuesta registrada mediante `Idempotency-Key`.
 - **Desacoplamiento Operativo:** Las fallas en canales externos de notificación no bloquean la admisión ni confirmación de apuestas.
 
 <p align="center">
@@ -60,30 +60,38 @@ liga-de-apuestas/
 ├── .gitignore
 ├── README.md
 └── parte_1_arquitectura/
-    ├── 00_registro_maestro_p1.md          # Trazabilidad, bitácora y control de decisiones
+    ├── trazabilidad_y_requisitos.md       # Matriz de trazabilidad y cobertura de los 16 puntos
     ├── 01_requisitos_y_negocio.md         # Análisis de dominio, actores, roles e invariantes
-    ├── 02_arquitectura_y_componentes.md   # Evaluación de estilos arquitectónicos y límites
-    ├── 03_flujo_critico_y_comunicacion.md # Flujo de apuesta y contratos síncronos
-    ├── 04_mensajeria_y_eventos.md         # Diseño de mensajería, eventos y topología
-    ├── 05_datos_e_idempotencia.md         # Modelo de datos, consistencia y transacciones
-    ├── 06_escalabilidad_y_fallos.md       # Carga masiva y análisis de escenarios de fallo
-    ├── 07_seguridad_y_costos.md           # Esquema RBAC, segmentación y optimización
-    ├── 08_diagramas_y_adrs/               # Diagramas Mermaid y registros formales ADR
-    ├── 09_presentacion_diapositivas.md    # Estructura de presentación ejecutiva
-    └── 10_guia_sustentacion.md            # Defensa técnica y absorción de cambios en vivo
+    ├── 02_arquitectura_y_componentes.md   # Evaluación de estilos arquitectónicos y boundaries
+    ├── 03_flujo_critico_y_comunicacion.md # Flujo transaccional y contratos síncronos
+    ├── 04_mensajeria_y_eventos.md         # Diseño de streaming Kafka, eventos y topología
+    ├── 05_datos_e_idempotencia.md         # Persistencia, consistencia, mayores restos y políticas
+    ├── 06_escalabilidad_y_fallos.md       # Carga masiva, presupuesto de latencia y fallos (A, B, C)
+    ├── 07_seguridad_y_costos.md           # Esquema RBAC, segmentación DMZ y optimización de costos
+    ├── 08_diagramas_y_adrs/               # Diagramas Mermaid y los 3 registros formales ADR
+    ├── 09_presentacion_diapositivas.md    # Guion ejecutivo de 20 diapositivas y conclusiones
+    └── 10_guia_sustentacion.md            # Banco de preguntas y absorción de apuestas en vivo
 ```
 
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"/>
 </p>
 
-## Documentación Técnica
+## Documentación Técnica y Entregables Oficiales
 
-| Documento | Estado | Enlace |
+| Documento | Área Temática | Enlace |
 |---|---|---|
-| Registro Maestro y Trazabilidad | Activo | [00_registro_maestro_p1.md](parte_1_arquitectura/00_registro_maestro_p1.md) |
-| Análisis de Requisitos y Dominio | Consolidado | [01_requisitos_y_negocio.md](parte_1_arquitectura/01_requisitos_y_negocio.md) |
-| Arquitectura y Componentes | En elaboración | [02_arquitectura_y_componentes.md](parte_1_arquitectura/02_arquitectura_y_componentes.md) |
+| **Trazabilidad y Requisitos** | Cobertura de los 16 puntos del PDF, decisiones y estado de evidencias | [trazabilidad_y_requisitos.md](parte_1_arquitectura/trazabilidad_y_requisitos.md) |
+| **Requisitos y Reglas de Negocio** | FSM de carrera, modelo Pari-Mutuel y los 5 invariantes | [01_requisitos_y_negocio.md](parte_1_arquitectura/01_requisitos_y_negocio.md) |
+| **Arquitectura y Componentes** | Estilo híbrido, descarte justificado de microservicios y módulos | [02_arquitectura_y_componentes.md](parte_1_arquitectura/02_arquitectura_y_componentes.md) |
+| **Flujo Crítico y Comunicación Síncrona** | Flujo atómico de apuesta, tabla síncrona formal e incertidumbre de red | [03_flujo_critico_y_comunicacion.md](parte_1_arquitectura/03_flujo_critico_y_comunicacion.md) |
+| **Mensajería y Event Streaming** | Apache Kafka, catálogo canónico, lotes de liquidación y Outbox | [04_mensajeria_y_eventos.md](parte_1_arquitectura/04_mensajeria_y_eventos.md) |
+| **Persistencia, Consistencia e Idempotencia** | Esquema OLTP/OLAP, mayores restos, reembolso sin ganadores y WORM | [05_datos_e_idempotencia.md](parte_1_arquitectura/05_datos_e_idempotencia.md) |
+| **Escalabilidad y Manejo de Fallos** | Ráfaga de 10k ops/s, Casos A, B y C (opcional) de fallos y latencia | [06_escalabilidad_y_fallos.md](parte_1_arquitectura/06_escalabilidad_y_fallos.md) |
+| **Seguridad, Control de Acceso y Costos** | Matriz RBAC, rate limiting, segmentación de red y regla de Dyllan | [07_seguridad_y_costos.md](parte_1_arquitectura/07_seguridad_y_costos.md) |
+| **Diagramas Oficiales y Registros ADR** | Diagrama general, secuencia de apuesta, topología y ADRs 1, 2 y 3 | [08_diagramas_y_adrs/](parte_1_arquitectura/08_diagramas_y_adrs/) |
+| **Presentación y Pregunta Final** | Respuesta técnica hoy vs 100x y guion de 20 diapositivas | [09_presentacion_diapositivas.md](parte_1_arquitectura/09_presentacion_diapositivas.md) |
+| **Guía de Sustentación Técnica** | Preguntas probables del jurado y absorción de Live Betting en vivo | [10_guia_sustentacion.md](parte_1_arquitectura/10_guia_sustentacion.md) |
 
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>

@@ -151,10 +151,13 @@ Conforme al caso opcional del PDF (pág. 16): *Diez minutos después de publicad
 2. **Transición a Estado `RESULTADO_EN_RECTIFICACION`:**  
    El operador autorizado registra formalmente la corrección (`POST /api/v1/races/{id}/rectify`) adjuntando la nueva evidencia visual y el motivo. El sistema frena de inmediato cualquier lote de acreditación en curso para esa carrera.
 3. **Cálculo de la Nueva Liquidación Oficial:**  
-   El worker recalcula la bolsa mutua para el mediano legítimo $M_{\text{correcto}}$, generando los montos de premio correctos.
+   El worker recalcula la bolsa mutua para el mediano legítimo $M_{\text{correcto}}$, generando los montos de premio correctos con una nueva versión de liquidación (`settlement_version = 2`).
 4. **Política de Saldo y Ajuste Contable:**
-   - A los apostadores del mediano legítimo se les acredita su premio íntegro bajo el concepto `PRIZE_PAYOUT_RECTIFIED`.
-   - Respecto a los premios pagados erróneamente: en el contexto de créditos virtuales de Salchipapa Maker Racing, se registra un movimiento contable compensatorio de ajuste (`ADJUSTMENT_ERRONEOUS_PAYOUT`). Si el usuario ya consumió los fondos virtuales, su balance no se fuerza a negativo si las políticas del torneo lo prohíben, absorbiendo la diferencia contable en el balance de la casa como pérdida operativa por rectificación deportiva.
+   - **Invariante de Saldo Preservado:** Si el usuario que recibió el premio erróneo ya consumió sus EIA Coins, **su balance jamás se fuerza a negativo**, respetando la restricción física `CHECK (balance >= 0)`. No se inventa una recuperación mágica de fondos virtuales inexistentes.
+   - **Diferenciación de Movimientos:**
+     - *Premio Original:* Registrado con `transaction_type = 'PRIZE_PAYOUT'` y `settlement_version = 1`.
+     - *Nuevo Premio Legítimo:* Se abona a los verdaderos ganadores con `transaction_type = 'PRIZE_PAYOUT'` y `settlement_version = 2`. La clave de idempotencia compuesta `UNIQUE(bet_id, transaction_type, settlement_version)` permite el pago legítimo sin colisionar con la liquidación errónea previa.
+     - *Ajuste Compensatorio:* Al usuario beneficiado por error se le descuenta el balance disponible hasta un mínimo de 0 (`LEAST(balance, erroneous_amount)`) mediante un movimiento de tipo `ADJUSTMENT_ERRONEOUS_PAYOUT`. El importe insoluto no recuperable se registra en auditoría como pérdida operativa de Salchipapa Maker Racing asumida por rectificación deportiva.
 5. **Sellado de Auditoría:**  
    Se emite un evento inmutable `ResultadoRectificado` que ingresa a la cadena criptográfica de auditoría, documentando la identidad del operador, la marca de tiempo de la corrección y el impacto financiero exacto.
 

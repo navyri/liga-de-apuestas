@@ -23,16 +23,21 @@
   - **Costo:** Estricto apego a la directriz de Dyllan: una base de datos relacional operativa con réplica, un clúster Kafka moderado y cómputo elástico que se reduce al mínimo en periodos intersemestrales.
   - **Mantenibilidad:** Código modular fuertemente tipado con interfaces explícitas que impiden acoplamientos espurios.
 
-### 2. Ruta de Evolución ante un Crecimiento de 100 Veces (10.000.000 usuarios / 1.000.000 apuestas/s)
-Si Salchipapa Maker Racing se expandiera globalmente y la carga se multiplicara por 100:
-1. **Paso 1: Sharding y Particionamiento Horizontal de Billeteras por Rango de Usuario:**  
-   La base de datos relacional única se divide en *shards* transaccionales independientes basados en el hash del `user_id`. Como la transacción de apuesta solo involucra a un único usuario y a una carrera (cuya metadata de cierre se replica en memoria/caché local en cada shard), la atomicidad local ACID se preserva en cada fragmento sin requerir transacciones distribuidas entre nodos.
-2. **Paso 2: Segregación Física del Módulo de Billetera (Hacia Servicio Contable Dedicado):**  
-   Al alcanzar escala masiva, el módulo `WalletModule` puede extraerse como una unidad desplegable independiente (*Dedicated Ledger Service*), comunicándose con el motor de apuestas mediante gRPC de alta velocidad o reserva de balance por créditos anticipados en memoria (*token-bucket credit allocations*).
-3. **Paso 3: Escalado de Kafka y Nivel de Particionamiento:**  
-   Los tópicos de Kafka escalan de 8 a 64 o 128 particiones, distribuidas sobre clústeres elásticos con almacenamiento escalonado (*Tiered Storage*) para retención eficiente sin saturar discos locales.
-4. **Paso 4: Borde Global (Edge Computing):**  
-   Despliegue del API Gateway y validación perimetral de JWT en puntos de presencia distribuidos (PoPs / Anycast), mitigando ataques DDoS y ejecutando el rate limiting en el borde geográfico.
+### 2. Ruta de Evolución ante un Crecimiento Hipotético de 100 Veces
+Si Salchipapa Maker Racing experimentara un crecimiento masivo de 100 veces, la arquitectura no debe reescribirse a ciegas. Cada evolución debe responder a **señales y cuellos de botella empíricos claramente identificados**:
+
+1. **Evolución 1: Sharding Transaccional de la Base de Datos:**
+   - *Señal disparadora:* La contención en el Write-Ahead Log (WAL) y el límite físico de IOPS del nodo primario relacional impiden superar las 15.000 escrituras sostenidas/s.
+   - *Mecanismo:* Se divide la base de datos de billeteras y apuestas en *shards* particionados por `user_id`. Como la apuesta solo involucra al usuario y la metadata de carrera (replicable en caché local), se preserva la atomicidad local sin transacciones distribuidas.
+2. **Evolución 2: Segregación Física del Servicio Contable (Billetera):**
+   - *Señal disparadora:* Necesidad de equipos de desarrollo independientes para el libro mayor o requisitos regulatorios contables externos.
+   - *Problemas de consistencia que introduce:* Separar físicamente Billetera y Apuestas **destruye la transacción local ACID**, obligando a introducir coordinación distribuida (patrón Saga con compensaciones o reserva de créditos anticipados) y aumentando la latencia de red en la ruta crítica de 1 segundo. Por tanto, esta segregación **no es obligatoria ni recomendada inicialmente** salvo que la escala organizativa lo imponga.
+3. **Evolución 3: Kafka Tiered Storage:**
+   - *Señal disparadora:* El volumen de eventos acumulados satura los discos NVMe locales del clúster de Kafka.
+   - *Mecanismo:* Se habilita almacenamiento escalonado para descargar segmentos fríos a almacenamiento de objetos sin degradar la memoria del broker.
+4. **Evolución 4: Borde Distribuido (Edge Computing):**
+   - *Señal disparadora:* Tráfico internacional con latencia de red geográfica superior a 400 ms desde clientes distantes.
+   - *Mecanismo:* Despliegue de puntos de presencia (PoPs) para terminación TLS y rate limiting cercano al usuario.
 
 ---
 
