@@ -1,0 +1,19 @@
+# Archivos del sistema y temporales
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.tmp
+*.temp
+*~
+
+# Editores y entornos
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Exclusión de archivos y materiales de enunciado o de la Parte 2
+*.pdf
+*.docx
+*.csv
