@@ -43,11 +43,11 @@
 - [x] **P1-2.5** Definir escalamiento independiente. *(Completado y verificado por revisión autónoma)*.
 
 ### ETAPA P1-3 — Flujo crítico y comunicación síncrona
-- [ ] **P1-3.1** Flujo completo de aceptación/rechazo de apuesta.
-- [ ] **P1-3.2** Coherencia entre apuesta y descuento.
-- [ ] **P1-3.3** Validaciones y cierre.
-- [ ] **P1-3.4** Tabla síncrona exigida.
-- [ ] **P1-3.5** Timeouts, reintentos y respuestas inciertas.
+- [x] **P1-3.1** Flujo completo de aceptación/rechazo de apuesta. *(Completado y verificado por revisión autónoma)*.
+- [x] **P1-3.2** Coherencia entre apuesta y descuento. *(Completado y verificado por revisión autónoma)*.
+- [x] **P1-3.3** Validaciones y cierre. *(Completado y verificado por revisión autónoma)*.
+- [x] **P1-3.4** Tabla síncrona exigida. *(Completado y verificado por revisión autónoma)*.
+- [x] **P1-3.5** Timeouts, reintentos y respuestas inciertas. *(Completado y verificado por revisión autónoma)*.
 
 ### ETAPA P1-4 — Mensajería
 - [ ] **P1-4.1** Comparar RabbitMQ, Kafka, ambos o ninguno.
@@ -146,9 +146,10 @@
 
 | ID Artefacto | Nombre del Artefacto | Versión | Estado | Descripción / Contenido |
 | :--- | :--- | :--- | :--- | :--- |
-| **P1-ART-001** | Registro Maestro P1 | v1.3 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001), hechos, supuestos, trazabilidad y bitácora. |
+| **P1-ART-001** | Registro Maestro P1 | v1.4 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001), hechos, supuestos, trazabilidad y bitácora. |
 | **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio consolidadas. |
 | **P1-ART-003** | Arquitectura y Componentes | v1.0 | `[x]` Consolidado | Comparación de estilos, justificación de descartes, desglose de boundaries, módulos vs despliegues y modelo de escalamiento. |
+| **P1-ART-004** | Flujo Crítico y Comunicación Síncrona | v1.0 | `[x]` Consolidado | Secuencia integral de apuesta-descuento, consistencia local ACID, tabla síncrona formal y manejo de timeouts/incertidumbre. |
 | **P1-ADR-001** | ADR-001: Estilo Arquitectónico | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la adopción de la Arquitectura Híbrida y descarte de alternativas. |
 
 ---
@@ -188,6 +189,7 @@
 - **2026-10-27 (Sesión Inicial - Paso 6):** Desarrollo y revisión autónoma de los subpasos P1-1.2, P1-1.3, P1-1.4 y P1-1.5 en `P1-ART-002 v1.1`. Cierre formal de la Etapa P1-1 (5/5 tareas en `[x]`). Actualización de matriz de trazabilidad y conteos de progreso.
 - **2026-10-27 (Sesión Inicial - Paso 7):** Elaboración de `P1-2.1` en `P1-ART-003 v0.1` (`02_arquitectura_y_componentes.md`): comparación de 4 estilos frente a coherencia, cierre, latencia, ráfaga de 10k ops/s, liquidación y costos. Actualización del README principal con identidad visual adaptada, badges reales e índice completo.
 - **2026-10-27 (Sesión Inicial - Paso 8):** Aprobación del usuario para la Arquitectura Híbrida (`P1-DEC-001`). Incorporación de precisiones: apuesta-descuento en transacción local, matización de garantías de rendimiento, reajuste de motivos de descarte de microservicios, e inclusión explícita de Resultados, Liquidación, Devoluciones y Auditoría. Elaboración y verificación de `P1-2.3`, `P1-2.4` y `P1-2.5`. Redacción de `P1-ADR-001`. Cierre formal de la Etapa P1-2 (5/5 tareas en `[x]`).
+- **2026-10-27 (Sesión Inicial - Paso 9):** Elaboración y consolidación autónoma de la Etapa P1-3 en `P1-ART-004 v1.0` (`03_flujo_critico_y_comunicacion.md`): secuencia atómica de apuesta y débito, tabla síncrona formal (Decisión 3), validación atómica de hora de cierre y protocolo de incertidumbre de red / timeouts con idempotency keys. Cierre de P1-3 (5/5 tareas en `[x]`).
 
 ---
 
