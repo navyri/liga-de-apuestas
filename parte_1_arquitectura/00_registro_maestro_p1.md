@@ -60,15 +60,15 @@
 - [x] **P1-4.8** Publicación confiable entre persistencia y mensajería. *(Completado con Transactional Outbox)*.
 
 ### ETAPA P1-5 — Datos e idempotencia
-- [~] **P1-5.1** Almacenamiento y propiedad. *(Elaborado en P1-ART-006)*.
-- [~] **P1-5.2** Consistencia fuerte y eventual. *(Elaborado en P1-ART-006)*.
-- [~] **P1-5.3** Concurrencia y prevención de saldo negativo. *(Elaborado en P1-ART-006)*.
-- [~] **P1-5.4** Idempotencia en al menos tres operaciones. *(Elaborado en P1-ART-006)*.
-- [~] **P1-5.5** Reintentos frente a apuestas legítimas nuevas. *(Elaborado en P1-ART-006)*.
-- [~] **P1-5.6** Premios, comisión y devoluciones. *(Elaborado en P1-ART-006)*.
-- [~] **P1-5.7** Supuestos de redondeo y ausencia de ganadores. *(Pendiente de decisión del usuario: P1-PA-001 y P1-PA-002)*.
-- [~] **P1-5.8** Histórico, analítica y auditoría de cinco años. *(Elaborado en P1-ART-006)*.
-- [~] **P1-5.9** Justificar transacciones, outbox o sagas donde se necesiten. *(Elaborado en P1-ART-006)*.
+- [x] **P1-5.1** Almacenamiento y propiedad. *(Completado y consolidado)*.
+- [x] **P1-5.2** Consistencia fuerte y eventual. *(Completado y consolidado)*.
+- [x] **P1-5.3** Concurrencia y prevención de saldo negativo. *(Completado y consolidado)*.
+- [x] **P1-5.4** Idempotencia en al menos tres operaciones. *(Completado y consolidado)*.
+- [x] **P1-5.5** Reintentos frente a apuestas legítimas nuevas. *(Completado y consolidado)*.
+- [x] **P1-5.6** Premios, comisión y devoluciones. *(Completado con algoritmo de mayores restos)*.
+- [x] **P1-5.7** Supuestos de redondeo y ausencia de ganadores. *(Aprobado por el usuario: P1-DEC-003 y P1-DEC-004)*.
+- [x] **P1-5.8** Histórico, analítica y auditoría de cinco años. *(Completado con delimitación WORM)*.
+- [x] **P1-5.9** Justificar transacciones, outbox o sagas donde se necesiten. *(Completado y formalizado en P1-ADR-003)*.
 
 ### ETAPA P1-6 — Escalabilidad y fallos
 - [ ] **P1-6.1** Analizar 100.000 usuarios y 10.000 apuestas/s durante 30 segundos.
@@ -121,24 +121,29 @@
 ## 2. REGISTRO DE DECISIONES ARQUITECTÓNICAS (ADR) Y DECISIONES TÉCNICAS
 - **P1-DEC-001 (Aprobada por el usuario):** Adopción de la **Arquitectura Híbrida** (Núcleo Modular Transaccional para usuarios, medianos, carreras, apuestas y billetera, con servicios/workers desacoplados para notificaciones, analítica y liquidación masiva). Descarte formal de Microservicios Puros y Monolito Tradicional. Formalizada en `P1-ADR-001`.
 - **P1-DEC-002 (Aprobada por el usuario):** Selección de **Apache Kafka como Broker Único** de mensajería y streaming de eventos. Descarte de RabbitMQ como broker único y de la solución dual (ambos). Adopción del patrón Transactional Outbox para publicación confiable y particionamiento por `race_id` y `user_id`. Formalizada en `P1-ADR-002`.
+- **P1-DEC-003 (Aprobada por el usuario):** Adopción de la **Política de Mayores Restos** para la distribución de residuos fraccionarios de la bolsa común: precisión de dos decimales (centavos enteros de EIA Coin), comisión con redondeo determinista al centavo más cercano, asignación base entera inferior, distribución de remanentes por mayor resto con desempate determinista por `bet_id`, y cálculo global previo a la dispersión de lotes.
+- **P1-DEC-004 (Aprobada por el usuario):** Adopción de la **Política ante Ausencia de Ganadores**: reembolso íntegro del 100% a los apostadores participantes, sin retención de comisión ni acumulación de pozo (*no rollover*), preservando la carrera en estado `LIQUIDADA` con motivo explícito `SIN_APUESTAS_GANADORAS` sin marcarla como cancelada.
+- **P1-DEC-005 (Aprobada por el usuario):** Idempotencia de premios vinculada directamente a la apuesta (`UNIQUE(bet_id, 'PRIZE_PAYOUT')`), distinguiendo deduplicación técnica de compensaciones y permitiendo múltiples apuestas ganadoras del mismo usuario en la misma carrera. Formalizada en `P1-ADR-003`.
 
 ---
 
 ## 3. HECHOS EXPLÍCITOS, SUPUESTOS, PREGUNTAS ABIERTAS Y RIESGOS TÉCNICOS
 
-### Hechos y Condiciones Explícitas (Antes listados preliminarmente como supuestos)
-- **P1-HEC-001 (Explícito, antes P1-SUP-001):** *Naturaleza de la moneda virtual:* Los *EIA Coins* son créditos ficticios del enunciado, no tienen valor monetario, no se compran ni se canjean por dinero real (Fuente: PDF, pág. 1).
-- **P1-HEC-002 (Explícito, antes P1-SUP-002):** *Condición temporal de exposición:* La fecha de exposición está fijada para el 4 y 5 de noviembre, sin año explícito en el documento (Fuente: PDF, pág. 19).
+### Hechos y Condiciones Explícitas
+- **P1-HEC-001 (Explícito):** *Naturaleza de la moneda virtual:* Los *EIA Coins* son créditos ficticios del enunciado, no tienen valor monetario, no se compran ni se canjean por dinero real (Fuente: PDF, pág. 1).
+- **P1-HEC-002 (Explícito):** *Condición temporal de exposición:* La fecha de exposición está fijada para el 4 y 5 de noviembre, sin año explícito en el documento (Fuente: PDF, pág. 19).
+- **P1-HEC-003 (Referencia Académica):** *Repositorio del Profesor (`mlops2026`):* Repositorio de referencia académica `https://github.com/sebastianzapatar/mlops2026.git`. Se inspeccionó su estructura (FastAPI, Docker Compose, MLFlow, PyCaret, endpoints modulares y esquemas Pydantic). Constituye un marco de orientación conceptual en buenas prácticas de arquitectura y APIs, sin que sus tecnologías específicas sean obligatorias para el diseño de Medianos ni alteren los requisitos del PDF.
 
-### Supuestos Propuestos (Pendientes de aprobación)
-- *Ningún supuesto metodológico adicional propuesto en esta etapa.*
+### Supuestos y Decisiones de Proyecto Formalizadas
+- **P1-SUP-005 (Decisión de Proyecto):** *Precisión Decimal:* Adopción de precisión contable de dos decimales (100 centavos = 1 EIA Coin) y aritmética entera determinista.
 
-### Preguntas Abiertas de Negocio (Pendientes de definición en etapas correspondientes)
-- **P1-PA-001 (Pregunta abierta, antes P1-SUP-003):** *Política de redondeo y remanentes:* El PDF no define decimales ni el manejo de fracciones sobrantes al repartir el 90% de la bolsa; se formulará una propuesta técnica/contable concreta en P1-5.
-- **P1-PA-002 (Pregunta abierta, antes P1-SUP-004):** *Ausencia de ganadores:* El PDF no especifica el destino de la bolsa si ningún usuario apostó al mediano ganador; se planteará una política explícita en P1-5 (ej. reembolso del 90% a apostadores o acumulación).
+### Preguntas Abiertas Resueltas Mediante Decisiones Aprobadas
+- **P1-PA-001 (Cerrada con P1-DEC-003):** *Política de redondeo:* Resuelta mediante algoritmo de mayores restos con conservación exacta de la bolsa.
+- **P1-PA-002 (Cerrada con P1-DEC-004):** *Ausencia de ganadores:* Resuelta mediante reembolso íntegro del 100% y motivo `SIN_APUESTAS_GANADORAS`.
 
 ### Riesgos y Desafíos Técnicos Identificados
-- **P1-RIE-001 (Desafío de rendimiento y concurrencia, antes clasificado preliminarmente como P1-CON-001):** *Tensión entre latencia estricta (< 1 s) y pico masivo (10.000 apuestas/s en 30 s previos al cierre).* Representa un desafío central de dimensionamiento, particionamiento y consistencia transaccional sin colapsar el almacenamiento ni violar el límite temporal; no constituye una contradicción lógica demostrada del enunciado.
+- **P1-RIE-001 (Desafío de rendimiento y concurrencia):** *Tensión entre latencia estricta (< 1 s) y pico masivo (10.000 apuestas/s).* Mitigado mediante consistencia local atómica, bloqueos por usuario e índices de idempotencia en BD.
+- **P1-RIE-002 (Incertidumbre de conectividad):** *Timeouts técnicos:* Mitigado mediante `Idempotency-Key` y consulta de estado alternativa.
 
 ---
 
@@ -146,14 +151,15 @@
 
 | ID Artefacto | Nombre del Artefacto | Versión | Estado | Descripción / Contenido |
 | :--- | :--- | :--- | :--- | :--- |
-| **P1-ART-001** | Registro Maestro P1 | v1.7 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001/002), trazabilidad y bitácora. |
+| **P1-ART-001** | Registro Maestro P1 | v1.8 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001 a 005), trazabilidad y bitácora. |
 | **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio consolidadas. |
 | **P1-ART-003** | Arquitectura y Componentes | v1.0 | `[x]` Consolidado | Comparación de estilos, justificación de descartes, desglose de boundaries, módulos vs despliegues y modelo de escalamiento. |
-| **P1-ART-004** | Flujo Crítico y Comunicación Síncrona | v1.1 | `[x]` Consolidado | Secuencia integral de apuesta-descuento, consistencia local ACID, tabla síncrona formal y protocolo de incertidumbre de red. |
-| **P1-ART-005** | Mensajería y Comunicación Asíncrona | v1.0 | `[x]` Consolidado | Comparativa de brokers, catálogo canónico en español, tabla de eventos, topología de tópicos, particionamiento de liquidación y Transactional Outbox. |
-| **P1-ART-006** | Datos, Persistencia e Idempotencia | v0.1 | `[~]` Elaborado | Esquema OLTP vs OLAP, consistencia fuerte vs eventual, bloqueo de billetera, 3 casos de idempotencia y propuestas de redondeo/sin ganadores. |
+| **P1-ART-004** | Flujo Crítico y Comunicación Síncrona | v1.2 | `[x]` Consolidado | Secuencia integral de apuesta-descuento, consistencia local ACID, tabla síncrona formal y protocolo de incertidumbre de red vs latencia. |
+| **P1-ART-005** | Mensajería y Comunicación Asíncrona | v1.1 | `[x]` Consolidado | Comparativa de brokers, catálogo canónico en español, topología de tópicos, particionamiento de liquidación por lotes y Transactional Outbox corregido. |
+| **P1-ART-006** | Datos, Persistencia e Idempotencia | v1.0 | `[x]` Consolidado | Esquema OLTP vs OLAP, consistencia fuerte vs eventual, bloqueo `FOR UPDATE`, 3 casos de idempotencia, mayores restos y política de sin ganadores. |
 | **P1-ADR-001** | ADR-001: Estilo Arquitectónico | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la adopción de la Arquitectura Híbrida y descarte de alternativas. |
 | **P1-ADR-002** | ADR-002: Broker de Mensajería | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la selección de Apache Kafka como broker único y patrón Transactional Outbox. |
+| **P1-ADR-003** | ADR-003: Consistencia e Idempotencia | v1.0 | `[x]` Aprobado | Registro formal de decisión para consistencia local ACID, idempotencia por apuesta, mayores restos y reembolso ante ausencia de ganadores. |
 
 ---
 
@@ -196,6 +202,7 @@
 - **2026-10-27 (Sesión Inicial - Paso 10):** Elaboración de `P1-4.1` en `P1-ART-005 v0.1` (`04_mensajeria_y_eventos.md`): comparación técnica de RabbitMQ, Kafka, Ambos y Ninguno frente al pico de 10k eventos/s, múltiples consumidores independientes y reproducción para auditoría. Preparación para la consulta de la Decisión 5 (`P1-4.2`).
 - **2026-10-27 (Sesión Inicial - Paso 11):** Aprobación del usuario para Apache Kafka (`P1-DEC-002`) con precisiones de descarte proporcional, matización de tasas de eventos vs apuestas, delimitación de Kafka frente a auditoría a 5 años e idempotencia en replay. Ajuste en `P1-ART-004 v1.1` sobre estados de incertidumbre vs garantías de latencia. Consolidación de `P1-4.3` a `P1-4.8` en `P1-ART-005 v1.0` (eventos canónicos en español, tabla formal, topología con particionamiento de liquidación y Transactional Outbox). Redacción de `P1-ADR-002`. Cierre formal de la Etapa P1-4 (8/8 tareas en `[x]`).
 - **2026-10-27 (Sesión Inicial - Paso 12):** Elaboración técnica integral de la Etapa P1-5 en `P1-ART-006 v0.1` (`05_datos_e_idempotencia.md`): esquema de almacenamiento (OLTP en núcleo, OLAP analítico, WORM auditoría), consistencia fuerte vs eventual, prevención de saldo negativo con bloqueo de fila `FOR UPDATE`, idempotencia en 3 operaciones críticas, deduplicación de eventos y formulación de opciones para redondeo (`P1-PA-001`) y ausencia de ganadores (`P1-PA-002`).
+- **2026-10-27 (Sesión Inicial - Paso 13):** Inspección del repositorio de referencia del profesor `mlops2026` (`P1-HEC-003`). Incorporación de la política de mayores restos (`P1-DEC-003`) y ausencia de ganadores con reembolso 100% y motivo `SIN_APUESTAS_GANADORAS` (`P1-DEC-004`). Corrección de afirmaciones técnicas: Transactional Outbox desglosado en relay y at-least-once, particionamiento de liquidación por lotes (`batch_id`) con orden de bloqueo por usuario, idempotencia de premios vinculada a la apuesta (`P1-DEC-005`), delimitación rigurosa de WORM frente a replicación, y aclaración del estado incierto en cliente. Redacción de `P1-ADR-003`. Cierre formal de la Etapa P1-5 (9/9 tareas en `[x]`).
 
 ---
 

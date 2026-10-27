@@ -140,12 +140,25 @@ Todos los eventos de la plataforma comparten una estructura base canónica con v
      └─────────────────────► Consumer Group: "dispersores-premios-billetera"
 ```
 
-### Distribución del Trabajo de Liquidación Masiva sin RabbitMQ
-Para procesar más de 1.000.000 de apuestas en menos de 15 minutos sin generar una única tarea gigantesca monolítica y sin introducir un segundo broker:
-1. **Fase 1 (Cálculo Agregado en Worker):** Al recibir `ResultadoOficialPublicado`, el `WorkerLiquidacion` ejecuta una consulta agregada sobre la bolsa de la carrera en la BD operativa, determinando la masa ganadora $T_w$, la bolsa neta $B_{\text{neta}}$ y la cuota unitaria final $Q_w$. Esta fase toma menos de 10 segundos.
-2. **Fase 2 (Generación de Lotes Particionados):** El worker segmenta las apuestas ganadoras en **lotes homogéneos de 1.000 apuestas** (`LoteLiquidacionGenerado`).
-3. **Fase 3 (Dispersión Paralela por Tópico Particionado por `user_id`):** Los lotes se publican en el tópico `liquidacion.lotes` utilizando el identificador del usuario como clave de partición (`user_id`).
-4. **Fase 4 (Consumo Concurrente):** Un grupo escalado de workers acreditadores consume los lotes en paralelo. Dado que los eventos están particionados por usuario, se evitan interbloqueos (*deadlocks*) en la tabla de billeteras, logrando acreditar las apuestas ganadoras de forma fluida a una tasa de $\sim 1.500\text{ a } 2.500\text{ acreditaciones/s}$, completando el millón de jugadas en un rango de 7 a 11 minutos (muy por debajo del límite de 15 minutos).
+### Distribución del Trabajo de Liquidación Masiva
+Para procesar más de 1.000.000 de apuestas en un plazo objetivo inferior a 15 minutos sin generar una única tarea gigantesca monolítica y sin introducir un segundo broker:
+
+1. **Fase 1 (Cálculo Agregado Global en el Worker):**  
+   Al recibir el evento `ResultadoOficialPublicado`, el `WorkerLiquidacion` ejecuta una consulta agregada sobre la bolsa de la carrera en la BD operativa, determinando la masa ganadora $T_w$, la bolsa neta $B_{\text{neta}}$ y la cuota unitaria base. En esta misma fase se calcula el reparto determinista aplicando la política de mayores restos a nivel global (ver P1-5.6), asegurando la conservación exacta de la bolsa antes de generar cualquier orden de acreditación.
+2. **Fase 2 (Generación de Lotes y Granularidad de Mensajes):**  
+   - Las órdenes de acreditación se agrupan en **lotes de tamaño acotado** (por ejemplo, 500 a 1.000 apuestas premiadas por mensaje).
+   - Cada mensaje de lote contiene un identificador único de lote (`batch_id`), el `race_id`, el rango de secuencias de apuestas incluidas y la lista de transferencias `[{ bet_id, user_id, payout_cents }]`.
+3. **Fase 3 (Clave de Particionamiento y Distribución entre Particiones):**  
+   - Dado que un lote contiene múltiples apuestas que pueden pertenecer a diferentes usuarios, **no es posible usar `user_id` como clave a nivel de todo el lote**.
+   - Para distribuir la carga de una carrera popular de manera uniforme entre las particiones del tópico `liquidacion.lotes`, se utiliza como clave de partición el identificador del lote: `key = batch_id` (o round-robin balanceado). Esto dispersa los lotes equitativamente entre las $P$ particiones de Kafka y los workers en ejecución.
+4. **Fase 4 (Procesamiento Concurrente y Orden de Bloqueo en Billeteras):**  
+   - Múltiples workers consumen lotes en paralelo. Para evitar interbloqueos (*deadlocks*) en la base de datos cuando dos workers procesan lotes que contienen casualmente al mismo usuario (por ejemplo, un usuario con múltiples apuestas ganadoras), el worker **ordena internamente las operaciones por `user_id` ascendente** antes de solicitar los bloqueos transaccionales (`SELECT FOR UPDATE`).
+   - Cada acreditación individual se registra con la clave idempotente de premio basada en la apuesta (`bet_id`).
+5. **Fase 5 (Reanudación de Lotes Parciales y Detección de Finalización):**  
+   - Si un worker colapsa a mitad de un lote, el reintento de procesamiento es seguro: las acreditaciones ya ejecutadas colisionan por clave única y se omiten (`ON CONFLICT DO NOTHING`), completándose únicamente las pendientes.
+   - El worker emite un evento de control `LoteLiquidacionCompletado (batch_id, race_id)`. El orquestador de liquidación mantiene un contador de lotes confirmados frente al total generado; al registrarse el 100% de los lotes, la carrera transiciona formalmente a estado `LIQUIDADA`.
+6. **Validación del Objetivo de 15 Minutos:**  
+   - *(Aclaración de diseño):* El particionamiento y la división en lotes estructuran el paralelismo, pero **no constituyen por sí solos una garantía matemática de terminar en menos de 15 minutos**. Cumplir esta meta bajo 1.000.000 de apuestas exige dimensionar la base de datos para soportar un rendimiento sostenido de al menos $1.111\text{ a } 2.000\text{ escrituras contables/s}$, pools de conexiones dimensionados, I/O aprovisionado y validación empírica mediante pruebas de carga de estrés.
 
 ---
 
@@ -161,7 +174,7 @@ Para procesar más de 1.000.000 de apuestas en menos de 15 minutos sin generar u
 
 ## P1-4.8: PUBLICACIÓN CONFIABLE: PATRÓN TRANSACTIONAL OUTBOX
 
-Para erradicar la inconsistencia clásica de los sistemas distribuidos (donde se guarda en la base de datos pero se cae el broker antes de publicar, o viceversa), se implementa el patrón **Transactional Outbox**:
+Para desacoplar la persistencia en base de datos de la publicación en mensajería sin recurrir a transacciones distribuidas (2PC), se implementa el patrón **Transactional Outbox**:
 
 ```text
  ┌─────────────────────────────────────────────────────────────┐
@@ -169,23 +182,39 @@ Para erradicar la inconsistencia clásica de los sistemas distribuidos (donde se
  │                                                             │
  │  1. UPDATE wallets SET balance = balance - 500              │
  │  2. INSERT INTO bets (id, user_id, amount, ...)             │
- │  3. INSERT INTO outbox_events (id, topic, payload, status)  │
+ │  3. INSERT INTO audit_records (id, entity, change, ...)     │
+ │  4. INSERT INTO outbox_events (id, topic, payload, status)  │
  │                                                             │
- │  COMMIT ATÓMICO (Garantiza persistencia conjunta)           │
+ │  COMMIT ATÓMICO EN BD (Persistencia local conjunta)         │
  └──────────────────────────────┬──────────────────────────────┘
                                 │
-                                ▼ CDC / Polling Publisher
+                                ▼ Desacoplado asíncrono
                  ┌─────────────────────────────┐
                  │    OUTBOX RELAY PROCESS     │
                  │ - Lee eventos 'PENDING'     │
                  │ - Publica en Apache Kafka   │
                  │ - Marca eventos 'PUBLISHED' │
+                 │ - Monitorea eventos lentos  │
                  └──────────────┬──────────────┘
-                                │
+                                │ Reintentos de red / Posibles duplicados
                                 ▼
                          [ APACHE KAFKA ]
+                                │
+                                ▼
+                 ┌─────────────────────────────┐
+                 │   CONSUMIDORES IDEMPOTENTES │
+                 │ - Deduplican por eventId    │
+                 └─────────────────────────────┘
 ```
 
-- **Garantía de Persistencia:** El evento `ApuestaAceptada` se escribe en la tabla `outbox_events` dentro de la **misma transacción local** que debita el saldo y guarda la apuesta.
-- **Relay Desacoplado:** Un proceso emisor (*Outbox Relay* mediante lectura de logs de transacción / CDC o polling de alta frecuencia) lee los registros pendientes y los despacha hacia Apache Kafka con confirmación del broker (`acks=all`).
-- **Resiliencia:** Si Kafka experimenta una caída momentánea, las apuestas siguen siendo admitidas y cobradas normalmente en la base de datos; los eventos se acumulan de forma segura en la tabla outbox y se drenan automáticamente al recuperarse el broker.
+### Mecánica de Funcionamiento y Límites de la Garantía:
+1. **Transacción Local Inicial:**  
+   La deducción de saldo en la billetera, el registro de la apuesta admitida, la traza local de auditoría y el registro del evento en la tabla `outbox_events` ocurren dentro de la **misma transacción atómica local en la base de datos**. No hay comunicación de red con Kafka durante esta transacción.
+2. **Publicación Asíncrona Posterior por un Relay:**  
+   Un proceso emisor independiente (*Outbox Relay*, basado en lectura de logs de transacción / CDC o polling de alta frecuencia) lee los eventos en estado `PENDING` y los remite a Apache Kafka.
+3. **Reintentos y Publicaciones Duplicadas:**  
+   Si el relay despacha un mensaje a Kafka pero la confirmación (*ack*) se pierde o demora, el relay reintentará el envío. Por tanto, **Kafka puede recibir eventos duplicados**. La garantía de publicación es de tipo *at-least-once*, lo que hace obligatorio que los consumidores sean estrictamente idempotentes mediante la clave `eventId`.
+4. **Condiciones de Recuperación, Monitoreo y Disponibilidad:**  
+   - *(Aclaración crítica):* El patrón Outbox **no garantiza una entrega mágica e inmediata**. La publicación depende de la disponibilidad del broker y de la salud del proceso relay.
+   - Si Kafka no está disponible, los eventos se acumulan de forma segura en la tabla `outbox_events` sin bloquear la admisión de apuestas; al restablecerse el broker, el relay drena los eventos pendientes en orden.
+   - Se debe implementar monitoreo continuo sobre el retraso (*outbox lag*) y una alerta operativa si existen eventos en estado `PENDING` con una antigüedad superior a un umbral definido (por ejemplo, > 30 segundos).
