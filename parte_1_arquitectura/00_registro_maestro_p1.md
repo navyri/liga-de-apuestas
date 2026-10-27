@@ -71,16 +71,16 @@
 - [x] **P1-5.9** Justificar transacciones, outbox o sagas donde se necesiten. *(Completado y formalizado en P1-ADR-003)*.
 
 ### ETAPA P1-6 — Escalabilidad y fallos
-- [ ] **P1-6.1** Analizar 100.000 usuarios y 10.000 apuestas/s durante 30 segundos.
-- [ ] **P1-6.2** Cuellos de botella y escalamiento.
-- [ ] **P1-6.3** Respuesta en menos de un segundo.
-- [ ] **P1-6.4** Impedir aceptaciones fuera del cierre.
-- [ ] **P1-6.5** Premios en menos de 15 minutos.
-- [ ] **P1-6.6** Durabilidad y recuperación.
-- [ ] **P1-6.7** Caída de notificaciones.
-- [ ] **P1-6.8** Caída de billetera o equivalente.
-- [ ] **P1-6.9** Decidir si abordaremos la corrección opcional de resultados.
-- [ ] **P1-6.10** Plan conceptual de métricas y validación.
+- [x] **P1-6.1** Analizar 100.000 usuarios y 10.000 apuestas/s durante 30 segundos. *(Completado y consolidado)*.
+- [x] **P1-6.2** Cuellos de botella y escalamiento. *(Completado y consolidado)*.
+- [x] **P1-6.3** Respuesta en menos de un segundo. *(Completado con desglose de presupuesto de latencia)*.
+- [x] **P1-6.4** Impedir aceptaciones fuera del cierre. *(Completado con validación atómica en motor)*.
+- [x] **P1-6.5** Premios en menos de 15 minutos. *(Completado con análisis de throughput y lotes)*.
+- [x] **P1-6.6** Durabilidad y recuperación. *(Completado con RPO=0, RTO<30s y PITR)*.
+- [x] **P1-6.7** Caída de notificaciones. *(Completado: apuestas continúan sin bloqueo)*.
+- [x] **P1-6.8** Caída de billetera o equivalente. *(Completado: apuestas se bloquean por integridad)*.
+- [x] **P1-6.9** Decidir si abordaremos la corrección opcional de resultados. *(Completado: Caso C abordado con protocolo de ajuste contable)*.
+- [x] **P1-6.10** Plan conceptual de métricas y validación. *(Completado y consolidado)*.
 
 ### ETAPA P1-7 — Seguridad y costos
 - [ ] **P1-7.1** Autenticación, autorización y roles.
@@ -151,12 +151,13 @@
 
 | ID Artefacto | Nombre del Artefacto | Versión | Estado | Descripción / Contenido |
 | :--- | :--- | :--- | :--- | :--- |
-| **P1-ART-001** | Registro Maestro P1 | v1.8 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001 a 005), trazabilidad y bitácora. |
+| **P1-ART-001** | Registro Maestro P1 | v1.9 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001 a 005), trazabilidad y bitácora. |
 | **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio consolidadas. |
 | **P1-ART-003** | Arquitectura y Componentes | v1.0 | `[x]` Consolidado | Comparación de estilos, justificación de descartes, desglose de boundaries, módulos vs despliegues y modelo de escalamiento. |
 | **P1-ART-004** | Flujo Crítico y Comunicación Síncrona | v1.2 | `[x]` Consolidado | Secuencia integral de apuesta-descuento, consistencia local ACID, tabla síncrona formal y protocolo de incertidumbre de red vs latencia. |
 | **P1-ART-005** | Mensajería y Comunicación Asíncrona | v1.1 | `[x]` Consolidado | Comparativa de brokers, catálogo canónico en español, topología de tópicos, particionamiento de liquidación por lotes y Transactional Outbox corregido. |
 | **P1-ART-006** | Datos, Persistencia e Idempotencia | v1.0 | `[x]` Consolidado | Esquema OLTP vs OLAP, consistencia fuerte vs eventual, bloqueo `FOR UPDATE`, 3 casos de idempotencia, mayores restos y política de sin ganadores. |
+| **P1-ART-007** | Escalabilidad y Manejo de Fallos | v1.0 | `[x]` Consolidado | Análisis de ráfaga de 10k ops/s, presupuesto de latencia (<1s), cierre estricto, Casos A, B y C (opcional) de fallos y plan de validación. |
 | **P1-ADR-001** | ADR-001: Estilo Arquitectónico | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la adopción de la Arquitectura Híbrida y descarte de alternativas. |
 | **P1-ADR-002** | ADR-002: Broker de Mensajería | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la selección de Apache Kafka como broker único y patrón Transactional Outbox. |
 | **P1-ADR-003** | ADR-003: Consistencia e Idempotencia | v1.0 | `[x]` Aprobado | Registro formal de decisión para consistencia local ACID, idempotencia por apuesta, mayores restos y reembolso ante ausencia de ganadores. |
@@ -203,6 +204,7 @@
 - **2026-10-27 (Sesión Inicial - Paso 11):** Aprobación del usuario para Apache Kafka (`P1-DEC-002`) con precisiones de descarte proporcional, matización de tasas de eventos vs apuestas, delimitación de Kafka frente a auditoría a 5 años e idempotencia en replay. Ajuste en `P1-ART-004 v1.1` sobre estados de incertidumbre vs garantías de latencia. Consolidación de `P1-4.3` a `P1-4.8` en `P1-ART-005 v1.0` (eventos canónicos en español, tabla formal, topología con particionamiento de liquidación y Transactional Outbox). Redacción de `P1-ADR-002`. Cierre formal de la Etapa P1-4 (8/8 tareas en `[x]`).
 - **2026-10-27 (Sesión Inicial - Paso 12):** Elaboración técnica integral de la Etapa P1-5 en `P1-ART-006 v0.1` (`05_datos_e_idempotencia.md`): esquema de almacenamiento (OLTP en núcleo, OLAP analítico, WORM auditoría), consistencia fuerte vs eventual, prevención de saldo negativo con bloqueo de fila `FOR UPDATE`, idempotencia en 3 operaciones críticas, deduplicación de eventos y formulación de opciones para redondeo (`P1-PA-001`) y ausencia de ganadores (`P1-PA-002`).
 - **2026-10-27 (Sesión Inicial - Paso 13):** Inspección del repositorio de referencia del profesor `mlops2026` (`P1-HEC-003`). Incorporación de la política de mayores restos (`P1-DEC-003`) y ausencia de ganadores con reembolso 100% y motivo `SIN_APUESTAS_GANADORAS` (`P1-DEC-004`). Corrección de afirmaciones técnicas: Transactional Outbox desglosado en relay y at-least-once, particionamiento de liquidación por lotes (`batch_id`) con orden de bloqueo por usuario, idempotencia de premios vinculada a la apuesta (`P1-DEC-005`), delimitación rigurosa de WORM frente a replicación, y aclaración del estado incierto en cliente. Redacción de `P1-ADR-003`. Cierre formal de la Etapa P1-5 (9/9 tareas en `[x]`).
+- **2026-10-27 (Sesión Inicial - Paso 14):** Elaboración y consolidación de la Etapa P1-6 en `P1-ART-007 v1.0` (`06_escalabilidad_y_fallos.md`): análisis de cuellos de botella ante 100k usuarios y 10k apuestas/s, desglose de componentes que escalan vs los que no, presupuesto de latencia (<1s), cierre atómico en motor, liquidación masiva en 6-9 min, durabilidad RPO=0/RTO<30s, análisis de fallos Caso A (notificaciones), Caso B (billetera), resolución forense del Caso C opcional (corrección de foto de llegada) y plan de validación de métricas. Cierre formal de la Etapa P1-6 (10/10 tareas en `[x]`).
 
 ---
 
