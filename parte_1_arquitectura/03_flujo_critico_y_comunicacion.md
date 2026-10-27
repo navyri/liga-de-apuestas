@@ -111,11 +111,18 @@ Conforme a la estructura obligatoria requerida en la Decisión 3 del PDF, se ide
 
 ## P1-3.5: GESTIÓN DE TIMEOUTS, REINTENTOS Y RESPUESTAS INCIERTAS
 
-En sistemas distribuidos y transaccionales de apuestas, un timeout de red no implica que la operación no haya tenido éxito en el servidor. Para proteger la consistencia y la experiencia del usuario, se adopta la siguiente política formal:
+En sistemas transaccionales distribuidos de apuestas bajo alta concurrencia, es imperativo distinguir tres estados lógicos de una operación desde la perspectiva del cliente:
+1. **`ACEPTADA` (Determinista):** Transacción local confirmada (`COMMIT`), apuesta persistida en la bolsa y saldo descontado. El cliente recibe `HTTP 201 Created`.
+2. **`RECHAZADA` (Determinista):** Regla de negocio no satisfecha (saldo insuficiente, mediano no participante o llegada posterior a la hora de cierre según el reloj del servidor). El cliente recibe `HTTP 422 Unprocessable Entity` o `HTTP 409 Conflict`.
+3. **`DESCONOCIDA / INCIERTA` (Por incertidumbre de red o timeout técnico):** La petición no completó su ciclo de respuesta antes del límite de espera técnico del cliente o del gateway (configurado preventivamente en ~800 ms para no retener conexiones bloqueadas). 
 
+> **Aclaración crítica sobre latencia:**  
+> El timeout de cliente de 800 ms **no constituye una garantía de que la operación de negocio se resolvió con éxito en menos de un segundo**. Es un mecanismo defensivo para liberar el socket ante fallos de conectividad. Cuando ocurre un timeout, el estado de la apuesta permanece estrictamente en condición de incertidumbre.
+
+### Protocolo de Resolución de Incertidumbre y Reintentos:
 1. **Incertidumbre de Red en el Cliente:**  
-   Si el cliente web/móvil no recibe respuesta antes de los 800 ms (por pérdida de señal celular o fallo de paquete), el cliente **no debe asumir que la apuesta falló**.
+   Si el cliente web/móvil experimenta timeout o pérdida de paquete antes de recibir confirmación, **la aplicación no debe asumir que la apuesta falló ni que fue cobrada**.
 2. **Reintentos Idempotentes Seguros:**  
-   La aplicación cliente retiene en memoria la misma `Idempotency-Key` generada para esa intención de apuesta. Al restablecerse la conectividad o dispararse el reintento automático, despacha la misma clave. El servidor detectará que la operación ya fue confirmada o está en curso, retornando el estado final sin cobrar dos veces.
+   La aplicación cliente retiene en memoria la misma `Idempotency-Key` (UUIDv4) generada originalmente. Al ejecutar un reintento automático o tras la acción del usuario, reenvía la misma clave. El servidor detectará si la transacción ya fue confirmada (retornando el estado final sin duplicar cobros) o si se encuentra en procesamiento.
 3. **Consulta de Estado Alternativa:**  
-   Si persiste la incertidumbre, el cliente puede invocar de forma síncrona y liviana el endpoint de consulta rápida `GET /api/v1/bets/by-key/{idempotency_key}` para confirmar si la apuesta fue efectivamente admitida en la bolsa o si debe proceder a una nueva jugada.
+   Si persiste la incertidumbre, el cliente puede invocar el endpoint de lectura liviana `GET /api/v1/bets/by-key/{idempotency_key}` para inspeccionar el estado definitivo registrado en el servidor antes de permitir al usuario formular una nueva intención de apuesta.

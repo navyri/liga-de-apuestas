@@ -50,14 +50,14 @@
 - [x] **P1-3.5** Timeouts, reintentos y respuestas inciertas. *(Completado y verificado por revisión autónoma)*.
 
 ### ETAPA P1-4 — Mensajería
-- [~] **P1-4.1** Comparar RabbitMQ, Kafka, ambos o ninguno. *(Elaborado en P1-ART-005; pendiente de decisión en P1-4.2)*.
-- [ ] **P1-4.2** Aprobar elección.
-- [ ] **P1-4.3** Definir eventos en un único idioma.
-- [ ] **P1-4.4** Tabla de productores, consumidores, tecnología y claves.
-- [ ] **P1-4.5** Contenido mínimo y versiones.
-- [ ] **P1-4.6** Topología de mensajería.
-- [ ] **P1-4.7** Reintentos, confirmaciones, duplicados y fallidos.
-- [ ] **P1-4.8** Publicación confiable entre persistencia y mensajería.
+- [x] **P1-4.1** Comparar RabbitMQ, Kafka, ambos o ninguno. *(Completado y consolidado)*.
+- [x] **P1-4.2** Aprobar elección. *(Aprobado formalmente por el usuario: P1-DEC-002)*.
+- [x] **P1-4.3** Definir eventos en un único idioma. *(Completado en español formal PascalCase)*.
+- [x] **P1-4.4** Tabla de productores, consumidores, tecnología y claves. *(Completado y consolidado)*.
+- [x] **P1-4.5** Contenido mínimo y versiones. *(Completado y consolidado)*.
+- [x] **P1-4.6** Topología de mensajería. *(Completado y consolidado con particionamiento de liquidación)*.
+- [x] **P1-4.7** Reintentos, confirmaciones, duplicados y fallidos. *(Completado y consolidado con DLT e idempotencia)*.
+- [x] **P1-4.8** Publicación confiable entre persistencia y mensajería. *(Completado con Transactional Outbox)*.
 
 ### ETAPA P1-5 — Datos e idempotencia
 - [ ] **P1-5.1** Almacenamiento y propiedad.
@@ -120,7 +120,7 @@
 
 ## 2. REGISTRO DE DECISIONES ARQUITECTÓNICAS (ADR) Y DECISIONES TÉCNICAS
 - **P1-DEC-001 (Aprobada por el usuario):** Adopción de la **Arquitectura Híbrida** (Núcleo Modular Transaccional para usuarios, medianos, carreras, apuestas y billetera, con servicios/workers desacoplados para notificaciones, analítica y liquidación masiva). Descarte formal de Microservicios Puros y Monolito Tradicional. Formalizada en `P1-ADR-001`.
-- **Decisiones propuestas pendientes:** Ninguna en esta etapa (se abordarán comunicaciones y brokers en P1-3 y P1-4).
+- **P1-DEC-002 (Aprobada por el usuario):** Selección de **Apache Kafka como Broker Único** de mensajería y streaming de eventos. Descarte de RabbitMQ como broker único y de la solución dual (ambos). Adopción del patrón Transactional Outbox para publicación confiable y particionamiento por `race_id` y `user_id`. Formalizada en `P1-ADR-002`.
 
 ---
 
@@ -146,12 +146,13 @@
 
 | ID Artefacto | Nombre del Artefacto | Versión | Estado | Descripción / Contenido |
 | :--- | :--- | :--- | :--- | :--- |
-| **P1-ART-001** | Registro Maestro P1 | v1.5 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001), hechos, supuestos, trazabilidad y bitácora. |
+| **P1-ART-001** | Registro Maestro P1 | v1.6 | `[x]` Aprobado | Checklist maestro, política de autonomía, decisiones aprobadas (P1-DEC-001/002), trazabilidad y bitácora. |
 | **P1-ART-002** | Negocio, Actores, Roles y Capacidades | v1.1 | `[x]` Aprobado | Análisis de roles (explícito vs propuesto) y 9 capacidades funcionales de negocio consolidadas. |
 | **P1-ART-003** | Arquitectura y Componentes | v1.0 | `[x]` Consolidado | Comparación de estilos, justificación de descartes, desglose de boundaries, módulos vs despliegues y modelo de escalamiento. |
-| **P1-ART-004** | Flujo Crítico y Comunicación Síncrona | v1.0 | `[x]` Consolidado | Secuencia integral de apuesta-descuento, consistencia local ACID, tabla síncrona formal y manejo de timeouts/incertidumbre. |
-| **P1-ART-005** | Mensajería y Comunicación Asíncrona | v0.1 | `[~]` Elaborado | Comparativa RabbitMQ vs Kafka vs Ambos vs Ninguno para la Decisión 5. |
+| **P1-ART-004** | Flujo Crítico y Comunicación Síncrona | v1.1 | `[x]` Consolidado | Secuencia integral de apuesta-descuento, consistencia local ACID, tabla síncrona formal y protocolo de incertidumbre de red. |
+| **P1-ART-005** | Mensajería y Comunicación Asíncrona | v1.0 | `[x]` Consolidado | Comparativa de brokers, catálogo canónico en español, tabla de eventos, topología de tópicos, particionamiento de liquidación y Transactional Outbox. |
 | **P1-ADR-001** | ADR-001: Estilo Arquitectónico | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la adopción de la Arquitectura Híbrida y descarte de alternativas. |
+| **P1-ADR-002** | ADR-002: Broker de Mensajería | v1.0 | `[x]` Aprobado | Registro formal de decisión arquitectónica para la selección de Apache Kafka como broker único y patrón Transactional Outbox. |
 
 ---
 
@@ -192,6 +193,7 @@
 - **2026-10-27 (Sesión Inicial - Paso 8):** Aprobación del usuario para la Arquitectura Híbrida (`P1-DEC-001`). Incorporación de precisiones: apuesta-descuento en transacción local, matización de garantías de rendimiento, reajuste de motivos de descarte de microservicios, e inclusión explícita de Resultados, Liquidación, Devoluciones y Auditoría. Elaboración y verificación de `P1-2.3`, `P1-2.4` y `P1-2.5`. Redacción de `P1-ADR-001`. Cierre formal de la Etapa P1-2 (5/5 tareas en `[x]`).
 - **2026-10-27 (Sesión Inicial - Paso 9):** Elaboración y consolidación autónoma de la Etapa P1-3 en `P1-ART-004 v1.0` (`03_flujo_critico_y_comunicacion.md`): secuencia atómica de apuesta y débito, tabla síncrona formal (Decisión 3), validación atómica de hora de cierre y protocolo de incertidumbre de red / timeouts con idempotency keys. Cierre de P1-3 (5/5 tareas en `[x]`).
 - **2026-10-27 (Sesión Inicial - Paso 10):** Elaboración de `P1-4.1` en `P1-ART-005 v0.1` (`04_mensajeria_y_eventos.md`): comparación técnica de RabbitMQ, Kafka, Ambos y Ninguno frente al pico de 10k eventos/s, múltiples consumidores independientes y reproducción para auditoría. Preparación para la consulta de la Decisión 5 (`P1-4.2`).
+- **2026-10-27 (Sesión Inicial - Paso 11):** Aprobación del usuario para Apache Kafka (`P1-DEC-002`) con precisiones de descarte proporcional, matización de tasas de eventos vs apuestas, delimitación de Kafka frente a auditoría a 5 años e idempotencia en replay. Ajuste en `P1-ART-004 v1.1` sobre estados de incertidumbre vs garantías de latencia. Consolidación de `P1-4.3` a `P1-4.8` en `P1-ART-005 v1.0` (eventos canónicos en español, tabla formal, topología con particionamiento de liquidación y Transactional Outbox). Redacción de `P1-ADR-002`. Cierre formal de la Etapa P1-4 (8/8 tareas en `[x]`).
 
 ---
 

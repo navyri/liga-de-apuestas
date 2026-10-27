@@ -2,65 +2,190 @@
 **Caso:** La Gran Liga de Apuestas de Medianos EIA  
 **Organización:** Salchipapa Maker Racing S.A.S.  
 **Artefacto:** `P1-ART-005`  
-**Versión:** `v0.1` (Borrador técnico para decisión)  
-**Estado:** `[~]` Elaborado pendiente de decisión del usuario para P1-4.2 (Decisión 5: RabbitMQ vs. Kafka)  
+**Versión:** `v1.0`  
+**Estado:** `[x]` Consolidado (Elección de Apache Kafka aprobada por el usuario en P1-DEC-002; diseño de eventos, topología y outbox verificado por revisión autónoma)  
 
 ---
 
-## P1-4.1: COMPARACIÓN TÉCNICA: RABBITMQ, KAFKA, AMBOS O NINGUNO
+## P1-4.1 Y P1-4.2: DECISIÓN 5 — ELECCIÓN DE LA TECNOLOGÍA DE MENSAJERÍA
 
-Para resolver la **Decisión 5** del PDF (págs. 11-12, 14-15), se evalúan las cuatro alternativas de infraestructura de mensajería frente a las características del dominio:
+### 1. Dirección Aprobada: Apache Kafka como Broker Único del Sistema
+Se adopta formalmente **Apache Kafka** como plataforma exclusiva de mensajería y streaming de eventos para la Liga de Apuestas de Medianos.
 
-### 1. Perfil del Tráfico Asíncrono del Negocio
-- **Eventos Transaccionales de Alto Volumen:** Emisión de eventos de apuestas (`ApuestaRealizada` / `BetPlaced`) a una tasa pico de 10.000 eventos/s durante 30 segundos (300.000 eventos acumulados) y generación masiva de registros diarios para analítica (millones al día).
-- **Consumo Múltiple e Independiente:** Un mismo evento de apuesta interesa simultáneamente a:
-  - Motor de cálculo de cuotas dinámicas estimadas (en tiempo casi real).
-  - Servicio de auditoría y detección de fraudes (detección de anomalías al cierre).
-  - Pipeline de analítica y estadísticas (almacén histórico).
-  - Servicio de notificaciones al apostador (confirmación push/correo).
-- **Procesamiento de Tareas / Tareas en Lotes:** Distribución de trabajos pesados de liquidación masiva de premios (> 1.000.000 apuestas) y dispersión de devoluciones por carreras canceladas.
+### 2. Justificación Técnica y Comparativa Frente al Dominio
 
----
+#### A. Ajuste al Patrón de Múltiples Consumidores Independientes y Eventos Retenidos
+- **Naturaleza del Dominio:** En la plataforma, un único evento de negocio (por ejemplo, la admisión de una apuesta o la publicación del resultado oficial) interesa concurrentemente a múltiples subsistemas:
+  - Motor de estimación de cuotas dinámicas en vivo.
+  - Servicio de auditoría y control de anomalías.
+  - Pipeline de estadísticas y analítica para reportes diarios y venta premium.
+  - Servicio de notificaciones multicanal hacia los apostadores.
+- **Ventaja de Diseño de Kafka:** En Kafka, el almacenamiento se estructura como un log distribuido de confirmación en disco (*commit log* append-only). Múltiples grupos de consumidores (`Consumer Groups`) leen concurrentemente la misma partición a su propio ritmo sin necesidad de duplicar el mensaje físicamente en almacenamiento ni generar colas aisladas por cada suscriptor. Cada grupo mantiene su propio cursor o puntero de lectura (`offset`).
 
-### 2. Análisis Comparativo de las Alternativas
+#### B. Justificación del Descarte de Alternativas
+1. **Descarte de RabbitMQ como broker principal del diseño:**
+   - Si bien RabbitMQ soporta patrones avanzados de enrutamiento AMQP, colas tradicionales y extensiones como *RabbitMQ Streams* (que ofrecen semánticas de log secuencial), el diseño del sistema encaja de forma más directa y estándar en el modelo de tópicos particionados y grupos de consumidores de Kafka, donde los eventos retenidos por ventana temporal permiten desacoplar de forma nativa a consumidores con velocidades de procesamiento dispares (ej. notificaciones lentas vs. cálculo ágil de cuotas).
+   - *(Aclaración de descarte):* No se descarta a RabbitMQ por una supuesta incapacidad técnica ni por limitaciones genéricas de throughput, sino porque la semántica de publicación basada en log distribuido con particionamiento explícito por clave de negocio (`race_id`, `user_id`) satisface de manera más compacta y uniforme todos los flujos asíncronos del caso de estudio sin requerir tecnologías heterogéneas.
+2. **Descarte de la Solución Dual (RabbitMQ + Kafka combinados):**
+   - El PDF señala taxativamente (pág. 11, 15): *"No existe obligación de utilizar ambos... Si utilizan ambos, deberán justificar por qué mantener dos tecnologías diferentes representa una ventaja suficiente para asumir la complejidad adicional"*.
+   - Para el alcance de la Liga de Medianos, **no se ha demostrado una ventaja operativa suficiente que compense la complejidad de aprovisionar, monitorizar, asegurar y operar dos plataformas de mensajería distintas**. Una sola tecnología bien dimensionada cubre tanto el streaming de eventos como la distribución de tareas de liquidación.
 
-#### A. RabbitMQ Únicamente (Message Broker Basado en Colas y AMQP)
-- **Fortalezas:** Excelente para enrutamiento flexible mediante exchanges (direct, topic, fanout), distribución de tareas a workers en competencia (*competing consumers*), gestión de reintentos con colas de cartas muertas (DLQ) y baja sobrecarga operativa base.
-- **Limitaciones frente al caso:**
-  - En RabbitMQ, una vez que un mensaje es consumido y confirmado (*acknowledged*), se elimina de la cola. No permite retención histórica ni reproducción posterior de eventos (*replay*) para reconstrucción forense o reentrenamiento analítico.
-  - El modelo *fan-out* hacia 4 consumidores distintos (notificaciones, analítica, fraude, cuotas) multiplica físicamente las colas y copias de mensajes en disco/RAM. Sostener 10.000 eventos/s multiplicados por 4 consumidores genera 40.000 mensajes/s en el broker, saturando la memoria y provocando contención severa por contrapresión (*backpressure*).
+#### C. Matización Rigurosa de Rendimiento y Rendimiento Asíncrono
+- **Distinción entre Apuestas/s y Eventos/s:**
+  - El pico del negocio es de **10.000 apuestas por segundo** en la capa transaccional HTTP/BD durante 30 segundos.
+  - Cada apuesta aceptada produce un evento principal de dominio (`BetPlaced`). No obstante, si se emitieran eventos secundarios de auditoría o cuotas sin consolidación, la tasa de eventos podría multiplicarse. El diseño adopta **1 evento canónico por apuesta admitida**, resultando en una tasa asíncrona pico de ~10.000 eventos/s hacia Kafka.
+- **Supuestos de Dimensionamiento:**
+  - Tamaño promedio de evento `BetPlaced` serializado en JSON/Avro: $\sim 500\text{ bytes}$.
+  - Tasa de datos en pico: $10.000\text{ ev/s} \times 500\text{ bytes} \approx 5\text{ MB/s}$ de rendimiento de escritura sostenido durante 30 segundos ($\approx 150\text{ MB}$ totales por ráfaga), lo cual es absorbible por un clúster moderado de Kafka con particiones adecuadas sin representar una carga insalvable.
+- **Compromiso entre Paralelismo y Orden por Partición:**
+  - En Kafka, el orden estricto de entrega solo se garantiza **dentro de una misma partición**.
+  - Aumentar el número de particiones eleva el paralelismo de consumo, pero distribuye los eventos. Para preservar el orden causal donde es obligatorio (ej. ciclo de una carrera), se utiliza la clave de partición adecuada.
 
-#### B. Apache Kafka Únicamente (Distributed Event Streaming Platform / Commit Log)
-- **Fortalezas:**
-  - Diseñado como un registro distribuido append-only en disco optimizado para escrituras secuenciales masivas y alto *throughput* (cientos de miles de eventos/s).
-  - **Múltiples consumidores independientes sin duplicación física:** Cada consumidor (Analítica, Fraude, Notificaciones, Cuotas) mantiene su propio cursor (*offset*) y lee el mismo log a su propio ritmo sin interferir con los demás.
-  - **Retención y reproducción:** Los eventos se conservan según política temporal (ej. 7 días o semanas), permitiendo al servicio de auditoría o analítica retroceder el cursor y reprocesar el histórico ante fallos o recalibración de modelos.
-  - **Particionamiento por clave:** Garantiza orden estricto por carrera (`race_id`) o por usuario (`user_id`).
-- **Limitaciones frente al caso:**
-  - No cuenta nativamente con colas de trabajo con visibilidad temporal individualizada ni reintentos selectivos por mensaje (el reintento requiere tópicos de reintento dedicados tipo *retry-topics* o DLQ topics).
-  - Sobrecarga operativa superior si se despliega clúster auto-gestionado completo, aunque mitigable mediante servicios administrados.
-
-#### C. Ambos Brokers (RabbitMQ + Kafka)
-- **Enfoque:** Utilizar Kafka como columna vertebral para el flujo de eventos de alta velocidad (apuestas, analítica, auditoría) y RabbitMQ para la orquestación de tareas puntuales de liquidación masiva y reintentos de notificación.
-- **Evaluación frente a la Regla de Dyllan:** Exige operar, monitorizar y aprovisionar dos plataformas de mensajería completamente diferentes con curvas de aprendizaje y costos dispares. El PDF advierte expresamente (pág. 15): *"Si utilizan ambos, deberán justificar por qué mantener dos tecnologías diferentes representa una ventaja suficiente para asumir la complejidad adicional"*. Para una liga de medianos, mantener dos clústeres viola el principio de parsimonia arquitectónica.
-
-#### D. Ninguno (Comunicación Directa HTTP/gRPC)
-- **Evaluación:** Obligaría al núcleo transaccional a notificar síncronamente por HTTP a analítica, notificaciones y auditoría en cada apuesta. Bajo 10.000 req/s, provocaría el colapso inmediato del sistema por agotamiento de puertos y cascada de fallos. El desacoplamiento asíncrono es estrictamente indispensable.
-
----
-
-### 3. Matriz Comparativa de Mensajería
-
-| Criterio Técnico | RabbitMQ | Apache Kafka | Ambos (RabbitMQ + Kafka) |
-| :--- | :--- | :--- | :--- |
-| **Soporte de Pico (10k eventos/s)** | Exigido al límite en ráfaga; riesgo de degradación por consumo de RAM. | Óptimo (escritura secuencial en log en disco con cero copia). | Óptimo en Kafka, pero sobrecargado en RabbitMQ. |
-| **Múltiples Consumidores del Mismo Evento** | Requiere duplicar colas (fan-out); multiplica el uso de almacenamiento. | Nativo por diseño (grupos de consumidores sobre el mismo log). | Duplicado innecesariamente. |
-| **Reproducción y Reprocesamiento Histórico** | No soportado (los mensajes se eliminan tras el ACK). | Nativo (reproducibilidad por desplazamiento de *offset*). | Disponible solo en el segmento de Kafka. |
-| **Complejidad y Costo Operativo (Dyllan)** | Bajo a moderado. | Moderado (óptimo como servicio administrado). | Máximo (injustificado para el tamaño del problema). |
+#### D. Delimitación Estricta entre Retención Operativa en Kafka y Auditoría Inalterable a 5 Años
+- **Retención Operativa en Kafka:** Kafka se configura con una retención temporal acotada (ej. **7 días**). Su función es absorber ráfagas, tolerar caídas transitorias de consumidores y permitir reprocesamiento reciente (*replay* operativo). **Kafka no es el repositorio definitivo de auditoría inalterable a 5 años**.
+- **Auditoría Legal y Forense a 5 Años:** Se garantiza mediante la ingesta continua de eventos desde Kafka hacia una base de datos o almacenamiento inmutable de auditoría (esquema append-only con controles de integridad criptográfica y permisos exclusivos de solo lectura para el auditor).
+- **Protección contra Efectos Duplicados en Reprocesamiento (*Replay*):**
+  - Si un consumidor retrocede su offset para reprocesar eventos, **jamás debe re-acreditar premios ni emitir reembolsos duplicados**.
+  - Los consumidores de billetera y liquidación operan con **idempotencia estricta en la base de datos de destino** (ej. tablas contables con restricciones `UNIQUE (race_id, user_id, transaction_type)`), ignorando transacciones previamente ejecutadas.
 
 ---
 
-### 4. Propuesta de Decisión (P1-4.2)
-- **Recomendación técnica:** **Seleccionar Apache Kafka como tecnología única de mensajería y event streaming.**
-  - *Justificación:* Resuelve de manera natural el requerimiento explícito del PDF (pág. 11): *"múltiples consumidores interesados en la misma información (Analítica, Fraude, Estadísticas, Auditoría) donde cada consumidor lee el mismo evento de forma independiente y a su propio ritmo"*. Además, permite absorber con holgura los 10.000 eventos/s de la ráfaga mediante particionamiento sin multiplicar el almacenamiento, y habilita la reproducción histórica exigida por la auditoría forense.
-  - *Descarte de RabbitMQ y de la solución dual:* Se descarta RabbitMQ como broker principal por su ineficiencia al replicar colas para múltiples consumidores bajo ráfaga y por la imposibilidad de reproducir eventos. Se descarta la solución dual (ambos) para no duplicar costos ni infraestructura operativa, cumpliendo la directriz de Dyllan.
+## P1-4.3: DEFINICIÓN CANÓNICA DE EVENTOS EN UN ÚNICO IDIOMA
+
+Para dar cumplimiento formal al requisito del PDF (pág. 10, 14: *"Usen un único idioma para nombrarlos"*), se adopta **Español formal en formato PascalCase** en toda la plataforma:
+
+1. `ApuestaAceptada`: Emitido cuando una apuesta es validada, descontada de la billetera y confirmada en la base de datos.
+2. `CarreraIniciada`: Emitido cuando la carrera arranca oficialmente en pista y cesa irrevocablemente el corte.
+3. `CarreraFinalizada`: Emitido cuando el último mediano cruza la meta y la carrera concluye en pista.
+4. `ResultadoOficialPublicado`: Emitido cuando el Operador de Carrera registra y sella la foto de llegada y el ganador oficial.
+5. `LotePremiosCalculado`: Emitido por el worker de liquidación detallando las apuestas premiadas por bloque.
+6. `PremioAcreditado`: Emitido cada vez que se abona exitosamente la recompensa en la billetera de un apostador ganador.
+7. `CarreraCancelada`: Emitido si la carrera se suspende antes de finalizar, activando el proceso masivo de devoluciones.
+8. `DevolucionAcreditada`: Emitido al reintegrarse el 100% de los fondos de una apuesta tras cancelación.
+
+---
+
+## P1-4.4: TABLA DE PRODUCTORES, CONSUMIDORES, TOPOLOGÍA Y CLAVES (PDF pág. 14)
+
+Conforme a la estructura obligatoria de la Decisión 4 del PDF, se define el catálogo de eventos asíncronos:
+
+| Evento | Productor | Tecnología | Consumidor(es) | Clave de Partición (`Partition Key`) | Propósito / Efecto del Consumo |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`ApuestaAceptada`** | Núcleo Modular (`core-api` vía Outbox) | Apache Kafka (Topic: `apuestas.aceptadas`) | 1. `CalculadorCuotas`<br>2. `ServicioAnalitica`<br>3. `ServicioAuditoria`<br>4. `ServicioNotificaciones` | `race_id` | Mantiene el orden estricto de llegada de apuestas por carrera para el cálculo progresivo de la cuota estimada, alimentación de métricas y alerta al apostador. |
+| **`CarreraIniciada`** | Núcleo Modular (`RacesModule` vía Outbox) | Apache Kafka (Topic: `carreras.eventos`) | 1. `ServicioNotificaciones`<br>2. `ServicioAnalitica` | `race_id` | Notifica a usuarios en vivo y actualiza el estado de la transmisión en tiempo real. |
+| **`CarreraFinalizada`** | Núcleo Modular (`RacesModule` vía Outbox) | Apache Kafka (Topic: `carreras.eventos`) | 1. `ServicioNotificaciones`<br>2. `ConsolaOperador` | `race_id` | Alerta al operador y usuarios del fin de la carrera en pista a la espera de resultados oficiales. |
+| **`ResultadoOficialPublicado`**| Núcleo Modular (`RacesModule` vía Outbox) | Apache Kafka (Topic: `carreras.resultados`) | 1. `WorkerLiquidacion`<br>2. `ServicioNotificaciones`<br>3. `ServicioAuditoria` | `race_id` | **Disparador de liquidación:** El worker toma el resultado oficial y arranca el cálculo proporcional del 90% de la bolsa. |
+| **`LoteLiquidacionGenerado`** | `WorkerLiquidacion` | Apache Kafka (Topic: `liquidacion.lotes`) | `WorkersDispersadoresSaldo` (Pool de hilos en `core-api` / worker) | `user_id` | **Distribución de carga:** Divide 1M de apuestas en lotes particionados por usuario para evitar contención de balance en BD. |
+| **`PremioAcreditado`** | Worker / Módulo Billetera | Apache Kafka (Topic: `billetera.movimientos`) | 1. `ServicioNotificaciones`<br>2. `ServicioAuditoria`<br>3. `ServicioAnalitica` | `user_id` | Notifica al usuario ganador ("¡Ganaste X EIA Coins!") y registra el movimiento contable en auditoría. |
+| **`CarreraCancelada`** | Núcleo Modular (`RacesModule` vía Outbox) | Apache Kafka (Topic: `carreras.eventos`) | 1. `WorkerLiquidacion` (Modo Reembolso)<br>2. `ServicioNotificaciones`<br>3. `ServicioAuditoria` | `race_id` | Dispara el proceso de reembolso del 100% de los montos a cada apostador participante. |
+| **`DevolucionAcreditada`** | Worker / Módulo Billetera | Apache Kafka (Topic: `billetera.movimientos`) | 1. `ServicioNotificaciones`<br>2. `ServicioAuditoria` | `user_id` | Notifica al apostador el reintegro de sus EIA Coins por cancelación de carrera. |
+
+---
+
+## P1-4.5: ESQUEMA Y CONTENIDO MÍNIMO DE LOS EVENTOS
+
+Todos los eventos de la plataforma comparten una estructura base canónica con versionado semántico para garantizar evolución compatible de esquemas:
+
+```json
+{
+  "eventId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "eventType": "ApuestaAceptada",
+  "schemaVersion": "1.0",
+  "timestamp": "2026-10-27T18:30:00.125Z",
+  "producer": "core-api/instance-03",
+  "correlationId": "corr-89102-uuid",
+  "data": {
+    "betId": "bet-994821",
+    "raceId": "race-copa-final-2026",
+    "userId": "usr-48192",
+    "racerId": "racer-frodito-turbo",
+    "amount": 500,
+    "userBalanceAfter": 1500,
+    "idempotencyKey": "idem-client-8812739"
+  }
+}
+```
+
+### Campos Mínimos Obligatorios:
+- `eventId`: Identificador único global (UUIDv4) del evento para deduplicación en consumidores.
+- `eventType`: Nombre canónico del evento en PascalCase.
+- `schemaVersion`: Versión del contrato de datos para soportar evolución.
+- `timestamp`: Marca temporal en UTC generada por el servidor emisor.
+- `producer`: Identificador del componente u origen del mensaje.
+- `data`: Carga útil de negocio específica con identificadores de entidades, montos y claves de trazabilidad.
+
+---
+
+## P1-4.6: TOPOLOGÍA DE TÓPICOS Y GRUPOS DE CONSUMIDORES
+
+```text
+                                  APACHE KAFKA CLUSTER
+ ┌────────────────────────────────────────────────────────────────────────────────────────┐
+ │                                                                                        │
+ │  Topic: apuestas.aceptadas (Particionado por race_id)                                  │
+ │  [ P0 ][ P1 ][ P2 ][ P3 ][ P4 ][ P5 ][ P6 ][ P7 ]                                      │
+ │   │      │      │                                                                      │
+ └───┼──────┼──────┼──────────────────────────────────────────────────────────────────────┘
+     │      │      │
+     ├──────┴──────┴───────► Consumer Group: "cuotas-dinamicas-workers" (Offset propio)
+     ├─────────────────────► Consumer Group: "notificaciones-apuestas" (Offset propio)
+     ├─────────────────────► Consumer Group: "analitica-ingesta-diaria" (Offset propio)
+     └─────────────────────► Consumer Group: "auditoria-control-fraude" (Offset propio)
+
+ ┌────────────────────────────────────────────────────────────────────────────────────────┐
+ │  Topic: liquidacion.lotes (Particionado por user_id)                                   │
+ │  [ P0 ][ P1 ][ P2 ][ P3 ][ P4 ][ P5 ][ P6 ][ P7 ]                                      │
+ │   │                                                                                    │
+ └───┼────────────────────────────────────────────────────────────────────────────────────┘
+     └─────────────────────► Consumer Group: "dispersores-premios-billetera"
+```
+
+### Distribución del Trabajo de Liquidación Masiva sin RabbitMQ
+Para procesar más de 1.000.000 de apuestas en menos de 15 minutos sin generar una única tarea gigantesca monolítica y sin introducir un segundo broker:
+1. **Fase 1 (Cálculo Agregado en Worker):** Al recibir `ResultadoOficialPublicado`, el `WorkerLiquidacion` ejecuta una consulta agregada sobre la bolsa de la carrera en la BD operativa, determinando la masa ganadora $T_w$, la bolsa neta $B_{\text{neta}}$ y la cuota unitaria final $Q_w$. Esta fase toma menos de 10 segundos.
+2. **Fase 2 (Generación de Lotes Particionados):** El worker segmenta las apuestas ganadoras en **lotes homogéneos de 1.000 apuestas** (`LoteLiquidacionGenerado`).
+3. **Fase 3 (Dispersión Paralela por Tópico Particionado por `user_id`):** Los lotes se publican en el tópico `liquidacion.lotes` utilizando el identificador del usuario como clave de partición (`user_id`).
+4. **Fase 4 (Consumo Concurrente):** Un grupo escalado de workers acreditadores consume los lotes en paralelo. Dado que los eventos están particionados por usuario, se evitan interbloqueos (*deadlocks*) en la tabla de billeteras, logrando acreditar las apuestas ganadoras de forma fluida a una tasa de $\sim 1.500\text{ a } 2.500\text{ acreditaciones/s}$, completando el millón de jugadas en un rango de 7 a 11 minutos (muy por debajo del límite de 15 minutos).
+
+---
+
+## P1-4.7: ESTRATEGIA DE REINTENTOS, CONFIRMACIONES, MENSAJES DUPLICADOS Y FALLIDOS
+
+1. **Garantía de Entrega y Tolerancia a Duplicados:**  
+   Kafka opera bajo la semántica de entrega **al menos una vez** (*at-least-once*). En consecuencia, **los consumidores deben ser estrictamente idempotentes**. Todo consumidor registra en su almacén local el `eventId` procesado; si un mensaje se reentrega por caída de red, el consumidor detecta el `eventId` y emite confirmación de offset sin reejecutar la lógica.
+2. **Tópicos de Reintento y Carta Muerta (Dead Letter Topic - DLT):**  
+   - Si un consumidor falla por error transitorio (ej. micro-corte hacia el proveedor push de notificaciones), el mensaje se remite a un tópico de reintento (`notificaciones.retry-5s`) con cabecera de contador de intentos.
+   - Si tras 3 reintentos el fallo persiste (ej. dirección de correo corrupta), se desvía al tópico de descarte (`notificaciones.dlt`) para inspección operativa sin detener el consumo del flujo principal.
+
+---
+
+## P1-4.8: PUBLICACIÓN CONFIABLE: PATRÓN TRANSACTIONAL OUTBOX
+
+Para erradicar la inconsistencia clásica de los sistemas distribuidos (donde se guarda en la base de datos pero se cae el broker antes de publicar, o viceversa), se implementa el patrón **Transactional Outbox**:
+
+```text
+ ┌─────────────────────────────────────────────────────────────┐
+ │                TRANSACCIÓN LOCAL ACID EN BD                 │
+ │                                                             │
+ │  1. UPDATE wallets SET balance = balance - 500              │
+ │  2. INSERT INTO bets (id, user_id, amount, ...)             │
+ │  3. INSERT INTO outbox_events (id, topic, payload, status)  │
+ │                                                             │
+ │  COMMIT ATÓMICO (Garantiza persistencia conjunta)           │
+ └──────────────────────────────┬──────────────────────────────┘
+                                │
+                                ▼ CDC / Polling Publisher
+                 ┌─────────────────────────────┐
+                 │    OUTBOX RELAY PROCESS     │
+                 │ - Lee eventos 'PENDING'     │
+                 │ - Publica en Apache Kafka   │
+                 │ - Marca eventos 'PUBLISHED' │
+                 └──────────────┬──────────────┘
+                                │
+                                ▼
+                         [ APACHE KAFKA ]
+```
+
+- **Garantía de Persistencia:** El evento `ApuestaAceptada` se escribe en la tabla `outbox_events` dentro de la **misma transacción local** que debita el saldo y guarda la apuesta.
+- **Relay Desacoplado:** Un proceso emisor (*Outbox Relay* mediante lectura de logs de transacción / CDC o polling de alta frecuencia) lee los registros pendientes y los despacha hacia Apache Kafka con confirmación del broker (`acks=all`).
+- **Resiliencia:** Si Kafka experimenta una caída momentánea, las apuestas siguen siendo admitidas y cobradas normalmente en la base de datos; los eventos se acumulan de forma segura en la tabla outbox y se drenan automáticamente al recuperarse el broker.
