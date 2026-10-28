@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>Liga de Apuestas de Medianos EIA — Presentación Ejecutiva (Parte 1)</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--vino:#6B0F1A;--vino-osc:#540B13;--carm:#8B1E2D;--carm-al:#A82336;--acento:#E8B4B8;--fondo:#1E0A0F;--texto:#F4ECE4;--dorado:#C6A66B}
+html,body{height:100%}
+body{background:radial-gradient(1200px 700px at 30% 20%,#2A0A10 0%,#14060A 70%);color:var(--texto);font-family:"Segoe UI",Arial,Helvetica,sans-serif;overflow:hidden}
+#escenario{position:relative;width:1280px;height:720px;margin:12px auto 0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:40px 54px 54px;background:linear-gradient(160deg,#22090E 0%,#180710 100%);border:1px solid rgba(138,30,45,.45);border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+.slide.activa{display:flex}
+h1.titulo{font-size:33px;font-weight:700;color:var(--acento);letter-spacing:.3px;border-left:8px solid var(--carm-al);padding-left:16px;margin-bottom:4px;line-height:1.15}
+.subtitulo{font-size:16.5px;color:#D9BFBF;margin-bottom:12px}
+.contenido{flex:1;min-height:0;overflow:hidden}
+a.abrir{display:flex;align-items:center;justify-content:center;flex:1;min-width:0;text-decoration:none}
+a.abrir:hover img{outline:2px solid var(--carm-al);outline-radius:6px}
+p,li{font-size:20.5px;line-height:1.38}
+ul,ol{padding-left:26px}
+li{margin:6px 0}
+b,strong{color:var(--acento)}
+.mono{font-family:Consolas,"Courier New",monospace;font-size:.92em;color:#F0D9DC}
+table{width:100%;border-collapse:collapse;font-size:16px;margin-top:6px}
+th{background:var(--vino);color:var(--texto);padding:8px 11px;text-align:left;border:1px solid #7C1622}
+td{padding:7px 11px;border:1px solid #5A121B;background:#20090E;vertical-align:top}
+tr:nth-child(even) td{background:#260B12}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:#2A0C13;border:1px solid #7C1622;border-radius:8px;padding:13px 17px}
+.card h3{color:var(--acento);font-size:18.5px;margin-bottom:5px}
+.card p,.card li{font-size:16.5px}
+.kpi{background:linear-gradient(150deg,#6B0F1A,#540B13);border:1px solid var(--carm-al);border-radius:10px;padding:14px 10px;text-align:center}
+.kpi .num{font-size:27px;font-weight:700;color:#fff;display:block}
+.kpi .lbl{font-size:14.5px;color:#F1D4D8;display:block;margin-top:3px}
+.chips span{display:inline-block;background:var(--carm);border-radius:20px;padding:4px 13px;margin:4px 6px 0 0;font-size:15.5px}
+img.diagrama{display:block;margin:0 auto;max-width:100%;max-height:100%;object-fit:contain}
+.pie{position:absolute;left:54px;right:54px;bottom:16px;display:flex;justify-content:space-between;font-size:13px;color:#B98A93;border-top:1px solid rgba(138,30,45,.35);padding-top:7px}
+.cita{font-style:italic;color:var(--acento);font-size:19.5px;border-left:4px solid var(--dorado);padding:8px 14px;background:rgba(108,15,26,.28);border-radius:0 8px 8px 0}
+.ok{color:#9BD98F;font-weight:700}
+.bad{color:#F0A0A0;font-weight:700}
+.fw{font-weight:700;color:var(--acento)}
+#indicador{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--carm),var(--acento));width:0;z-index:20;transition:width .25s}
+#contador{position:fixed;right:18px;top:10px;font-size:15px;color:#C89AA2;background:rgba(20,6,10,.75);padding:4px 12px;border-radius:14px;border:1px solid #5A121B;z-index:20}
+#controles{position:fixed;bottom:14px;right:18px;display:flex;gap:8px;z-index:20}
+#controles button{background:var(--vino);color:var(--texto);border:1px solid var(--carm-al);font-size:18px;width:42px;height:36px;border-radius:8px;cursor:pointer}
+#controles button:hover{background:var(--carm)}
+#panel-notas{position:fixed;left:0;right:0;bottom:0;max-height:34vh;overflow:auto;background:rgba(12,4,8,.97);border-top:3px solid var(--dorado);padding:12px 22px 16px;display:none;z-index:30;font-size:16px;color:#EBD8C8}
+#panel-notas.visible{display:block}
+#panel-notas h4{color:var(--dorado);margin-bottom:5px;font-size:14px;letter-spacing:1px}
+.nota{display:none}
+#pie-teclas{position:fixed;bottom:14px;left:18px;font-size:12.5px;color:#96707A;z-index:20}
+@media print{
+  body{background:#fff;overflow:visible}
+  #indicador,#contador,#controles,#panel-notas,#pie-teclas,.nota{display:none!important}
+  #escenario{width:1280px;height:auto;margin:0}
+  .slide{display:flex!important;position:relative;inset:auto;width:1280px;height:720px;page-break-after:always;break-after:page;border:none;border-radius:0;box-shadow:none}
+  .slide:last-child{page-break-after:auto;break-after:auto}
+}
+@page{size:1280px 720px;margin:0}
+</style>
+</head>
+<body>
+<div id="indicador"></div>
+<div id="contador">1 / 20</div>
+<div id="pie-teclas">← → cambiar diapositiva · N: notas del orador</div>
+<div id="controles"><button id="ant" title="Anterior">‹</button><button id="sig" title="Siguiente">›</button></div>
+
+<main id="escenario">
+
+<!-- ============ SLIDE 01: PORTADA ============ -->
+<section class="slide activa">
+  <div class="contenido" style="display:flex;flex-direction:column;justify-content:center;text-align:center">
+    <div style="font-size:15px;letter-spacing:4px;color:#D9A7AE;text-transform:uppercase;margin-bottom:18px">Arquitectura de Software · Parte 1 · Sustentación</div>
+    <div style="font-size:64px;font-weight:800;color:#fff;line-height:1.08;text-shadow:0 4px 24px rgba(168,35,54,.55)">La Gran Liga de Apuestas<br>de Medianos EIA</div>
+    <div style="width:220px;height:5px;background:linear-gradient(90deg,#A82336,#E8B4B8);margin:24px auto"></div>
+    <div style="font-size:21px;color:#E8CDD1">Salchipapa Maker Racing S.A.S.</div>
+    <div style="font-size:17px;color:#C9A3A9;margin-top:8px;max-width:900px;margin-left:auto;margin-right:auto">Diseño arquitectónico de la plataforma de apuestas mutuas (Pari-Mutuel) sobre carreras de medianos</div>
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:34px">
+      <div class="kpi" style="min-width:150px"><span class="num">100k</span><span class="lbl">usuarios en pico</span></div>
+      <div class="kpi" style="min-width:150px"><span class="num">10k/s</span><span class="lbl">apuestas en ráfaga</span></div>
+      <div class="kpi" style="min-width:150px"><span class="num">&lt; 1 s</span><span class="lbl">respuesta al apostar</span></div>
+      <div class="kpi" style="min-width:150px"><span class="num">3 ADR</span><span class="lbl">decisiones registradas</span></div>
+    </div>
+    <div style="margin-top:36px;font-size:15px;color:#B98A93">Octubre 2026 · Documentación de arquitectura — sin implementación de plataforma</div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>01 / 20</span></footer>
+  <aside class="nota">Apertura (30 s): somos el equipo de arquitectura del caso «La Gran Liga de Apuestas de Medianos EIA». Presentamos el diseño de la plataforma de apuestas mutuas: qué arquitectura elegimos, por qué, y cómo evoluciona. Aclarar desde ya: esto es diseño y documentación, no una plataforma implementada.</aside>
+</section>
+
+<!-- ============ SLIDE 02: CONTEXTO ============ -->
+<section class="slide">
+  <h1 class="titulo">02 · Contexto del negocio y el desafío de Dyllan</h1>
+  <p class="subtitulo">De una hoja de cálculo a un sistema profesional que no pierda dinero ni credibilidad</p>
+  <div class="contenido">
+    <div class="grid2">
+      <div>
+        <ul>
+          <li>El negocio nace como torneo universitario informal entre carreras («medianos»), con apuestas entre compañeros usando <b>EIA Coins</b>, la moneda virtual del ecosistema.</li>
+          <li>El problema actual es operativo y contable: carreras, apuestas y saldos manejados de forma manual, sin cierre automático, sin trazabilidad y sin defensa contra duplicados.</li>
+          <li>El enunciado exige un sistema profesional con <b>nueve capacidades</b>: usuarios, medianos, carreras, apuestas, billetera, resultados y premios, notificaciones, estadísticas y auditoría.</li>
+          <li>La directriz económica de la dirección es parte del problema:</li>
+        </ul>
+        <div class="cita" style="margin-top:10px">«No quiero pagar una infraestructura de Netflix para una carrera de cinco medianos.»</div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <h3>Capacidades principales (PDF pág. 3–8)</h3>
+          <div class="chips">
+            <span>Usuarios y auth</span><span>Medianos</span><span>Carreras</span><span>Apuestas</span><span>Billetera EIA Coins</span><span>Resultados y premios</span><span>Notificaciones</span><span>Estadísticas</span><span>Auditoría y fraude</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Riesgos identificados desde el inicio</h3>
+          <ul>
+            <li><b>Latencia vs. concurrencia:</b> &lt; 1 s con 10.000 apuestas/s.</li>
+            <li><b>Incertidumbre de red:</b> un timeout no significa fallo (exige idempotencia).</li>
+            <li><b>Sobreingeniería:</b> complejidad que el negocio no paga.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>02 / 20</span></footer>
+  <aside class="nota">Contexto (1 min): el caso creció más rápido que sus herramientas. La cita de Dyllan no es humor: es un criterio de gobernanza que usamos para rechazar opciones caras en todo el diseño. Las nueve capacidades del enunciado son el catálogo que debemos cubrir sin sobreproyectar.</aside>
+</section>
+
+<!-- ============ SLIDE 03: REQUISITOS ============ -->
+<section class="slide">
+  <h1 class="titulo">03 · Requisitos clave y parámetros cuantitativos</h1>
+  <p class="subtitulo">Los números del enunciado (PDF pág. 8–9) condicionan cada decisión de arquitectura</p>
+  <div class="contenido">
+    <table>
+      <tr><th style="width:26%">Parámetro</th><th style="width:34%">Criterio cuantitativo</th><th>Implicación de diseño</th></tr>
+      <tr><td>Usuarios concurrentes</td><td>500 base · <b class="mono">100.000</b> en la final de la Copa Intersemestral</td><td>Elasticidad en el borde y lecturas eficientes.</td></tr>
+      <tr><td>Pico transaccional</td><td><b class="mono">10.000 apuestas/s</b> sostenidas 30 s previos al cierre (300.000 apuestas)</td><td>Particionamiento, buffers y bloqueo a nivel de fila.</td></tr>
+      <tr><td>Latencia al apostar</td><td><b class="mono">&lt; 1 segundo</b> para aceptada o rechazada</td><td>Prohíbe esperas distribuidas síncronas en la ruta crítica.</td></tr>
+      <tr><td>Durabilidad</td><td><b class="mono">Cero</b> tolerancia a pérdida de apuestas o movimientos</td><td>Commit atómico con WAL y réplica síncrona.</td></tr>
+      <tr><td>Liquidación</td><td><b class="mono">&lt; 15 minutos</b> para &gt; 1.000.000 de apuestas</td><td>Procesamiento masivo por lotes, nunca en una petición HTTP.</td></tr>
+      <tr><td>Estadísticas</td><td>Tolerancia de minutos; reportes premium hasta 1 día</td><td>Analítica desacoplada (consistencia eventual).</td></tr>
+      <tr><td>Auditoría</td><td>Registro inmutable por <b class="mono">≥ 5 años</b>, solo lectura</td><td>Almacén append-only con inmutabilidad física.</td></tr>
+    </table>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>03 / 20</span></footer>
+  <aside class="nota">Requisitos (1 min): estos siete números son la fuente de verdad del caso. Cualquier tecnología que propongamos debe justificarse frente a ellos. Nótese la asimetría: la ráfaga dura 30 segundos; la liquidación, 15 minutos; la auditoría, 5 años. Tiempos distintos = caminos distintos (síncrono vs. asíncrono).</aside>
+</section>
+
+<!-- ============ SLIDE 04: MODELO DE NEGOCIO ============ -->
+<section class="slide">
+  <h1 class="titulo">04 · Modelo de negocio: apuesta mutua (Pari-Mutuel) y ciclo de carrera</h1>
+  <p class="subtitulo">La casa retiene 10 %; el 90 % se reparte proporcional entre aciertos al mediano ganador</p>
+  <div class="contenido">
+    <div class="grid2" style="grid-template-columns:1.05fr .95fr">
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <h3>Fórmulas del reparto</h3>
+          <ul>
+            <li>Bolsa bruta: <span class="mono">B = Σ montos apostados</span></li>
+            <li>Casa (10 %): <span class="mono">R = 0.10 × B</span></li>
+            <li>Bolsa neta: <span class="mono">Bneta = 0.90 × B</span></li>
+            <li>Cuota definitiva al cierre: <span class="mono">Qw = Bneta / T_w</span> (masa apostada al ganador)</li>
+            <li>Cuotas en vivo mientras <span class="mono">ABIERTA</span>: <span class="mono">Qest(m) = 0.90 × B_actual / T_m</span> — <b>estimación informativa</b>, no garantía.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Reglas de apuesta</h3>
+          <ul>
+            <li>Múltiples apuestas por usuario y carrera: legítimas; la deduplicación solo actúa sobre <b>reintentos</b> (misma clave).</li>
+            <li>El cierre obedece al <b>reloj del servidor</b>, nunca a un botón del operador.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column">
+        <h3>Ciclo de vida de la carrera (FSM)</h3>
+        <div style="flex:1;min-height:0;display:flex;align-items:center">
+          <a class="abrir" href="../08_diagramas_y_adrs/exportados/ciclo_carrera.png" target="_blank" title="Abrir el diagrama en tamaño completo"><img class="diagrama" src="../08_diagramas_y_adrs/exportados/ciclo_carrera.png" alt="Diagrama de estados de la carrera: PROGRAMADA, ABIERTA, CERRADA, EN_CURSO, FINALIZADA, LIQUIDADA y CANCELADA"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>04 / 20</span></footer>
+  <aside class="nota">Modelo (1 min): en Pari-Mutuel no hay cuota fija: la cuota final se sella matemáticamente cuando cesan las apuestas. Por eso el cierre debe ser quirúrgico. La FSM del PDF tiene 6 estados formales más CANCELADA (excepción con reembolso 100 %). Ojo: «sin ganadores» NO es cancelación — lo vemos en la slide 15.</aside>
+</section>
+
+<!-- ============ SLIDE 05: INVARIANTES ============ -->
+<section class="slide">
+  <h1 class="titulo">05 · Los cinco invariantes del sistema</h1>
+  <p class="subtitulo">Condiciones de corrección que jamás se violan bajo carga, concurrencia ni fallo</p>
+  <div class="contenido">
+    <div class="grid3" style="margin-bottom:14px">
+      <div class="card"><h3>1 · Sin saldo negativo</h3><p><span class="mono">Saldo(u) ≥ 0</span> ∀ usuarios. Un EIA Coin nunca se gasta dos veces, ni con pestañas múltiples o bots.</p></div>
+      <div class="card"><h3>2 · Cierre temporal estricto</h3><p>Si <span class="mono">t_recepción ≥ T_inicio</span>, la apuesta es <b>RECHAZADA</b>: manda el reloj del servidor, no el del cliente.</p></div>
+      <div class="card"><h3>3 · Integridad Pari-Mutuel</h3><p><span class="mono">Σ premios + comisión (10 %) = B</span>. Ni un centavo emitido de más ni retenido de más.</p></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>4 · No duplicación por idempotencia</h3><p>Para una misma clave lógica, el efecto ocurre <b>exactamente una vez</b>: <span class="mono">f(f(op)) = f(op)</span>. Cuatro pulsaciones de «APOSTAR» = un solo débito.</p></div>
+      <div class="card"><h3>5 · Auditoría inmutable</h3><p>Toda mutación de saldos, apuestas, estados o resultados genera un registro <b>append-only</b>; el rol Auditor solo lee (retención ≥ 5 años).</p></div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>05 / 20</span></footer>
+  <aside class="nota">Invariantes (1 min): son el contrato de corrección del sistema. Los cinco se usan como prueba de diseño: cada mecanismo posterior (FOR UPDATE, outbox, mayores restos) existe para sostener uno de ellos. El invariante 2 es el que separa una apuesta «en vuelo» de una apuesta aceptada: solo el COMMIT la acepta.</aside>
+</section>
+
+<!-- ============ SLIDE 06: DECISIÓN 1 ============ -->
+<section class="slide">
+  <h1 class="titulo">06 · Decisión 1: estilo arquitectónico (ADR-001)</h1>
+  <p class="subtitulo">Cuatro estilos evaluados; se adopta la Arquitectura Híbrida (Núcleo Modular + workers desacoplados)</p>
+  <div class="contenido">
+    <table>
+      <tr><th style="width:22%">Estilo</th><th>Consistencia en la ruta crítica</th><th>Aislamiento de fallos / carga</th><th>Costo y operación</th><th style="width:13%">Veredicto</th></tr>
+      <tr><td><b>Monolito tradicional</b></td><td>ACID local, pero sin fronteras formales</td><td><span class="bad">Pobre:</span> un fallo en notificaciones o reportes degrada el hilo transaccional</td><td>Bajo costo inicial, deuda de diseño creciente</td><td class="bad">Descartado</td></tr>
+      <tr><td><b>Monolito modular completo</b></td><td>ACID local en todas las capacidades</td><td>Medio: todo escala junto, sin segregación de analítica masiva</td><td>Simple; pero arrastra OLAP pesado al núcleo</td><td>Parcial</td></tr>
+      <tr><td><b>Microservicios puros (9 servicios)</b></td><td><span class="bad">Saga/2PC</span> entre apuesta y billetera en &lt; 1 s</td><td>Excelente aislamiento, alta complejidad emergente</td><td><span class="bad">Alto:</span> 9 despliegues, 9 BDs, tracing, mTLS, discovery</td><td class="bad">Descartado</td></tr>
+      <tr style="background:#3A0D15"><td><b>Arquitectura híbrida</b></td><td><span class="ok">ACID local</span> para débito + apuesta (una transacción)</td><td>Notificaciones, analítica y liquidación <b>fuera</b> de la ruta crítica</td><td>1 núcleo replicable + 1 Kafka + workers ligeros</td><td class="ok">ADOPTADO</td></tr>
+    </table>
+    <div class="grid3" style="margin-top:14px">
+      <div class="card"><h3>Ganancia 1</h3><p>Sin 2PC ni Sagas en el flujo de admisión.</p></div>
+      <div class="card"><h3>Ganancia 2</h3><p>La caída de notificaciones no frena apuestas.</p></div>
+      <div class="card"><h3>Límite asumido</h3><p>Disciplina modular obligatoria y contención de BD gestionada por particiones y fila-locks.</p></div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>06 / 20</span></footer>
+  <aside class="nota">Decisión 1 (1.5 min): el criterio de selección fue dónde poner la frontera transaccional. En híbrida, billetera y apuestas viven en la misma unidad desplegable, así que la atomicidad es una transacción local. Nótese que el estilo no garantiza por sí solo el &lt; 1 s: elimina dependencias de red intermedias para que los mecanismos posteriores (bloqueo por fila, outbox) puedan cumplirlo.</aside>
+</section>
+
+<!-- ============ SLIDE 07: DESCARTES ============ -->
+<section class="slide">
+  <h1 class="titulo">07 · Descarte justificado de alternativas</h1>
+  <p class="subtitulo">Por qué no microservicios puros ni monolito clásico — con argumentos técnicos, no de moda</p>
+  <div class="contenido">
+    <div class="grid2">
+      <div class="card">
+        <h3>✗ Microservicios puros</h3>
+        <ul>
+          <li>Separar físicamente <b>apuestas</b> y <b>billetera</b> destruye la transacción local: exige <b>Sagas con compensación</b> en la ruta de 1 segundo.</li>
+          <li>Más puntos de fallo y latencia de red por apuesta (10.000 veces por segundo).</li>
+          <li>Complejidad operativa desproporcionada: service discovery, mTLS, tracing, esquemas de despliegue × 9.</li>
+          <li>Contra la directriz de Dyllan: costo y equipo de operación que el negocio no sostiene.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>✗ Monolito tradicional</h3>
+        <ul>
+          <li>Sin fronteras: un proveedor de notificaciones lento <b>agota hilos/conexiones</b> y bloquea apuestas legítimas.</li>
+          <li>La ingesta analítica de millones de registros/día competiría por los mismos bloqueos y IOPS que la ráfaga del cierre.</li>
+          <li>Degrada el invariante de disponibilidad sin aportar ninguna ventaja de consistencia adicional.</li>
+        </ul>
+        <h3 style="margin-top:10px">✗ ¿Y el monolito modular completo?</h3>
+        <p>Es el paso intermedio lógico; se adopta <b>parcialmente</b>: el núcleo es modular, pero analítica y liquidación se segregan porque su carga y sus fallos son de otra naturaleza.</p>
+      </div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>07 / 20</span></footer>
+  <aside class="nota">Descartes (1 min): pregunta típica del jurado: «¿por qué no microservicios si es el estándar?». Respuesta: microservicios puros introducen transacciones distribuidas entre apuesta y billetera dentro de una ventana de 1 s con 10.000 apuestas/s. La híbrida conserva ACID local donde es sagrado y usa Kafka para lo que sí requiere desacople.</aside>
+</section>
+
+<!-- ============ SLIDE 08: DIAGRAMA GENERAL ============ -->
+<section class="slide">
+  <h1 class="titulo">08 · Diagrama general de arquitectura</h1>
+  <p class="subtitulo">Clientes → DMZ (CDN + Gateway/WAF) → Núcleo Modular transaccional → Kafka y almacenes privados</p>
+  <div class="contenido" style="display:flex;gap:18px;align-items:stretch">
+    <div style="flex:1;min-width:0;display:flex;align-items:center">
+      <a class="abrir" href="../08_diagramas_y_adrs/exportados/diagrama_general.png" target="_blank" title="Abrir el diagrama en tamaño completo"><img class="diagrama" src="../08_diagramas_y_adrs/exportados/diagrama_general.png" alt="Diagrama general de arquitectura con clientes, DMZ, núcleo modular, bases de datos y clúster Kafka"></a>
+    </div>
+    <div style="width:300px;display:flex;flex-direction:column;gap:12px">
+      <div class="card"><h3>Zona pública (DMZ)</h3><p>CDN de estáticos y API Gateway con rate limiting, WAF y terminación TLS 1.3. Ningún servicio ni BD expone puertos a Internet.</p></div>
+      <div class="card"><h3>Núcleo transaccional</h3><p><span class="mono">core-api</span> stateless y replicable con módulos Usuarios, Medianos, Carreras, Apuestas y Billetera sobre OLTP (PostgreSQL primario + réplica).</p></div>
+      <div class="card"><h3>Plano asíncrono</h3><p>Transactional Outbox → Kafka → workers: notificaciones, analítica OLAP, auditoría inmutable y liquidación masiva.</p></div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>08 / 20</span></footer>
+  <aside class="nota">Diagrama general (1.5 min): recorrido de izquierda a derecha. Lo importante es ver dos planos: el síncrono (arriba, acotado: cliente–gateway–core–OLTP) y el asíncrono (outbox–Kafka–workers). La flecha de outbox garantiza que solo existan eventos si la transacción hizo COMMIT.</aside>
+</section>
+
+<!-- ============ SLIDE 09: SÍNCRONA VS ASÍNCRONA ============ -->
+<section class="slide">
+  <h1 class="titulo">09 · Diferenciación: ruta síncrona (&lt; 1 s) vs. plano asíncrono</h1>
+  <p class="subtitulo">Solo cinco comunicaciones son síncronas; todo lo demás fluye por eventos con Outbox</p>
+  <div class="contenido">
+    <table style="font-size:15px">
+      <tr><th>Origen → Destino</th><th>Protocolo</th><th>Por qué síncrono</th><th>Estrategia ante fallo</th></tr>
+      <tr><td>Cliente → Gateway</td><td>HTTPS/REST</td><td>El usuario necesita ver si apostó (&lt; 1 s)</td><td>Timeout cliente 800 ms + reintento con la misma <span class="mono">Idempotency-Key</span></td></tr>
+      <tr><td>Gateway → <span class="mono">core-api</span></td><td>HTTP/2 · gRPC</td><td>Ruta crítica, latencia interna mínima</td><td>Circuit breaker 600 ms → HTTP 504 con estado incierto</td></tr>
+      <tr><td><span class="mono">core-api</span> → OLTP</td><td>Nativo BD (pool)</td><td>No doble gasto, cierre y saldo atómicos</td><td>Timeout 500 ms → rollback y HTTP 503</td></tr>
+      <tr><td>Operador → <span class="mono">core-api</span></td><td>HTTPS/REST</td><td>Sellado del resultado oficial con confirmación</td><td>Reintento idempotente por <span class="mono">race_id</span></td></tr>
+      <tr><td>Auditor → réplica</td><td>HTTPS/REST</td><td>Consulta interactiva forense</td><td>Lectura en réplica; timeout 5 s</td></tr>
+    </table>
+    <div class="grid2" style="margin-top:12px">
+      <div class="card"><h3>Asíncrono vía Kafka (eventos canónicos)</h3><div class="chips"><span>ApuestaAceptada</span><span>CarreraIniciada</span><span>CarreraFinalizada</span><span>ResultadoOficialPublicado</span><span>LoteLiquidacionGenerado</span><span>PremioAcreditado</span><span>CarreraCancelada</span><span>DevolucionAcreditada</span></div></div>
+      <div class="card"><h3>Regla de oro</h3><p>Kafka <b>jamás</b> está en el ciclo de reloj de la petición HTTP: los eventos se publican con <b>Transactional Outbox</b> tras el COMMIT. La escritura en el broker no puede costarle milisegundos al apostador.</p></div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>09 / 20</span></footer>
+  <aside class="nota">Síncrona vs asíncrona (1.5 min): solo la admisión de la apuesta es síncrona de punta a punta. Nótese el protocolo de incertidumbre: timeout ≠ fallo; el cliente reintenta con la misma clave o consulta GET /bets/by-key. Los 8 eventos están nombrados en un único idioma (español, PascalCase) por requisito del enunciado.</aside>
+</section>
+
+<!-- ============ SLIDE 10: FLUJO SECUENCIAL ============ -->
+<section class="slide">
+  <h1 class="titulo">10 · Flujo secuencial de una apuesta</h1>
+  <p class="subtitulo">Rate limiting, idempotencia, bloqueo de fila, transacción ACID local y outbox en un solo ciclo</p>
+  <div class="contenido" style="display:flex;gap:16px;align-items:stretch">
+    <div style="flex:1;min-width:0;display:flex;align-items:center">
+      <a class="abrir" href="../08_diagramas_y_adrs/exportados/diagrama_secuencia_apuesta.png" target="_blank" title="Abrir el diagrama en tamaño completo"><img class="diagrama" src="../08_diagramas_y_adrs/exportados/diagrama_secuencia_apuesta.png" alt="Diagrama de secuencia de la apuesta: apostador, gateway, núcleo, base de datos, outbox relay, Kafka y notificaciones"></a>
+    </div>
+    <div style="width:290px;display:flex;flex-direction:column;gap:11px">
+      <div class="card" style="padding:11px 15px"><h3>1 · Borde</h3><p style="font-size:15.5px">Gateway: rate limiting (Token Bucket), validación JWT y claims RBAC antes de tocar el núcleo.</p></div>
+      <div class="card" style="padding:11px 15px"><h3>2 · Transacción local</h3><p style="font-size:15.5px">Idempotencia → carrera <span class="mono">ABIERTA</span> y <span class="mono">CLOCK_TIMESTAMP() &lt; start_time</span> → <span class="mono">FOR UPDATE</span> de billetera → débito + <span class="mono">INSERT bets</span> + fila en <span class="mono">outbox_events</span> → <b>COMMIT</b>.</p></div>
+      <div class="card" style="padding:11px 15px"><h3>3 · Confirmación</h3><p style="font-size:15.5px">HTTP 201 con saldo nuevo en decenas de ms (presupuesto total 330–660 ms).</p></div>
+      <div class="card" style="padding:11px 15px"><h3>4 · Asíncrono</h3><p style="font-size:15.5px">Outbox Relay publica en Kafka y notifica al apostador sin tocar la ruta crítica.</p></div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>10 / 20</span></footer>
+  <aside class="nota">Flujo (2 min): énfasis en los puntos que sostienen invariantes: (a) la inserción es condicionada — si el reloj ya pasó, afecta 0 filas y hay ROLLBACK con 409; (b) FOR UPDATE serializa al mismo usuario, no a la tabla entera; (c) el evento se escribe en la MISMA transacción: sin ventana de «apuesta sin evento» ni «evento sin apuesta».</aside>
+</section>
+
+<!-- ============ SLIDE 11: DECISIÓN 2 KAFKA ============ -->
+<section class="slide">
+  <h1 class="titulo">11 · Decisión 2: Apache Kafka como broker único (ADR-002)</h1>
+  <p class="subtitulo">Un solo log particionado cubre streaming de eventos y lotes de liquidación</p>
+  <div class="contenido">
+    <div class="grid3" style="margin-bottom:13px">
+      <div class="card"><h3>Múltiples consumidores, un flujo</h3><p>Cuotas, notificaciones, analítica y auditoría leen el <b>mismo</b> log a su propio ritmo con offsets independientes, sin duplicar mensajes ni colas por suscriptor.</p></div>
+      <div class="card"><h3>Orden y paralelismo por clave</h3><p>Orden estricto dentro de la partición; clave de negocio (<span class="mono">race_id</span>, <span class="mono">user_id</span>, <span class="mono">batch_id</span>) para distribuir el pico uniformemente.</p></div>
+      <div class="card"><h3>Dimensionamiento del pico</h3><p>1 evento canónico por apuesta: ~10.000 ev/s × ~500 B ≈ <b>5 MB/s</b> (~150 MB por ráfaga de 30 s): un clúster moderado lo absorbe.</p></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Descarte de RabbitMQ</h3><p>No por incapacidad técnica, sino porque el modelo de tópicos particionados + consumer groups encaja de forma más compacta y uniforme con todos los flujos del caso, sin tecnologías heterogéneas.</p></div>
+      <div class="card"><h3>Descarte del dual (RabbitMQ + Kafka)</h3><p>El enunciado exige justificar dos tecnologías; no se demostró ventaja que compense operar, asegurar y monitorizar dos brokers. <b>Costo de Netflix, problema de cinco medianos.</b></p></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>Retención operativa ≠ auditoría legal</h3><p>Kafka retiene ~7 días para absorber ráfagas y replay operativo; la auditoría inalterable de 5 años vive en almacén append-only con WORM y sellado de hashes, alimentado desde Kafka. Los consumidores son idempotentes por <span class="mono">eventId</span> ante reintentos o rebalanceos.</p></div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>11 / 20</span></footer>
+  <aside class="nota">Decisión 2 (1.5 min): defensa típica: «¿por qué no RabbitMQ, que es más liviano?». Respuesta: el dominio tiene muchos consumidores independientes leyendo el mismo flujo a velocidades distintas; el log particionado lo resuelve sin duplicar almacenamiento, y el particionamiento por lote paraleliza la liquidación. Un solo broker además cumple la directriz de costo.</aside>
+</section>
+
+<!-- ============ SLIDE 12: TOPOLOGÍA ============ -->
+<section class="slide">
+  <h1 class="titulo">12 · Topología de eventos y catálogo canónico</h1>
+  <p class="subtitulo">Topics, claves de partición y consumer groups del diseño</p>
+  <div class="contenido" style="display:flex;gap:16px;align-items:stretch">
+    <div style="flex:1.15;min-width:0;display:flex;align-items:center">
+      <a class="abrir" href="../08_diagramas_y_adrs/exportados/topologia_mensajeria.png" target="_blank" title="Abrir el diagrama en tamaño completo"><img class="diagrama" src="../08_diagramas_y_adrs/exportados/topologia_mensajeria.png" alt="Topología de mensajería con tópicos de Kafka y grupos de consumidores"></a>
+    </div>
+    <div style="width:430px">
+      <table style="font-size:14.5px">
+        <tr><th>Topic</th><th>Clave</th><th>Consumidores</th></tr>
+        <tr><td class="mono">apuestas.aceptadas</td><td class="mono">user_id</td><td>cuotas, notificaciones, analítica, auditoría</td></tr>
+        <tr><td class="mono">carreras.eventos</td><td class="mono">race_id</td><td>notificaciones, analítica, consola operador</td></tr>
+        <tr><td class="mono">carreras.resultados</td><td class="mono">race_id</td><td>worker liquidación, notif., auditoría</td></tr>
+        <tr><td class="mono">liquidacion.lotes</td><td class="mono">batch_id</td><td>dispersores de premios (pool de workers)</td></tr>
+        <tr><td class="mono">billetera.movimientos</td><td class="mono">user_id</td><td>notificaciones, auditoría, analítica</td></tr>
+      </table>
+      <div class="card" style="margin-top:12px;padding:12px 15px"><h3>Garantía de entrega y DLT</h3><p style="font-size:15.5px"><b>At-least-once</b> (Outbox + reintentos): consumidores idempotentes por <span class="mono">eventId</span> con <span class="mono">ON CONFLICT DO NOTHING</span>. Fallos transitorios → topic <span class="mono">retry</span>; tras 3 intentos → carta muerta <span class="mono">.dlt</span>.</p></div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>12 / 20</span></footer>
+  <aside class="nota">Topología (1.5 min): la clave de partición es una decisión de diseño, no un detalle: en apuestas usamos user_id para paralelismo máximo (las cuotas se agregan por ventanas), en carreras race_id para preservar el orden del ciclo de vida, y en liquidación batch_id porque un lote mezcla usuarios. Los reintentos y la DLT evitan que un correo corrupto detenga el flujo.</aside>
+</section>
+
+<!-- ============ SLIDE 13: IDEMPOTENCIA ============ -->
+<section class="slide">
+  <h1 class="titulo">13 · Estrategia de idempotencia en 3 operaciones críticas</h1>
+  <p class="subtitulo">f(f(x)) = f(x): cuatro pulsaciones de «APOSTAR» producen exactamente un débito</p>
+  <div class="contenido">
+    <div class="grid3">
+      <div class="card"><h3>1 · Creación de apuesta</h3><ul><li>Cliente genera <span class="mono">Idempotency-Key</span> (UUIDv4) por intención.</li><li>BD: <span class="mono">UNIQUE(user_id, idempotency_key)</span> en <span class="mono">bets_idempotency</span>.</li><li>Reintento → colisión atómica → se retorna la respuesta cacheada (HTTP 200) sin cobrar de nuevo.</li></ul></div>
+      <div class="card"><h3>2 · Pago de premios</h3><ul><li>Clave natural por apuesta: <span class="mono">UNIQUE(bet_id, 'PRIZE_PAYOUT')</span>.</li><li>No se agrega a nivel (carrera, usuario): el usuario puede tener <b>múltiples apuestas ganadoras legítimas</b>.</li><li>Reintento de lote → <span class="mono">ON CONFLICT DO NOTHING</span>.</li></ul></div>
+      <div class="card"><h3>3 · Replay de eventos Kafka</h3><ul><li>Tabla local <span class="mono">processed_events(event_id PK)</span>.</li><li><span class="mono">INSERT … ON CONFLICT DO NOTHING</span> antes de ejecutar lógica.</li><li>Fila ya existente → confirmar offset y descartar en silencio.</li></ul></div>
+    </div>
+    <div class="grid2" style="margin-top:13px">
+      <div class="card"><h3>Reintento ≠ nueva intención</h3><p>Misma <span class="mono">Idempotency-Key</span> = reintento (se responde lo ya confirmado). Nueva apuesta deliberada = <b>nueva clave</b>: se procesa como operación independiente con su propio <span class="mono">bet_id</span>.</p></div>
+      <div class="card"><h3>Transacción atómica de cierre</h3><p>El INSERT de la apuesta condiciona <span class="mono">status='ABIERTA'</span> y <span class="mono">CLOCK_TIMESTAMP() &lt; start_time</span>: si la espera por bloqueos cruza el cero horario, <b>0 filas → ROLLBACK → HTTP 409</b>. La espera nunca degrada la regla.</p></div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>13 / 20</span></footer>
+  <aside class="nota">Idempotencia (1.5 min): las tres operaciones son las que el enunciado pide explícitamente. Punto fino que el jurado valora: la clave de premio es (bet_id, tipo), no (carrera, usuario), porque un apostador puede tener varias jugadas ganadoras; agregar a nivel usuario perdería pagos legítimos.</aside>
+</section>
+
+<!-- ============ SLIDE 14: MAYORES RESTOS ============ -->
+<section class="slide">
+  <h1 class="titulo">14 · Liquidación masiva y algoritmo de mayores restos (ADR-003)</h1>
+  <p class="subtitulo">Centavos enteros, sin coma flotante: comisión + premios = bolsa, exactamente al centavo</p>
+  <div class="contenido">
+    <div class="grid2">
+      <div class="card">
+        <h3>Algoritmo determinista (Hamilton)</h3>
+        <ol style="padding-left:22px">
+          <li>Todo en centavos: <span class="mono">1 EIA Coin = 100</span> unidades mínimas.</li>
+          <li>Comisión: <span class="mono">R = round(0.10 × B)</span> (redondeo bancario).</li>
+          <li><span class="mono">Bneta = B − R</span> → conservación por construcción.</li>
+          <li>Premio teórico: <span class="mono">P_k = Bneta × m_k / T_w</span>; base = <span class="mono">⌊P_k⌋</span>.</li>
+          <li>Centavos remanentes a los <b>mayores restos</b> fraccionarios.</li>
+          <li>Desempate determinista por <span class="mono">bet_id</span> lexicográfico (nunca por orden de llegada).</li>
+          <li>Cálculo global único en el worker antes de generar lotes: los dispersores jamás recalculan restos.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>Ejemplo demostrativo</h3>
+        <p style="font-size:16px">Ganadoras: 33.33 + 33.33 + 33.34 (T_w = 100.00) · B = 100.05</p>
+        <ul style="font-size:16px">
+          <li>R = 10.00 → <span class="mono">Bneta = 90.05</span></li>
+          <li>Teóricos: 30.013665 · 30.013665 · 30.022670 → bases 3.001 · 3.001 · 3.002 (suma 9.004)</li>
+          <li>1 centavo remanente → empate de restos 0.3665 → gana <span class="mono">BET-001</span></li>
+          <li>Resultado: <span class="mono">30.02 + 30.01 + 30.02</span></li>
+        </ul>
+        <p style="font-size:17px;background:#3A0D15;border-radius:8px;padding:9px 12px;margin-top:8px"><b>Comprobación:</b> premios 90.05 + comisión 10.00 = <b>100.05 = B</b> ✓ cero fuga de fondos</p>
+        <p style="font-size:15.5px;margin-top:8px">Trazabilidad: se guarda <span class="mono">settlement_policy_version = 'HAMILTON_LARGEST_REMAINDER_V1'</span> y los parámetros globales para reproducción forense exacta.</p>
+      </div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>14 / 20</span></footer>
+  <aside class="nota">Liquidación (1.5 min): el punto es contable, no estadístico: operamos en unidades enteras para erradicar la coma flotante. Con la comisión redondeada y Bneta por sustracción, la conservación es matemática. El ejemplo muestra además el desempate determinista: dos trabajadores nunca pueden repartir distinto un mismo centavo.</aside>
+</section>
+
+<!-- ============ SLIDE 15: SIN GANADORES ============ -->
+<section class="slide">
+  <h1 class="titulo">15 · Ausencia de ganadores y devoluciones</h1>
+  <p class="subtitulo">Desenlace deportivo válido ≠ incidente operativo: la carrera se liquida, no se cancela</p>
+  <div class="contenido">
+    <div class="grid2">
+      <div class="card">
+        <h3>Política del proyecto (P1-DEC-004)</h3>
+        <ul>
+          <li><b>Disparo:</b> resultado oficial publicado con masa ganadora nula (<span class="mono">T_w = 0</span>).</li>
+          <li><b>Reembolso íntegro 100 %</b> de lo apostado a cada participante de esa carrera.</li>
+          <li>La casa <b>renuncia</b> a su 10 % en este escenario excepcional.</li>
+          <li><b>Sin rollover:</b> no se acumula pozo para la siguiente carrera (cierre contable limpio).</li>
+          <li>Motivo explícito: <span class="mono">settlement_reason = 'SIN_APUESTAS_GANADORAS'</span>.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Preservación del ciclo y de la auditoría</h3>
+        <ul>
+          <li>La carrera <b>NO</b> pasa por <span class="mono">CANCELADA</span>: sí se corrió y el ganador cruzó la meta; sus estadísticas permanecen válidas.</li>
+          <li>Transita <span class="mono">FINALIZADA → LIQUIDADA</span> con su motivo propio.</li>
+          <li>Dos tipos de devolución distinguibles por el auditor: <span class="mono">REFUND_RACE_CANCELLED</span> (incidente) vs. <span class="mono">REFUND_NO_WINNERS</span> (desenlace).</li>
+          <li>Idempotencia: <span class="mono">UNIQUE(bet_id, 'REFUND_NO_WINNERS')</span>.</li>
+          <li>Bolsa vacía (<span class="mono">B = 0</span>): <span class="mono">LIQUIDADA</span> con motivo <span class="mono">BOLSA_VACIA</span>, sin divisiones por cero.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>Cancelación (contraste)</h3><p>La cancelación es transición de excepción <b>desde cualquier estado previo a FINALIZADA</b> con devolución íntegra del 100 % — un incidente operativo (clima, pista), no un resultado deportivo.</p></div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>15 / 20</span></footer>
+  <aside class="nota">Sin ganadores (1 min): el PDF deja este vacío abierto; nosotros lo resolvemos como decisión formal: devolver el 100 % y no retener comisión. La sutileza clave: la carrera NO se cancela — cancelarla falsificaría el historial deportivo y dispararía el motivo equivocado en auditoría.</aside>
+</section>
+
+<!-- ============ SLIDE 16: CARGAS MASIVAS ============ -->
+<section class="slide">
+  <h1 class="titulo">16 · Manejo de cargas masivas (10.000 apuestas/s)</h1>
+  <p class="subtitulo">Escalamiento asimétrico: lo que crece en el pico y lo que se aparta del mismo</p>
+  <div class="contenido">
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="card"><h3 class="ok">Escalan agresivamente en el pico</h3><ul><li><b>API Gateway:</b> 100.000 conexiones TLS, rate limiting y anti-bot.</li><li><b><span class="mono">core-api</span>:</b> réplicas stateless (CPU/memoria).</li><li><b>Topic <span class="mono">apuestas.aceptadas</span>:</b> particiones dimensionadas.</li><li><b>OLTP:</b> IOPS elásticos NVMe + réplicas de lectura.</li></ul></div>
+      <div class="card"><h3>No escalan en el pico (y está bien)</h3><ul><li><b>Liquidación:</b> la carrera aún no terminó; permanece inactiva.</li><li><b>Analítica OLAP:</b> congela la ingesta pesada; tolera minutos.</li><li><b>Notificaciones:</b> drenan a su ritmo, desacopladas por colas.</li><li><b>Consolas operativas:</b> &lt; 1 operación por segundo.</li></ul></div>
+    </div>
+    <div class="grid3">
+      <div class="card"><h3>Presupuesto de latencia</h3><p style="font-size:15.5px">Cliente↔gateway 150–300 ms + gateway 5–10 ms + red interna 2–5 ms + transacción BD 15–40 ms + respuesta ≈ 5 ms → <b>total 330–660 ms</b> (&lt; 1.000 ms). Protegido por cero saltos RPC síncronos y outbox.</p></div>
+      <div class="card"><h3>Liquidación &lt; 15 min</h3><p style="font-size:15.5px">1.000.000 apuestas en 900 s exige ≥ 1.111 acreditaciones/s: cálculo global &lt; 10 s, ~1.000–2.000 lotes, 10 workers concurrentes con batch inserts → <b>6–9 minutos estimados</b>.</p></div>
+      <div class="card"><h3>Durabilidad</h3><p style="font-size:15.5px">WAL con commit síncrono + réplica síncrona: <b>RPO = 0 s</b> (cero pérdida confirmada), <b>RTO &lt; 30 s</b> con failover automático; PITR continuo hacia objetos.</p></div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>16 / 20</span></footer>
+  <aside class="nota">Cargas (1.5 min): el cuello de botella real no es el cómputo: son las conexiones del borde, los locks de fila y el fsync del WAL. Por eso el escalamiento es asimétrico. Validación empírica planificada: k6/Locust (≥10k apuestas/s durante 30 s), p99 &lt; 800 ms, cero saldos negativos y cero apuestas post-cierre bajo estrés.</aside>
+</section>
+
+<!-- ============ SLIDE 17: FALLOS ============ -->
+<section class="slide">
+  <h1 class="titulo">17 · Análisis de fallos: Casos A, B y C</h1>
+  <p class="subtitulo">La respuesta depende de qué invariante gobierna el subsistema caído</p>
+  <div class="contenido">
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="card"><h3>Caso A · Notificaciones caídas → <span class="ok">SÍ, se sigue apostando</span></h3><p>Son capacidad de <b>consistencia eventual</b>, desacopladas por Kafka. Los eventos <span class="mono">ApuestaAceptada</span> se acumulan seguros en el topic; el usuario ya recibió su HTTP 201 en pantalla. Al recuperarse, el servicio reanuda desde su último offset y despacha lo pendiente.</p></div>
+      <div class="card"><h3>Caso B · Billetera caída → <span class="bad">NO, se rechaza/bloquea</span></h3><p>Verificar saldo y debituar es <b>precondición indivisible</b> de toda apuesta (consistencia fuerte). Seguir operando equivaldría a apostar a crédito: saldos negativos incontrolados y modelo Pari-Mutuel violado.</p></div>
+    </div>
+    <div class="card">
+      <h3>Caso C (opcional) · Resultado mal interpretado tras la foto de llegada</h3>
+      <div class="grid3" style="margin-top:6px">
+        <p><b>1. Congelar:</b> el operador registra la rectificación; se frena cualquier lote en curso (<span class="mono">RESULTADO_EN_RECTIFICACION</span>).</p>
+        <p><b>2. No mutar:</b> jamás se borra el error: se recalcula con <span class="mono">settlement_version = 2</span> y se sella el evento <span class="mono">ResultadoRectificado</span>.</p>
+        <p><b>3. Compensar:</b> premios legítimos al ganador real (clave compuesta con versión); al beneficiado erróneo se le descuenta hasta 0 (<span class="mono">LEAST(balance, x)</span>) — jamás saldo negativo — y el insoluto se registra como pérdida operativa asumida.</p>
+      </div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>17 / 20</span></footer>
+  <aside class="nota">Fallos (1.5 min): el marco para responder cualquier pregunta de fallos: ¿el subsistema gobierna consistencia fuerte o eventual? Fuerte (billetera) → parar. Eventual (notif., analítica) → seguir y reanudar. El caso C muestra la política forense: compensación contable sin destruir evidencia, con trazabilidad de dos versiones de liquidación.</aside>
+</section>
+
+<!-- ============ SLIDE 18: SEGURIDAD ============ -->
+<section class="slide">
+  <h1 class="titulo">18 · Seguridad, RBAC y segmentación de red</h1>
+  <p class="subtitulo">Cuatro roles, mínimo privilegio y perímetro público mínimo</p>
+  <div class="contenido">
+    <table style="font-size:15px">
+      <tr><th>Operación</th><th style="text-align:center">Apostador</th><th style="text-align:center">Operador</th><th style="text-align:center">Admin</th><th style="text-align:center">Auditor</th></tr>
+      <tr><td>Emitir apuesta / consultar saldo propio</td><td style="text-align:center" class="ok">✓</td><td style="text-align:center">✗</td><td style="text-align:center">✗</td><td style="text-align:center">✗</td></tr>
+      <tr><td>Programar carreras / publicar resultado</td><td style="text-align:center">✗</td><td style="text-align:center" class="ok">✓</td><td style="text-align:center">✗</td><td style="text-align:center">✗</td></tr>
+      <tr><td>Bloquear usuarios / gestionar roles</td><td style="text-align:center">✗</td><td style="text-align:center">✗</td><td style="text-align:center" class="ok">✓</td><td style="text-align:center">✗</td></tr>
+      <tr><td>Consultar auditoría</td><td style="text-align:center">✗</td><td style="text-align:center">✗</td><td style="text-align:center">solo métricas</td><td style="text-align:center" class="ok">✓ solo lectura</td></tr>
+      <tr><td><b>Modificar saldos o apuestas directamente</b></td><td style="text-align:center" class="bad">✗</td><td style="text-align:center" class="bad">✗</td><td style="text-align:center" class="bad">✗</td><td style="text-align:center" class="bad">✗</td></tr>
+    </table>
+    <div class="grid3" style="margin-top:12px">
+      <div class="card"><h3>Perímetro y anti-abuso</h3><p style="font-size:15.5px">Rate limiting multinivel: 5 apuestas/s por usuario (ráfaga 10), 50 consultas/min por IP; HTTP 429 + <span class="mono">Retry-After</span>; detección de bots y bloqueo de cuentas múltiples en los últimos 10 s al cierre.</p></div>
+      <div class="card"><h3>Identidad y cifrado</h3><p style="font-size:15.5px">JWT stateless (EdDSA/RS256, 15–30 min) + refresh rotativo; Argon2id/bcrypt; TLS 1.3 externo, mTLS interno, AES-256 en reposo y secretos en KMS (cero secretos en el repositorio).</p></div>
+      <div class="card"><h3>DMZ vs. VPC</h3><p style="font-size:15.5px">Solo CDN y Gateway son públicos. Cómputo (core, workers), Kafka, OLTP, OLAP y auditoría WORM residen en subredes privadas sin IP accesible desde Internet.</p></div>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>18 / 20</span></footer>
+  <aside class="nota">Seguridad (1 min): dos ideas: (1) nadie — ni el admin — muta saldos directamente; toda corrección pasa por movimientos contables compensatorios auditables; (2) la superficie pública es mínima: dos componentes. JWT stateless es también decisión de rendimiento: permite validar tokens en memoria en cada una de las 10.000 req/s.</aside>
+</section>
+
+<!-- ============ SLIDE 19: COSTOS Y EVOLUCIÓN ============ -->
+<section class="slide">
+  <h1 class="titulo">19 · Gobernanza de costos y evolución ante crecimiento 100×</h1>
+  <p class="subtitulo">La pregunta final: qué implementaríamos hoy y cómo evoluciona sin reescrituras</p>
+  <div class="contenido">
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="card"><h3>Hoy (Fase 100k usuarios / 10k apuestas/s)</h3><ul><li>1 núcleo modular replicable + 1 Kafka administrado + 3 workers ligeros.</li><li>BD administrada con réplica; cómputo elástico que se reduce al mínimo en meses intersemestrales.</li><li>Sin Sagas, sin service mesh, sin segundo broker: complejidad solo donde el requisito la exige.</li></ul></div>
+      <div class="card"><h3>Respuesta a la pregunta del enunciado</h3><p>«Implementaríamos una <b>Arquitectura Híbrida</b> hoy: núcleo transaccional con consistencia ACID local y Kafka para el desacople real. Crecer 100× <b>no</b> implica reescribir: cada evolución responde a una señal empírica de cuello de botella.»</p></div>
+    </div>
+    <table style="font-size:15px">
+      <tr><th style="width:16%">Evolución</th><th>Señal disparadora</th><th>Mecanismo</th></tr>
+      <tr><td><b>1 · Sharding de BD</b></td><td>WAL saturado; IOPS primario no supera ~15.000 escrituras/s</td><td>Shards por <span class="mono">user_id</span>: la apuesta toca un solo shard → se preserva la atomicidad local sin transacciones distribuidas.</td></tr>
+      <tr><td><b>2 · Segregar billetera</b></td><td>Equipos independientes o regulación contable externa</td><td><span class="bad">Única evolución que destruye ACID local</span> (exige Saga); no es obligatoria ni recomendable al inicio.</td></tr>
+      <tr><td><b>3 · Tiered storage</b></td><td>El volumen de eventos satura los NVMe del clúster</td><td>Descarga de segmentos fríos a objetos sin tocar la memoria del broker.</td></tr>
+      <tr><td><b>4 · Edge (PoPs)</b></td><td>Latencia geográfica &gt; 400 ms para clientes lejanos</td><td>Terminación TLS y rate limiting cercanos al usuario.</td></tr>
+    </table>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>19 / 20</span></footer>
+  <aside class="nota">Pregunta final (2 min): la respuesta tiene dos tiempos. Hoy: híbrida con consistencia fuerte donde importa. Crecimiento 100×: evolución por señales — sharding por usuario, tiered storage, edge. Señalar que la única evolución costosa (segregar billetera) es organizativa, no técnica, y por eso queda condicionada.</aside>
+</section>
+
+<!-- ============ SLIDE 20: CONCLUSIONES ============ -->
+<section class="slide">
+  <h1 class="titulo">20 · Conclusiones</h1>
+  <p class="subtitulo">Tres lecciones de diseño y cierre de la sustentación</p>
+  <div class="contenido">
+    <div class="grid3" style="margin-bottom:16px">
+      <div class="card"><h3>1 · La complejidad debe justificarse</h3><p>«Una buena arquitectura no es la que usa más tecnologías, sino la que usa la complejidad necesaria.» 20 microservicios y dos brokers para carreras de cinco medianos habrían sido costosos, frágiles e innecesarios.</p></div>
+      <div class="card"><h3>2 · La coherencia contable es innegociable</h3><p>Transacción local atómica + bloqueo por fila + claves idempotentes + mayores restos = integridad matemática al centavo: sin saldos negativos ni premios dobles, aunque alguien pulse cuatro veces.</p></div>
+      <div class="card"><h3>3 · El desacoplamiento da resiliencia</h3><p>Notificaciones y analítica fuera de la ruta crítica: la caída de un proveedor externo o una consulta pesada jamás tocan la admisión de apuestas.</p></div>
+    </div>
+    <div class="card" style="text-align:center;padding:20px">
+      <p style="font-size:16px;color:#C9A3A9;margin-bottom:10px">Cobertura de los 16 puntos del entregable oficial · 3 ADR · 4 diagramas Mermaid · 7 documentos técnicos</p>
+      <div style="font-size:38px;font-weight:800;color:#fff">Gracias — ¿Preguntas?</div>
+      <p style="font-size:15px;color:#B98A93;margin-top:8px">Salchipapa Maker Racing S.A.S. · La Gran Liga de Apuestas de Medianos EIA · Octubre 2026</p>
+    </div>
+  </div>
+  <footer class="pie"><span>Salchipapa Maker Racing S.A.S. · Liga de Apuestas de Medianos EIA</span><span>20 / 20</span></footer>
+  <aside class="nota">Cierre (1 min) + defensas: tener a mano las tres respuestas clave del guion de sustentación: híbrido vs. microservicios (transacciones distribuidas en 1 s), Kafka vs. RabbitMQ (múltiples consumer groups sobre un log), y mayores restos (centavos enteros y desempate por bet_id). Agradecer y abrir preguntas.</aside>
+</section>
+
+</main>
+
+<div id="panel-notas"><h4>NOTAS DEL ORADOR (tecla N para ocultar)</h4><div id="nota-cuerpo"></div></div>
+
+<script>
+(function(){
+  var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var barra=document.getElementById('indicador');
+  var contador=document.getElementById('contador');
+  var panel=document.getElementById('panel-notas');
+  var cuerpo=document.getElementById('nota-cuerpo');
+  var i=0;
+  function cargarNota(){
+    var n=slides[i].querySelector('.nota');
+    cuerpo.innerHTML=n?n.innerHTML:'(Sin notas para esta diapositiva.)';
+  }
+  function mostrar(n){
+    slides[i].classList.remove('activa');
+    i=(n+slides.length)%slides.length;
+    slides[i].classList.add('activa');
+    barra.style.width=((i+1)/slides.length*100)+'%';
+    contador.textContent=(i+1)+' / '+slides.length;
+    if(panel.classList.contains('visible')){cargarNota();}
+  }
+  document.getElementById('ant').addEventListener('click',function(){mostrar(i-1);});
+  document.getElementById('sig').addEventListener('click',function(){mostrar(i+1);});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();mostrar(i+1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();mostrar(i-1);}
+    else if(e.key==='Home'){mostrar(0);}
+    else if(e.key==='End'){mostrar(slides.length-1);}
+    else if(e.key==='n'||e.key==='N'){panel.classList.toggle('visible');cargarNota();}
+  });
+  var h=parseInt((location.hash||'').replace('#',''),10);
+  if(h>=1&&h<=slides.length){mostrar(h-1);}
+  else{barra.style.width=(100/slides.length)+'%';contador.textContent='1 / '+slides.length;}
+})();
+</script>
+</body>
+</html>
