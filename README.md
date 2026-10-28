@@ -59,18 +59,29 @@ El sistema modela una plataforma de apuestas mutuas (*pari-mutuel*) sobre compet
 liga-de-apuestas/
 ├── .gitignore
 ├── README.md
+├── herramientas/                            # Generación reproducible de los entregables visuales
+│   ├── generar_diagramas.mjs                # Fuentes Mermaid → SVG/PNG en exportados/
+│   ├── generar_documento_tecnico.py         # Markdown consolidado → documento técnico
+│   ├── tema_diagramas.json                  # Tema vinotinto de los diagramas
+│   └── puppeteer-config.json                # Chrome local para mermaid-cli
 └── parte_1_arquitectura/
-    ├── trazabilidad_y_requisitos.md       # Matriz de trazabilidad y cobertura de los 16 puntos
-    ├── 01_requisitos_y_negocio.md         # Análisis de dominio, actores, roles e invariantes
-    ├── 02_arquitectura_y_componentes.md   # Evaluación de estilos arquitectónicos y boundaries
-    ├── 03_flujo_critico_y_comunicacion.md # Flujo transaccional y contratos síncronos
-    ├── 04_mensajeria_y_eventos.md         # Diseño de streaming Kafka, eventos y topología
-    ├── 05_datos_e_idempotencia.md         # Persistencia, consistencia, mayores restos y políticas
-    ├── 06_escalabilidad_y_fallos.md       # Carga masiva, presupuesto de latencia y fallos (A, B, C)
-    ├── 07_seguridad_y_costos.md           # Esquema RBAC, segmentación DMZ y optimización de costos
-    ├── 08_diagramas_y_adrs/               # Diagramas Mermaid y los 3 registros formales ADR
-    ├── 09_presentacion_diapositivas.md    # Guion ejecutivo de 20 diapositivas y conclusiones
-    └── 10_guia_sustentacion.md            # Banco de preguntas y absorción de apuestas en vivo
+    ├── trazabilidad_y_requisitos.md         # Matriz de trazabilidad y cobertura de los 16 puntos
+    ├── 01_requisitos_y_negocio.md           # Análisis de dominio, actores, roles e invariantes
+    ├── 02_arquitectura_y_componentes.md     # Evaluación de estilos arquitectónicos y boundaries
+    ├── 03_flujo_critico_y_comunicacion.md   # Flujo transaccional y contratos síncronos
+    ├── 04_mensajeria_y_eventos.md           # Diseño de streaming Kafka, eventos y topología
+    ├── 05_datos_e_idempotencia.md           # Persistencia, consistencia, mayores restos y políticas
+    ├── 06_escalabilidad_y_fallos.md         # Carga masiva, presupuesto de latencia y fallos (A, B, C)
+    ├── 07_seguridad_y_costos.md             # Esquema RBAC, segmentación DMZ y optimización de costos
+    ├── 08_diagramas_y_adrs/                 # Fuentes Mermaid y los 3 registros formales ADR
+    │   └── exportados/                      # Renders oficiales SVG y PNG (regenerables)
+    ├── 09_presentacion_diapositivas.md      # Guion ejecutivo de 20 diapositivas y conclusiones
+    ├── 10_guia_sustentacion.md              # Banco de preguntas y absorción de apuestas en vivo
+    ├── presentacion/
+    │   └── index.html                       # Presentación ejecutiva (20 diapositivas, HTML + CSS + JS)
+    └── entregables/
+        ├── presentacion.pdf                 # Presentación exportada (una diapositiva por página)
+        └── documento_tecnico.pdf            # Documento técnico consolidado (Markdown + ADR + anexos)
 ```
 
 <p align="center">
@@ -92,6 +103,36 @@ liga-de-apuestas/
 | **Diagramas Oficiales y Registros ADR** | Diagrama general, secuencia de apuesta, topología y ADRs 1, 2 y 3 | [08_diagramas_y_adrs/](parte_1_arquitectura/08_diagramas_y_adrs/) |
 | **Presentación y Pregunta Final** | Respuesta técnica hoy vs 100x y guion de 20 diapositivas | [09_presentacion_diapositivas.md](parte_1_arquitectura/09_presentacion_diapositivas.md) |
 | **Guía de Sustentación Técnica** | Preguntas probables del jurado y absorción de Live Betting en vivo | [10_guia_sustentacion.md](parte_1_arquitectura/10_guia_sustentacion.md) |
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"/>
+</p>
+
+## Entregables Visuales de la Parte 1
+
+| Entregable | Contenido | Ubicación |
+|---|---|---|
+| **Presentación ejecutiva (HTML)** | 20 diapositivas con navegación por teclado (← →, Inicio/Fin), indicador de progreso, notas del orador separadas (tecla `N`) y estilos propios en la paleta vinotinto. Sin dependencias remotas: se abre directamente en cualquier navegador. | [presentacion/index.html](parte_1_arquitectura/presentacion/index.html) |
+| **Presentación ejecutiva (PDF)** | Exportación oficial: una diapositiva por página (20 páginas, 1280×720), sin controles ni notas. | [entregables/presentacion.pdf](parte_1_arquitectura/entregables/presentacion.pdf) |
+| **Documento técnico consolidado (PDF)** | Los 7 documentos temáticos + los 3 ADR + Anexo A con las fuentes y renders de los 4 diagramas (53 páginas). | [entregables/documento_tecnico.pdf](parte_1_arquitectura/entregables/documento_tecnico.pdf) |
+| **Diagramas oficiales exportados** | Diagrama general, secuencia de apuesta, topología de mensajería y ciclo de carrera en SVG y PNG de alta resolución, generados desde las fuentes Mermaid canónicas. | [08_diagramas_y_adrs/exportados/](parte_1_arquitectura/08_diagramas_y_adrs/exportados/) |
+
+### Regeneración de los entregables visuales
+
+Los entregables visuales son **generados** desde fuentes versionadas (Markdown y Mermaid). Para reproducirlos:
+
+```bash
+# 1) Diagramas (SVG y PNG) — requiere Node.js
+cd herramientas && npm install && cd ..
+node herramientas/generar_diagramas.mjs
+
+# 2) Documento técnico consolidado — requiere Python con la librería `markdown`
+python herramientas/generar_documento_tecnico.py
+#    y luego exportar el PDF con Chrome (headless) desde herramientas/.tmp_doc_tecnico/documento_tecnico.html
+
+# 3) Presentación — basta con abrir presentacion/index.html en un navegador
+#    y usar "Imprimir → Guardar como PDF" (una página por diapositiva, sin encabezados)
+```
 
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
