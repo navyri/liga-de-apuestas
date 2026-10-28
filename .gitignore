@@ -18,5 +18,16 @@ $RECYCLE.BIN/
 *.docx
 *.csv
 
+# Excepción: PDFs finales de entrega de la Parte 1 (generados desde fuentes versionadas en el repositorio)
+!parte_1_arquitectura/entregables/*.pdf
+
+# Referencia externa clonada únicamente para estudio (no es material propio del proyecto)
+/temp_ponyarchive/
+
+# Dependencias y temporales de las herramientas de generación documental
+herramientas/node_modules/
+herramientas/.tmp_mermaid/
+herramientas/.tmp_doc_tecnico/
+
 # Carpeta interna de gestión, checklist operativo y handoffs
 /.interno/
