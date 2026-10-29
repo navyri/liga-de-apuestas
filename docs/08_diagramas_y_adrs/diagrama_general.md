@@ -47,8 +47,9 @@ graph TD
 
     %% 5. MENSAJERÍA Y STREAMING
     subgraph MENSAJERIA ["⚡ APACHE KAFKA (BROKER DISTRIBUIDO)"]
-        T_BETS["Topic: apuestas.aceptadas<br/>(Key: race_id)"]:::brokerStyle
+        T_BETS["Topic: apuestas.aceptadas<br/>(Key: user_id)"]:::brokerStyle
         T_RACES["Topic: carreras.eventos<br/>(Key: race_id)"]:::brokerStyle
+        T_RESULTS["Topic: carreras.resultados<br/>(Key: race_id)"]:::brokerStyle
         T_SETTLE["Topic: liquidacion.lotes<br/>(Key: batch_id)"]:::brokerStyle
     end
 
@@ -73,12 +74,13 @@ graph TD
 
     %% Relaciones Asíncronas (Flecha Punteada -.-)
     DB_PRIMARY -.->|"Outbox Relay / CDC"| MENSAJERIA
-    T_BETS -.->|"Consumer Group: notificaciones"| S_NOTIF
-    T_BETS -.->|"Consumer Group: analitica"| S_ANALYTICS
-    T_BETS -.->|"Consumer Group: auditoria"| S_AUDIT
-    T_RACES -.->|"ResultadoOficialPublicado"| W_SETTLE
+    T_BETS -.->|"Consumer Group: notificaciones-apuestas"| S_NOTIF
+    T_BETS -.->|"Consumer Group: analitica-ingesta-diaria"| S_ANALYTICS
+    T_BETS -.->|"Consumer Group: auditoria-control-fraude"| S_AUDIT
+    T_RESULTS -.->|"ResultadoOficialPublicado"| W_SETTLE
+    T_RACES -.->|"CarreraIniciada / Finalizada / Cancelada"| S_NOTIF
     W_SETTLE -.->|"Lotes Particionados (Key: batch_id)"| T_SETTLE
-    T_SETTLE -.->|"Consumer Group: dispersores"| W_DISPERS
+    T_SETTLE -.->|"Consumer Group: dispersores-premios-billetera"| W_DISPERS
     W_DISPERS == "Acreditación Contable en Lote<br/>[ACID en Wallets]" ===> DB_PRIMARY
 ```
 

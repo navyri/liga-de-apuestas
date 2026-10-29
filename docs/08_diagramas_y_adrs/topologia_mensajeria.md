@@ -18,21 +18,28 @@ graph TD
     subgraph PRODUCTORES ["🚀 PRODUCTORES (PRODUCERS)"]
         P_CORE["Núcleo Modular / Outbox Relay<br/>(Transactional Outbox)"]:::prodStyle
         P_SETTLE["Worker de Liquidación<br/>(Generador de Lotes)"]:::prodStyle
+        P_DISPERS["Pool de Dispersores de Premios<br/>(Acreditación en Billetera)"]:::prodStyle
     end
 
     %% Tópicos y Particiones
     subgraph TOPICS ["⚡ CLÚSTER DE APACHE KAFKA (TOPICS & PARTITIONS)"]
-        subgraph T1 ["Topic: apuestas.aceptadas (8 Particiones | Key: race_id)"]
+        subgraph T1 ["Topic: apuestas.aceptadas (8 Particiones | Key: user_id)"]
             T1_P["P0 | P1 | P2 | P3 | P4 | P5 | P6 | P7"]:::topicStyle
         end
         subgraph T2 ["Topic: carreras.eventos (4 Particiones | Key: race_id)"]
             T2_P["P0 | P1 | P2 | P3"]:::topicStyle
         end
-        subgraph T3 ["Topic: liquidacion.lotes (8 Particiones | Key: batch_id)"]
-            T3_P["P0 | P1 | P2 | P3 | P4 | P5 | P6 | P7"]:::topicStyle
+        subgraph T3 ["Topic: carreras.resultados (4 Particiones | Key: race_id)"]
+            T3_P["P0 | P1 | P2 | P3"]:::topicStyle
         end
-        subgraph T4 ["Topic: notificaciones.dlt (Dead Letter Topic)"]
-            T4_P["DLT - Mensajes Fallidos tras 3 Reintentos"]:::topicStyle
+        subgraph T4 ["Topic: liquidacion.lotes (8 Particiones | Key: batch_id)"]
+            T4_P["P0 | P1 | P2 | P3 | P4 | P5 | P6 | P7"]:::topicStyle
+        end
+        subgraph T5 ["Topic: billetera.movimientos (4 Particiones | Key: user_id)"]
+            T5_P["P0 | P1 | P2 | P3"]:::topicStyle
+        end
+        subgraph T6 ["Topic: notificaciones.dlt (Dead Letter Topic)"]
+            T6_P["DLT - Mensajes Fallidos tras 3 Reintentos"]:::topicStyle
         end
     end
 
@@ -41,13 +48,13 @@ graph TD
         subgraph CG_CUOTAS ["Group: cuotas-dinamicas-workers"]
             C_CUOTAS["Workers de Cálculo de Cuotas en Vivo<br/>(Lectura secuencial por carrera)"]:::consumerStyle
         end
-        subgraph CG_NOTIF ["Group: notificaciones-service"]
+        subgraph CG_NOTIF ["Group: notificaciones-apuestas"]
             C_NOTIF["Consumidores Multicanal<br/>(Despacho Push / Correo / App)"]:::consumerStyle
         end
         subgraph CG_ANALYTICS ["Group: analitica-ingesta-diaria"]
             C_ANALYTICS["Consumidores Micro-Lotes<br/>(Alimentación Almacén OLAP)"]:::consumerStyle
         end
-        subgraph CG_AUDIT ["Group: auditoria-inmutable"]
+        subgraph CG_AUDIT ["Group: auditoria-control-fraude"]
             C_AUDIT["Consumidores de Auditoría<br/>(Sellado WORM / Hashes SHA-256)"]:::consumerStyle
         end
         subgraph CG_DISPERS ["Group: dispersores-premios-billetera"]
@@ -57,8 +64,10 @@ graph TD
 
     %% Flujos de Publicación
     P_CORE -->|"Publica ApuestaAceptada"| T1_P
-    P_CORE -->|"Publica CarreraIniciada / Finalizada / ResultadoOficial"| T2_P
-    P_SETTLE -->|"Publica Lotes (batch_id)"| T3_P
+    P_CORE -->|"Publica CarreraIniciada / Finalizada / Cancelada"| T2_P
+    P_CORE -->|"Publica ResultadoOficialPublicado"| T3_P
+    P_SETTLE -->|"Publica Lotes (batch_id)"| T4_P
+    P_DISPERS -.->|"Publica PremioAcreditado / DevolucionAcreditada"| T5_P
 
     %% Flujos de Consumo Independiente (Offsets Desacoplados)
     T1_P -.->|"Lectura por Offset Propio"| CG_CUOTAS
@@ -66,9 +75,9 @@ graph TD
     T1_P -.->|"Lectura por Offset Propio"| CG_ANALYTICS
     T1_P -.->|"Lectura por Offset Propio"| CG_AUDIT
 
-    T2_P -.->|"Disparador de Liquidación"| P_SETTLE
+    T3_P -.->|"Disparador de Liquidación"| P_SETTLE
     T2_P -.->|"Alertas de Eventos de Carrera"| CG_NOTIF
 
-    T3_P -.->|"Consumo Paralelo de Lotes"| CG_DISPERS
-    CG_NOTIF -.->|"Fallo tras 3 Reintentos"| T4_P
+    T4_P -.->|"Consumo Paralelo de Lotes"| CG_DISPERS
+    CG_NOTIF -.->|"Fallo tras 3 Reintentos"| T6_P
 ```

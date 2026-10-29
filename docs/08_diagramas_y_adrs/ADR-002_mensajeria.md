@@ -16,7 +16,7 @@ La plataforma de apuestas sobre carreras de medianos requiere una infraestructur
 4. **Ninguno (Comunicación Síncrona Directa):** Acoplamiento directo mediante llamadas REST/gRPC entre todos los componentes.
 
 ## 3. Decisión Tomada
-Se adopta **Apache Kafka como tecnología única de mensajería y event streaming**. Los eventos transaccionales del núcleo (apuestas, inicios, finales y resultados) se publican en tópicos particionados mediante el patrón Transactional Outbox. Múltiples grupos de consumidores independientes (`Consumer Groups`) leen concurrentemente las particiones a su propio ritmo sin duplicación física de datos en el broker. La liquidación masiva de premios se resuelve mediante tareas en lotes particionados por usuario (`user_id`) sobre tópicos de trabajo en el mismo clúster.
+Se adopta **Apache Kafka como tecnología única de mensajería y event streaming**. Los eventos transaccionales del núcleo (apuestas, inicios, finales y resultados) se publican en tópicos particionados mediante el patrón Transactional Outbox. Múltiples grupos de consumidores independientes (`Consumer Groups`) leen concurrentemente las particiones a su propio ritmo sin duplicación física de datos en el broker. La liquidación masiva de premios se resuelve mediante tareas en lotes particionados por identificador de lote (`batch_id`) sobre tópicos de trabajo en el mismo clúster.
 
 ## 4. Justificación del Descarte de Alternativas
 - **Descarte de RabbitMQ como broker único:** Aunque cuenta con extensiones modernas como streams, el modelo nativo de Kafka de log distribuido particionado por clave de negocio (`race_id`, `user_id`) con consumidores desacoplados por offset resuelve de manera más homogénea y directa las necesidades de difusión masiva hacia múltiples subsistemas y la distribución concurrente de lotes de liquidación.
@@ -27,7 +27,7 @@ Se adopta **Apache Kafka como tecnología única de mensajería y event streamin
 
 ### Lo que se gana:
 - **Consumo desacoplado y concurrente:** Notificaciones lentas, analítica pesada y auditoría consumen del mismo log sin saturar la memoria del broker ni interferir entre sí.
-- **Distribución eficiente de liquidación:** Descomposición del millón de apuestas en lotes homogéneos particionados por usuario, procesados en paralelo por workers para cumplir el plazo de 15 minutos sin generar interbloqueos de saldo.
+- **Distribución eficiente de liquidación:** Descomposición del millón de apuestas en lotes homogéneos particionados por identificador de lote (`batch_id`), procesados en paralelo por workers para cumplir el plazo de 15 minutos; el orden de bloqueo por `user_id` dentro de cada lote evita interbloqueos de saldo.
 - **Persistencia y reprocesamiento operativo:** Retención temporal de eventos (ej. 7 días) que permite recuperar caídas de consumidores y reprocesar información reciente.
 
 ### Lo que se sacrifica y límites:

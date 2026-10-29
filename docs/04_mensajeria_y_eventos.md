@@ -122,7 +122,7 @@ Todos los eventos de la plataforma comparten una estructura base canónica con v
                                   APACHE KAFKA CLUSTER
  ┌────────────────────────────────────────────────────────────────────────────────────────┐
  │                                                                                        │
- │  Topic: apuestas.aceptadas (Particionado por race_id)                                  │
+ │  Topic: apuestas.aceptadas (Particionado por user_id)                                  │
  │  [ P0 ][ P1 ][ P2 ][ P3 ][ P4 ][ P5 ][ P6 ][ P7 ]                                      │
  │   │      │      │                                                                      │
  └───┼──────┼──────┼──────────────────────────────────────────────────────────────────────┘
@@ -133,7 +133,7 @@ Todos los eventos de la plataforma comparten una estructura base canónica con v
      └─────────────────────► Consumer Group: "auditoria-control-fraude" (Offset propio)
 
  ┌────────────────────────────────────────────────────────────────────────────────────────┐
- │  Topic: liquidacion.lotes (Particionado por user_id)                                   │
+ │  Topic: liquidacion.lotes (Particionado por batch_id)                                  │
  │  [ P0 ][ P1 ][ P2 ][ P3 ][ P4 ][ P5 ][ P6 ][ P7 ]                                      │
  │   │                                                                                    │
  └───┼────────────────────────────────────────────────────────────────────────────────────┘

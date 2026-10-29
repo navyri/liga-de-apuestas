@@ -73,7 +73,7 @@ sequenceDiagram
     Note over RELAY,NOTIF: PROCESAMIENTO ASÍNCRONO DESACOPLADO
     RELAY->>+DB: Leer eventos 'PENDING' en outbox_events
     DB-->>-RELAY: Lista de eventos
-    RELAY->>+KAFKA: Publicar en topic: apuestas.aceptadas (Key: race_id)
+    RELAY->>+KAFKA: Publicar en topic: apuestas.aceptadas (Key: user_id)
     KAFKA-->>-RELAY: ACK (Confirmado por Kafka)
     RELAY->>DB: UPDATE outbox_events SET status='PUBLISHED'
     
