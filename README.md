@@ -116,6 +116,17 @@ liga-de-apuestas/
 | **Presentación ejecutiva (PDF)** | Exportación oficial: una diapositiva por página (20 páginas, 1280×720), sin controles ni notas. | [entregables/presentacion.pdf](docs/entregables/presentacion.pdf) |
 | **Documento técnico consolidado (PDF)** | Los 7 documentos temáticos + los 3 ADR + Anexo A con las fuentes y renders de los 4 diagramas (53 páginas). | [entregables/documento_tecnico.pdf](docs/entregables/documento_tecnico.pdf) |
 | **Diagramas oficiales exportados** | Diagrama general, secuencia de apuesta, topología de mensajería y ciclo de carrera en SVG y PNG de alta resolución, generados desde las fuentes Mermaid canónicas. | [08_diagramas_y_adrs/exportados/](docs/08_diagramas_y_adrs/exportados/) |
+| **Portal de entrega (GitHub Pages)** | Landing en `docs/index.html` con acceso a la presentación, los PDFs, los diagramas, la documentación y los ADR. | [docs/index.html](docs/index.html) |
+
+### Sitio web (GitHub Pages)
+
+La documentación y los entregables visuales se publican automáticamente desde la carpeta `docs/` de la rama `main`:
+
+**https://navyri.github.io/liga-de-apuestas/**
+
+- **Presentación en vivo:** https://navyri.github.io/liga-de-apuestas/presentacion/index.html
+- Cada `push` a `main` reconstruye el sitio (build de GitHub Pages verificado sobre el commit `91d46c3`).
+- El archivo `docs/.nojekyll` evita que GitHub Pages procese los Markdown con Jekyll y rompa los enlaces.
 
 ### Regeneración de los entregables visuales
 
@@ -130,7 +141,7 @@ node herramientas/generar_diagramas.mjs
 python herramientas/generar_documento_tecnico.py
 #    y luego exportar el PDF con Chrome (headless) desde herramientas/.tmp_doc_tecnico/documento_tecnico.html
 
-# 3) Presentación — basta con abrir presentacion/index.html en un navegador
+# 3) Presentación — basta con abrir docs/presentacion/index.html en un navegador
 #    y usar "Imprimir → Guardar como PDF" (una página por diapositiva, sin encabezados)
 ```
 

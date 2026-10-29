@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Gran Liga de Apuestas de Medianos EIA — Arquitectura (Parte 1)</title>
+<meta name="description" content="Entrega de la Parte 1: diseño de la arquitectura distribuida de la plataforma de apuestas mutuas de Salchipapa Maker Racing S.A.S. Presentación, documentos técnicos y diagramas.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--vino:#6B0F1A;--vino-osc:#540B13;--carm:#8B1E2D;--carm-al:#A82336;--acento:#E8B4B8;--fondo:#1E0A0F;--texto:#F4ECE4;--dorado:#C6A66B}
+body{background:radial-gradient(1400px 800px at 25% 0%,#2A0A10 0%,#14060A 65%);color:var(--texto);font-family:"Segoe UI",Arial,Helvetica,sans-serif;line-height:1.55}
+.contenedor{max-width:1060px;margin:0 auto;padding:0 24px}
+header{padding:64px 0 46px;text-align:center}
+.eyebrow{font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#D9A7AE;margin-bottom:16px}
+h1{font-size:clamp(32px,5vw,52px);font-weight:800;color:#fff;line-height:1.1;text-shadow:0 4px 24px rgba(168,35,54,.5)}
+h1 .acento{color:var(--acento)}
+.barra{width:200px;height:5px;background:linear-gradient(90deg,var(--carm-al),var(--acento));margin:22px auto;border-radius:3px}
+.org{font-size:19px;color:#E8CDD1}
+.bajada{font-size:16px;color:#C9A3A9;max-width:760px;margin:12px auto 0}
+.kpis{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.kpi{background:linear-gradient(150deg,var(--vino),var(--vino-osc));border:1px solid var(--carm-al);border-radius:10px;padding:12px 20px;text-align:center;min-width:132px}
+.kpi b{display:block;font-size:24px;color:#fff}
+.kpi span{font-size:13px;color:#F1D4D8}
+.acciones{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+.btn{display:inline-block;padding:13px 26px;border-radius:9px;font-size:16px;font-weight:600;text-decoration:none;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.45)}
+.btn-principal{background:linear-gradient(135deg,var(--carm-al),var(--vino));color:#fff;border:1px solid var(--acento)}
+.btn-secundario{background:transparent;color:var(--acento);border:1px solid var(--carm-al)}
+.aviso{margin:14px auto 0;max-width:720px;font-size:13.5px;color:#B98A93;border:1px dashed rgba(198,166,107,.5);border-radius:8px;padding:9px 14px;background:rgba(42,10,16,.5)}
+section{padding:34px 0}
+h2{font-size:26px;color:var(--acento);border-left:7px solid var(--carm-al);padding-left:14px;margin-bottom:6px}
+.sub{color:#C9A3A9;font-size:15px;margin-bottom:22px;padding-left:21px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:#2A0C13;border:1px solid #7C1622;border-radius:10px;padding:18px 20px;text-decoration:none;color:var(--texto);display:flex;flex-direction:column;gap:7px;transition:transform .12s,border-color .12s}
+.card:hover{transform:translateY(-3px);border-color:var(--carm-al)}
+.card h3{font-size:17.5px;color:#fff}
+.card p{font-size:14.5px;color:#D6B9BE}
+.tag{align-self:flex-start;font-size:11.5px;letter-spacing:1.5px;text-transform:uppercase;background:var(--carm);color:#F7E4E7;border-radius:14px;padding:3px 11px}
+.tag.pdf{background:var(--vino-osc);border:1px solid var(--carm-al);color:var(--acento)}
+.tag.svg{background:#3A0D15;border:1px solid var(--dorado);color:var(--dorado)}
+.lista-docs{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px}
+.doc-link{display:flex;gap:12px;align-items:baseline;background:rgba(42,12,19,.7);border:1px solid #5A121B;border-radius:8px;padding:11px 15px;text-decoration:none;color:var(--texto);transition:border-color .12s}
+.doc-link:hover{border-color:var(--carm-al)}
+.doc-link .num{font-weight:700;color:var(--dorado);font-family:Consolas,monospace;font-size:13px}
+.doc-link b{color:var(--acento);font-size:15px}
+.doc-link span{display:block;font-size:13px;color:#C7A5AB}
+.diagramas{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.diagrama{background:#F7F2F0;border:1px solid #7C1622;border-radius:9px;overflow:hidden;text-decoration:none;display:block;transition:transform .12s}
+.diagrama:hover{transform:translateY(-3px)}
+.diagrama img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;padding:8px}
+.diagrama b{display:block;padding:9px 13px;font-size:14px;color:var(--vino);background:#EEDADD}
+.pasos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.paso{background:rgba(42,12,19,.7);border:1px solid #5A121B;border-radius:8px;padding:14px 16px}
+.paso b{color:var(--dorado);display:block;margin-bottom:5px;font-size:14px;letter-spacing:.5px}
+.paso p{font-size:14px;color:#D6B9BE}
+.paso code{font-family:Consolas,"Courier New",monospace;background:#1C070C;padding:2px 6px;border-radius:4px;font-size:12.5px;color:var(--acento);word-break:break-all}
+footer{border-top:1px solid rgba(138,30,45,.45);margin-top:34px;padding:26px 0 40px;text-align:center;font-size:13.5px;color:#96707A}
+footer b{color:#C9A3A9}
+@media (max-width:640px){header{padding:44px 0 32px}.acciones .btn{width:100%;text-align:center}}
+</style>
+</head>
+<body>
+
+<header class="contenedor">
+  <div class="eyebrow">Arquitectura de Software · Parte 1 · Entrega</div>
+  <h1>La Gran Liga de Apuestas<br><span class="acento">de Medianos EIA</span></h1>
+  <div class="barra"></div>
+  <div class="org">Salchipapa Maker Racing S.A.S.</div>
+  <p class="bajada">Diseño de la arquitectura distribuida de la plataforma de apuestas mutuas (Pari-Mutuel) sobre carreras de medianos: decisiones justificadas, diagramas, ADR y sustentación.</p>
+  <div class="kpis">
+    <div class="kpi"><b>100k</b><span>usuarios en pico</span></div>
+    <div class="kpi"><b>10k/s</b><span>apuestas en ráfaga</span></div>
+    <div class="kpi"><b>&lt; 1 s</b><span>respuesta al apostar</span></div>
+    <div class="kpi"><b>20</b><span>diapositivas</span></div>
+    <div class="kpi"><b>3</b><span>ADR registrados</span></div>
+  </div>
+  <div class="acciones">
+    <a class="btn btn-principal" href="presentacion/index.html">▶ Ver la presentación (20 slides)</a>
+    <a class="btn btn-secundario" href="entregables/presentacion.pdf">⬇ Presentación (PDF)</a>
+    <a class="btn btn-secundario" href="entregables/documento_tecnico.pdf">⬇ Documento técnico (PDF)</a>
+  </div>
+  <p class="aviso">⚠️ <b>Entrega académica de diseño:</b> este sitio documenta el <i>diseño</i> de la arquitectura. Conforme al enunciado, la arquitectura <b>no está implementada</b> (sin backend, base de datos ni broker en ejecución). Los EIA Coins son créditos ficticios sin valor real.</p>
+</header>
+
+<main class="contenedor">
+
+  <section>
+    <h2>Presentación ejecutiva</h2>
+    <p class="sub">20 diapositivas · navegación con ← → o clic · tecla <b>N</b> para notas del orador · sin dependencias externas</p>
+    <div class="grid">
+      <a class="card" href="presentacion/index.html">
+        <span class="tag">HTML interactivo</span>
+        <h3>Presentación de sustentación</h3>
+        <p>Contexto, requisitos, decisiones (híbrida + Kafka + mayores restos), diagramas, fallos, seguridad, costos y evolución 100×.</p>
+      </a>
+      <a class="card" href="entregables/presentacion.pdf">
+        <span class="tag pdf">PDF · 20 páginas</span>
+        <h3>Presentación (exportación oficial)</h3>
+        <p>Una diapositiva por página, sin controles ni notas: el archivo para entregar o imprimir.</p>
+      </a>
+      <a class="card" href="entregables/documento_tecnico.pdf">
+        <span class="tag pdf">PDF · 53 páginas</span>
+        <h3>Documento técnico consolidado</h3>
+        <p>Los 7 documentos temáticos + los 3 ADR + Anexo A con las fuentes y renders de los 4 diagramas.</p>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Diagramas oficiales</h2>
+    <p class="sub">Generados desde las fuentes Mermaid canónicas (SVG y PNG de alta resolución) · clic para abrir a tamaño completo</p>
+    <div class="diagramas">
+      <a class="diagrama" href="08_diagramas_y_adrs/exportados/diagrama_general.svg" target="_blank" rel="noopener">
+        <img src="08_diagramas_y_adrs/exportados/diagrama_general.png" alt="Diagrama general de arquitectura">
+        <b>1 · Diagrama general</b>
+      </a>
+      <a class="diagrama" href="08_diagramas_y_adrs/exportados/diagrama_secuencia_apuesta.svg" target="_blank" rel="noopener">
+        <img src="08_diagramas_y_adrs/exportados/diagrama_secuencia_apuesta.png" alt="Diagrama de secuencia de una apuesta">
+        <b>2 · Secuencia de apuesta</b>
+      </a>
+      <a class="diagrama" href="08_diagramas_y_adrs/exportados/topologia_mensajeria.svg" target="_blank" rel="noopener">
+        <img src="08_diagramas_y_adrs/exportados/topologia_mensajeria.png" alt="Topología de mensajería Kafka">
+        <b>3 · Topología de mensajería</b>
+      </a>
+      <a class="diagrama" href="08_diagramas_y_adrs/exportados/ciclo_carrera.svg" target="_blank" rel="noopener">
+        <img src="08_diagramas_y_adrs/exportados/ciclo_carrera.png" alt="Ciclo de vida de la carrera">
+        <b>4 · Ciclo de carrera (FSM)</b>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Documentación técnica</h2>
+    <p class="sub">Fuentes Markdown versionadas en el repositorio (el PDF consolidado los refleja al completo)</p>
+    <div class="lista-docs">
+      <a class="doc-link" href="trazabilidad_y_requisitos.md"><span class="num">00</span><span><b>Trazabilidad y requisitos</b><span>Cobertura de los 16 puntos del PDF y decisiones</span></span></a>
+      <a class="doc-link" href="01_requisitos_y_negocio.md"><span class="num">01</span><span><b>Requisitos y negocio</b><span>Actores, FSM de carrera, Pari-Mutuel, 5 invariantes</span></span></a>
+      <a class="doc-link" href="02_arquitectura_y_componentes.md"><span class="num">02</span><span><b>Arquitectura y componentes</b><span>Estilo híbrido, descartes y módulos</span></span></a>
+      <a class="doc-link" href="03_flujo_critico_y_comunicacion.md"><span class="num">03</span><span><b>Flujo crítico y síncrona</b><span>Apuesta atómica, contratos, incertidumbre de red</span></span></a>
+      <a class="doc-link" href="04_mensajeria_y_eventos.md"><span class="num">04</span><span><b>Mensajería y eventos</b><span>Kafka, catálogo canónico, outbox, lotes</span></span></a>
+      <a class="doc-link" href="05_datos_e_idempotencia.md"><span class="num">05</span><span><b>Datos e idempotencia</b><span>OLTP/OLAP, mayores restos, WORM</span></span></a>
+      <a class="doc-link" href="06_escalabilidad_y_fallos.md"><span class="num">06</span><span><b>Escalabilidad y fallos</b><span>Ráfaga 10k/s, latencia, Casos A, B y C</span></span></a>
+      <a class="doc-link" href="07_seguridad_y_costos.md"><span class="num">07</span><span><b>Seguridad y costos</b><span>RBAC, rate limiting, DMZ, regla de Dyllan</span></span></a>
+      <a class="doc-link" href="09_presentacion_diapositivas.md"><span class="num">09</span><span><b>Guion de presentación</b><span>Fuente de las 20 diapositivas y conclusiones</span></span></a>
+      <a class="doc-link" href="10_guia_sustentacion.md"><span class="num">10</span><span><b>Guía de sustentación</b><span>Preguntas del jurado y Live Betting en vivo</span></span></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Registros de Decisión (ADR)</h2>
+    <p class="sub">Decisiones formales con opciones consideradas, alternativas descartadas y compromisos asumidos</p>
+    <div class="grid">
+      <a class="card" href="08_diagramas_y_adrs/ADR-001_estilo_arquitectonico.md">
+        <span class="tag">ADR-001</span>
+        <h3>Estilo arquitectónico</h3>
+        <p>Monolito vs. monolito modular vs. microservicios puros vs. híbrida → se adopta la híbrida.</p>
+      </a>
+      <a class="card" href="08_diagramas_y_adrs/ADR-002_mensajeria.md">
+        <span class="tag">ADR-002</span>
+        <h3>Tecnología de mensajería</h3>
+        <p>Kafka como broker único frente a RabbitMQ o dual: log particionado y consumer groups.</p>
+      </a>
+      <a class="card" href="08_diagramas_y_adrs/ADR-003_consistencia_billetera.md">
+        <span class="tag">ADR-003</span>
+        <h3>Consistencia e idempotencia</h3>
+        <p>ACID local, idempotencia por apuesta, mayores restos y reembolso sin ganadores.</p>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Regenerar los entregables</h2>
+    <p class="sub">Todo el material visual se genera desde fuentes versionadas en el repositorio</p>
+    <div class="pasos">
+      <div class="paso"><b>1 · DIAGRAMAS</b><p><code>cd herramientas &amp;&amp; npm install</code><br><code>node herramientas/generar_diagramas.mjs</code><br>SVG + PNG en <code>exportados/</code>.</p></div>
+      <div class="paso"><b>2 · DOCUMENTO TÉCNICO</b><p><code>python herramientas/generar_documento_tecnico.py</code><br>y exportar el PDF con Chrome headless desde el HTML intermedio.</p></div>
+      <div class="paso"><b>3 · PRESENTACIÓN</b><p>Abrir <code>presentacion/index.html</code> en el navegador → Imprimir → Guardar como PDF (una página por slide).</p></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <b>Salchipapa Maker Racing S.A.S.</b> · La Gran Liga de Apuestas de Medianos EIA<br>
+  Arquitectura de Software · Parte 1 · Octubre 2026 · <a href="https://github.com/navyri/liga-de-apuestas" style="color:#C9A3A9">Repositorio en GitHub</a>
+</footer>
+
+</body>
+</html>
