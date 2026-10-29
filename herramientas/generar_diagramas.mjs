@@ -4,14 +4,14 @@
  * canónicas en Mermaid dentro de los Markdown de la Parte 1.
  *
  * Fuentes canónicas (no editar las exportaciones a mano):
- *   parte_1_arquitectura/08_diagramas_y_adrs/diagrama_general.md
- *   parte_1_arquitectura/08_diagramas_y_adrs/diagrama_secuencia_apuesta.md
- *   parte_1_arquitectura/08_diagramas_y_adrs/topologia_mensajeria.md
- *   parte_1_arquitectura/08_diagramas_y_adrs/ciclo_carrera.md
+ *   docs/08_diagramas_y_adrs/diagrama_general.md
+ *   docs/08_diagramas_y_adrs/diagrama_secuencia_apuesta.md
+ *   docs/08_diagramas_y_adrs/topologia_mensajeria.md
+ *   docs/08_diagramas_y_adrs/ciclo_carrera.md
  *
  * Salida:
- *   parte_1_arquitectura/08_diagramas_y_adrs/exportados/<nombre>.svg
- *   parte_1_arquitectura/08_diagramas_y_adrs/exportados/<nombre>.png
+ *   docs/08_diagramas_y_adrs/exportados/<nombre>.svg
+ *   docs/08_diagramas_y_adrs/exportados/<nombre>.png
  *
  * Uso:
  *   node herramientas/generar_diagramas.mjs
@@ -48,7 +48,7 @@ function resolverMmdc() {
   );
 }
 const mmdcBin = resolverMmdc();
-const carpetaFuentes = join(raiz, 'parte_1_arquitectura', '08_diagramas_y_adrs');
+const carpetaFuentes = join(raiz, 'docs', '08_diagramas_y_adrs');
 const carpetaSalida = join(carpetaFuentes, 'exportados');
 const carpetaTmp = join(raiz, 'herramientas', '.tmp_mermaid');
 

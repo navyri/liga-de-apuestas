@@ -64,7 +64,7 @@ liga-de-apuestas/
 │   ├── generar_documento_tecnico.py         # Markdown consolidado → documento técnico
 │   ├── tema_diagramas.json                  # Tema vinotinto de los diagramas
 │   └── puppeteer-config.json                # Chrome local para mermaid-cli
-└── parte_1_arquitectura/
+└── docs/
     ├── trazabilidad_y_requisitos.md         # Matriz de trazabilidad y cobertura de los 16 puntos
     ├── 01_requisitos_y_negocio.md           # Análisis de dominio, actores, roles e invariantes
     ├── 02_arquitectura_y_componentes.md     # Evaluación de estilos arquitectónicos y boundaries
@@ -92,17 +92,17 @@ liga-de-apuestas/
 
 | Documento | Área Temática | Enlace |
 |---|---|---|
-| **Trazabilidad y Requisitos** | Cobertura de los 16 puntos del PDF, decisiones y estado de evidencias | [trazabilidad_y_requisitos.md](parte_1_arquitectura/trazabilidad_y_requisitos.md) |
-| **Requisitos y Reglas de Negocio** | FSM de carrera, modelo Pari-Mutuel y los 5 invariantes | [01_requisitos_y_negocio.md](parte_1_arquitectura/01_requisitos_y_negocio.md) |
-| **Arquitectura y Componentes** | Estilo híbrido, descarte justificado de microservicios y módulos | [02_arquitectura_y_componentes.md](parte_1_arquitectura/02_arquitectura_y_componentes.md) |
-| **Flujo Crítico y Comunicación Síncrona** | Flujo atómico de apuesta, tabla síncrona formal e incertidumbre de red | [03_flujo_critico_y_comunicacion.md](parte_1_arquitectura/03_flujo_critico_y_comunicacion.md) |
-| **Mensajería y Event Streaming** | Apache Kafka, catálogo canónico, lotes de liquidación y Outbox | [04_mensajeria_y_eventos.md](parte_1_arquitectura/04_mensajeria_y_eventos.md) |
-| **Persistencia, Consistencia e Idempotencia** | Esquema OLTP/OLAP, mayores restos, reembolso sin ganadores y WORM | [05_datos_e_idempotencia.md](parte_1_arquitectura/05_datos_e_idempotencia.md) |
-| **Escalabilidad y Manejo de Fallos** | Ráfaga de 10k ops/s, Casos A, B y C (opcional) de fallos y latencia | [06_escalabilidad_y_fallos.md](parte_1_arquitectura/06_escalabilidad_y_fallos.md) |
-| **Seguridad, Control de Acceso y Costos** | Matriz RBAC, rate limiting, segmentación de red y regla de Dyllan | [07_seguridad_y_costos.md](parte_1_arquitectura/07_seguridad_y_costos.md) |
-| **Diagramas Oficiales y Registros ADR** | Diagrama general, secuencia de apuesta, topología y ADRs 1, 2 y 3 | [08_diagramas_y_adrs/](parte_1_arquitectura/08_diagramas_y_adrs/) |
-| **Presentación y Pregunta Final** | Respuesta técnica hoy vs 100x y guion de 20 diapositivas | [09_presentacion_diapositivas.md](parte_1_arquitectura/09_presentacion_diapositivas.md) |
-| **Guía de Sustentación Técnica** | Preguntas probables del jurado y absorción de Live Betting en vivo | [10_guia_sustentacion.md](parte_1_arquitectura/10_guia_sustentacion.md) |
+| **Trazabilidad y Requisitos** | Cobertura de los 16 puntos del PDF, decisiones y estado de evidencias | [trazabilidad_y_requisitos.md](docs/trazabilidad_y_requisitos.md) |
+| **Requisitos y Reglas de Negocio** | FSM de carrera, modelo Pari-Mutuel y los 5 invariantes | [01_requisitos_y_negocio.md](docs/01_requisitos_y_negocio.md) |
+| **Arquitectura y Componentes** | Estilo híbrido, descarte justificado de microservicios y módulos | [02_arquitectura_y_componentes.md](docs/02_arquitectura_y_componentes.md) |
+| **Flujo Crítico y Comunicación Síncrona** | Flujo atómico de apuesta, tabla síncrona formal e incertidumbre de red | [03_flujo_critico_y_comunicacion.md](docs/03_flujo_critico_y_comunicacion.md) |
+| **Mensajería y Event Streaming** | Apache Kafka, catálogo canónico, lotes de liquidación y Outbox | [04_mensajeria_y_eventos.md](docs/04_mensajeria_y_eventos.md) |
+| **Persistencia, Consistencia e Idempotencia** | Esquema OLTP/OLAP, mayores restos, reembolso sin ganadores y WORM | [05_datos_e_idempotencia.md](docs/05_datos_e_idempotencia.md) |
+| **Escalabilidad y Manejo de Fallos** | Ráfaga de 10k ops/s, Casos A, B y C (opcional) de fallos y latencia | [06_escalabilidad_y_fallos.md](docs/06_escalabilidad_y_fallos.md) |
+| **Seguridad, Control de Acceso y Costos** | Matriz RBAC, rate limiting, segmentación de red y regla de Dyllan | [07_seguridad_y_costos.md](docs/07_seguridad_y_costos.md) |
+| **Diagramas Oficiales y Registros ADR** | Diagrama general, secuencia de apuesta, topología y ADRs 1, 2 y 3 | [08_diagramas_y_adrs/](docs/08_diagramas_y_adrs/) |
+| **Presentación y Pregunta Final** | Respuesta técnica hoy vs 100x y guion de 20 diapositivas | [09_presentacion_diapositivas.md](docs/09_presentacion_diapositivas.md) |
+| **Guía de Sustentación Técnica** | Preguntas probables del jurado y absorción de Live Betting en vivo | [10_guia_sustentacion.md](docs/10_guia_sustentacion.md) |
 
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"/>
@@ -112,10 +112,10 @@ liga-de-apuestas/
 
 | Entregable | Contenido | Ubicación |
 |---|---|---|
-| **Presentación ejecutiva (HTML)** | 20 diapositivas con navegación por teclado (← →, Inicio/Fin), indicador de progreso, notas del orador separadas (tecla `N`) y estilos propios en la paleta vinotinto. Sin dependencias remotas: se abre directamente en cualquier navegador. | [presentacion/index.html](parte_1_arquitectura/presentacion/index.html) |
-| **Presentación ejecutiva (PDF)** | Exportación oficial: una diapositiva por página (20 páginas, 1280×720), sin controles ni notas. | [entregables/presentacion.pdf](parte_1_arquitectura/entregables/presentacion.pdf) |
-| **Documento técnico consolidado (PDF)** | Los 7 documentos temáticos + los 3 ADR + Anexo A con las fuentes y renders de los 4 diagramas (53 páginas). | [entregables/documento_tecnico.pdf](parte_1_arquitectura/entregables/documento_tecnico.pdf) |
-| **Diagramas oficiales exportados** | Diagrama general, secuencia de apuesta, topología de mensajería y ciclo de carrera en SVG y PNG de alta resolución, generados desde las fuentes Mermaid canónicas. | [08_diagramas_y_adrs/exportados/](parte_1_arquitectura/08_diagramas_y_adrs/exportados/) |
+| **Presentación ejecutiva (HTML)** | 20 diapositivas con navegación por teclado (← →, Inicio/Fin), indicador de progreso, notas del orador separadas (tecla `N`) y estilos propios en la paleta vinotinto. Sin dependencias remotas: se abre directamente en cualquier navegador. | [presentacion/index.html](docs/presentacion/index.html) |
+| **Presentación ejecutiva (PDF)** | Exportación oficial: una diapositiva por página (20 páginas, 1280×720), sin controles ni notas. | [entregables/presentacion.pdf](docs/entregables/presentacion.pdf) |
+| **Documento técnico consolidado (PDF)** | Los 7 documentos temáticos + los 3 ADR + Anexo A con las fuentes y renders de los 4 diagramas (53 páginas). | [entregables/documento_tecnico.pdf](docs/entregables/documento_tecnico.pdf) |
+| **Diagramas oficiales exportados** | Diagrama general, secuencia de apuesta, topología de mensajería y ciclo de carrera en SVG y PNG de alta resolución, generados desde las fuentes Mermaid canónicas. | [08_diagramas_y_adrs/exportados/](docs/08_diagramas_y_adrs/exportados/) |
 
 ### Regeneración de los entregables visuales
 

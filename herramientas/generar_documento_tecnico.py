@@ -5,7 +5,7 @@ Genera el documento técnico consolidado de la Parte 1 (HTML intermedio + PDF).
 Fuente de verdad: los Markdown temáticos y los ADR de la Parte 1.
 Salida:
   herramientas/.tmp_doc_tecnico/documento_tecnico.html   (intermedio, no versionable)
-  parte_1_arquitectura/entregables/documento_tecnico.pdf (entregable)
+  docs/entregables/documento_tecnico.pdf (entregable)
 
 Uso:
   python herramientas/generar_documento_tecnico.py
@@ -22,7 +22,7 @@ import sys
 import markdown
 
 RAIZ = pathlib.Path(__file__).resolve().parents[1]
-ORIGEN = RAIZ / "parte_1_arquitectura"
+ORIGEN = RAIZ / "docs"
 CARPETA_ADR = ORIGEN / "08_diagramas_y_adrs"
 EXPORTADOS = CARPETA_ADR / "exportados"
 TMP = RAIZ / "herramientas" / ".tmp_doc_tecnico"
@@ -114,7 +114,7 @@ def construir() -> pathlib.Path:
         cuerpo = md_a_html(texto)
         nombre_png = EXPORTADOS / (ruta.stem + ".png")
         if extraer_mermaid(texto) and nombre_png.exists():
-            rel = pathlib.Path("..", "..", "parte_1_arquitectura", "08_diagramas_y_adrs", "exportados", nombre_png.name)
+            rel = pathlib.Path("..", "..", "docs", "08_diagramas_y_adrs", "exportados", nombre_png.name)
             render = (
                 "<figure>"
                 f"<img src='{rel.as_posix()}' alt='Render del diagrama {ruta.stem}'>"
