@@ -1,3 +1,27 @@
+<!-- BANNER:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=170&color=6B0F1A&text=GUIA%20DE%20SUSTENTACION%20TECNICA&fontColor=F4ECE4&fontSize=44&fontAlignY=34&desc=Documento%2010%20%C2%B7%20Preguntas%20probables%20del%20jurado%20y%20absorci%C3%B3n%20del%20Live%20Betting&descColor=E8B4B8&descAlignY=60"
+       alt="Banner: GUIA DE SUSTENTACION TECNICA"/>
+</p>
+
+<p align="center">
+  <img src="https://64.media.tumblr.com/3254f08405664a04d3c5a65f765eb8c9/61bf168659dda322-50/s2048x3072/36c765a65bc72096e27e85823017367c0b9b48b2.pnj" alt="Ilustración conceptual de estrategia y competición en la academia" width="520"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Panel-Preguntas%20del%20jurado-540B13?style=flat-square&logoColor=white" alt="Panel: Preguntas del jurado"/>
+  <img src="https://img.shields.io/badge/En%20vivo-Live%20Betting-6B0F1A?style=flat-square&logoColor=white" alt="En vivo: Live Betting"/>
+  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
+</p>
+
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"
+       alt=""/>
+</p>
+
+<!-- BANNER:FIN -->
+
 # ETAPA P1-10: BANCO DE PREGUNTAS Y GUÍA DE SUSTENTACIÓN
 **Caso:** La Gran Liga de Apuestas de Medianos EIA  
 **Organización:** Salchipapa Maker Racing S.A.S.  

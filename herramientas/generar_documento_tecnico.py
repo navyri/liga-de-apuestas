@@ -84,6 +84,12 @@ figure { margin: 12px 0 16px; text-align: center; page-break-inside: avoid; brea
 figure img { max-width: 100%; max-height: 205mm; border: 1px solid #C9A9AE; border-radius: 6px; background: #fff; }
 figcaption { font-size: 9pt; color: #6C4048; margin-top: 5px; }
 footer.doc { margin-top: 26px; font-size: 8.6pt; color: #8A6068; border-top: 1px solid #E0CBCE; padding-top: 6px; }
+/* ADR: el enunciado exige máximo una página por ADR -> maquetación compacta */
+section.adr { font-size: 9.7pt; line-height: 1.32; }
+section.adr h1 { font-size: 14pt; margin: 0 0 8px; }
+section.adr h2 { font-size: 11pt; margin: 11px 0 4px; border-bottom-width: 1px; }
+section.adr p, section.adr li { font-size: 9.7pt; margin: 4px 0; }
+section.adr ul { margin: 4px 0 6px; padding-left: 18px; }
 """
 
 
@@ -93,6 +99,8 @@ def extraer_mermaid(texto: str) -> str | None:
 
 
 def md_a_html(texto: str) -> str:
+    # Bloque decorativo de banner (solo para Markdown en GitHub/Pages): se omite en el PDF consolidado
+    texto = re.sub(r"<!-- BANNER:INICIO.*?<!-- BANNER:FIN -->\s*", "", texto, flags=re.S)
     # Fórmulas: $$display$$ -> bloque centrado; $inline$ -> span (sin render LaTeX)
     texto = re.sub(r"\$\$(.+?)\$\$", lambda m: f"\n\n<p class='formula'>{m.group(1).strip()}</p>\n\n", texto, flags=re.S)
     texto = re.sub(r"\$([^$\n]+?)\$", lambda m: f"<span class='formula'>{m.group(1)}</span>", texto)
@@ -138,7 +146,7 @@ def construir() -> pathlib.Path:
         texto = ruta.read_text(encoding="utf-8")
         titulo = titulo_de(texto)
         entradas_indice.append((titulo, "adr"))
-        secciones.append((titulo, f"<section class='doc'>{cargar(ruta)}</section>"))
+        secciones.append((titulo, f"<section class='doc adr'>{cargar(ruta)}</section>"))
 
     entradas_indice.append(("Anexo A · Fuentes y renders de los diagramas", None))
     anexo = []

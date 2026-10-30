@@ -1,3 +1,27 @@
+<!-- BANNER:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=170&color=6B0F1A&text=DATOS%20E%20IDEMPOTENCIA&fontColor=F4ECE4&fontSize=44&fontAlignY=34&desc=Documento%2005%20%C2%B7%20Esquema%20OLTP%2FOLAP%2C%20mayores%20restos%20y%20auditor%C3%ADa%20WORM&descColor=E8B4B8&descAlignY=60"
+       alt="Banner: DATOS E IDEMPOTENCIA"/>
+</p>
+
+<p align="center">
+  <img src="https://64.media.tumblr.com/3254f08405664a04d3c5a65f765eb8c9/61bf168659dda322-50/s2048x3072/36c765a65bc72096e27e85823017367c0b9b48b2.pnj" alt="Ilustración conceptual de estrategia y competición en la academia" width="520"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/ACID-SELECT%20FOR%20UPDATE-540B13?style=flat-square&logoColor=white" alt="ACID: SELECT FOR UPDATE"/>
+  <img src="https://img.shields.io/badge/Garantia-Cero%20doble%20gasto-6B0F1A?style=flat-square&logoColor=white" alt="Garantia: Cero doble gasto"/>
+  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
+</p>
+
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"
+       alt=""/>
+</p>
+
+<!-- BANNER:FIN -->
+
 # ETAPA P1-5: DATOS, PERSISTENCIA E IDEMPOTENCIA
 **Caso:** La Gran Liga de Apuestas de Medianos EIA  
 **Organización:** Salchipapa Maker Racing S.A.S.  

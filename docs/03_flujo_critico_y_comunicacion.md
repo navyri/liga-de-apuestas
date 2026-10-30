@@ -1,3 +1,27 @@
+<!-- BANNER:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=170&color=6B0F1A&text=FLUJO%20CRITICO%20Y%20COMUNICACION%20SINCRONA&fontColor=F4ECE4&fontSize=44&fontAlignY=34&desc=Documento%2003%20%C2%B7%20Apuesta%20at%C3%B3mica%2C%20contratos%20formales%20e%20incertidumbre%20de%20red&descColor=E8B4B8&descAlignY=60"
+       alt="Banner: FLUJO CRITICO Y COMUNICACION SINCRONA"/>
+</p>
+
+<p align="center">
+  <img src="https://64.media.tumblr.com/3254f08405664a04d3c5a65f765eb8c9/61bf168659dda322-50/s2048x3072/36c765a65bc72096e27e85823017367c0b9b48b2.pnj" alt="Ilustración conceptual de estrategia y competición en la academia" width="520"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Latencia-Objetivo%20%3C%201s-540B13?style=flat-square&logoColor=white" alt="Latencia: Objetivo < 1s"/>
+  <img src="https://img.shields.io/badge/Patron-Transactional%20Outbox-6B0F1A?style=flat-square&logoColor=white" alt="Patron: Transactional Outbox"/>
+  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
+</p>
+
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"
+       alt=""/>
+</p>
+
+<!-- BANNER:FIN -->
+
 # ETAPA P1-3: FLUJO CRÍTICO Y COMUNICACIÓN SÍNCRONA
 **Caso:** La Gran Liga de Apuestas de Medianos EIA  
 **Organización:** Salchipapa Maker Racing S.A.S.  
