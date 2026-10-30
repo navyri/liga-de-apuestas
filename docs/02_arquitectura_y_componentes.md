@@ -30,6 +30,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-2.1 Y P1-2.2: DECISIÓN 1 — ESTILO ARQUITECTÓNICO APROBADO
 
 ### 1. Dirección Arquitectónica Aprobada: Arquitectura Híbrida
@@ -58,6 +64,12 @@ Se adopta formalmente una **Arquitectura Híbrida** estructurada a partir de un 
 - **Contención de recursos:** La ingesta diaria de millones de registros analíticos y la ejecución de consultas pesadas de tendencias competirían directamente por los mismos recursos de memoria y bloqueos de almacenamiento que el pico de apuestas previo al cierre.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-2.3: DEFINICIÓN DE RESPONSABILIDADES, LÍMITES Y UBICACIÓN DE CAPACIDADES
 
@@ -124,6 +136,12 @@ A continuación se formaliza la ubicación arquitectónica de las nueve capacida
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-2.4: DISTINCIÓN ENTRE MÓDULOS, UNIDADES DESPLEGABLES Y PROPIEDAD DE DATOS
 
 Para evitar acoplamientos ocultos y respetar la regla de Dyllan, se formalizan las tres dimensiones arquitectónicas:
@@ -141,6 +159,12 @@ Para evitar acoplamientos ocultos y respetar la regla de Dyllan, se formalizan l
    - **Aislamiento de Recursos:** El almacén analítico se encuentra físicamente separado del almacén transaccional operativo, impidiendo que la generación de reportes premium degrade el rendimiento de las apuestas.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-2.5: ESTRATEGIA DE ESCALAMIENTO INDEPENDIENTE Y MITIGACIÓN DE CUELLOS DE BOTELLA
 

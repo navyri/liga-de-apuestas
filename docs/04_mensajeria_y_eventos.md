@@ -30,6 +30,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-4.1 Y P1-4.2: DECISIÓN 5 — ELECCIÓN DE LA TECNOLOGÍA DE MENSAJERÍA
 
 ### 1. Dirección Aprobada: Apache Kafka como Broker Único del Sistema
@@ -73,6 +79,12 @@ Se adopta formalmente **Apache Kafka** como plataforma exclusiva de mensajería 
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-4.3: DEFINICIÓN CANÓNICA DE EVENTOS EN UN ÚNICO IDIOMA
 
 Para dar cumplimiento formal al requisito del PDF (pág. 10, 14: *"Usen un único idioma para nombrarlos"*), se adopta **Español formal en formato PascalCase** en toda la plataforma:
@@ -87,6 +99,12 @@ Para dar cumplimiento formal al requisito del PDF (pág. 10, 14: *"Usen un únic
 8. `DevolucionAcreditada`: Emitido al reintegrarse el 100% de los fondos de una apuesta tras cancelación.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-4.4: TABLA DE PRODUCTORES, CONSUMIDORES, TOPOLOGÍA Y CLAVES (PDF pág. 14)
 
@@ -104,6 +122,12 @@ Conforme a la estructura obligatoria de la Decisión 4 del PDF, se define el cat
 | **`DevolucionAcreditada`** | Worker / Módulo Billetera | Apache Kafka (Topic: `billetera.movimientos`) | 1. `ServicioNotificaciones`<br>2. `ServicioAuditoria` | `user_id` | Notifica al apostador el reintegro de sus EIA Coins por cancelación de carrera. |
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-4.5: ESQUEMA Y CONTENIDO MÍNIMO DE LOS EVENTOS
 
@@ -138,6 +162,12 @@ Todos los eventos de la plataforma comparten una estructura base canónica con v
 - `data`: Carga útil de negocio específica con identificadores de entidades, montos y claves de trazabilidad.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-4.6: TOPOLOGÍA DE TÓPICOS Y GRUPOS DE CONSUMIDORES
 
@@ -185,6 +215,12 @@ Para procesar más de 1.000.000 de apuestas en un plazo objetivo inferior a 15 m
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-4.7: ESTRATEGIA DE REINTENTOS, CONFIRMACIONES, MENSAJES DUPLICADOS Y FALLIDOS
 
 1. **Garantía de Entrega y Tolerancia a Duplicados:**  
@@ -194,6 +230,12 @@ Para procesar más de 1.000.000 de apuestas en un plazo objetivo inferior a 15 m
    - Si tras 3 reintentos el fallo persiste (ej. dirección de correo corrupta), se desvía al tópico de descarte (`notificaciones.dlt`) para inspección operativa sin detener el consumo del flujo principal.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-4.8: PUBLICACIÓN CONFIABLE: PATRÓN TRANSACTIONAL OUTBOX
 

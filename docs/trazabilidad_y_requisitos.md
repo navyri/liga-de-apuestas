@@ -29,9 +29,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=6B0F1A"/>
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
 </p>
+<!-- DIVISOR:FIN -->
+
 
 ## 1. Matriz Integral de Trazabilidad
 
@@ -57,9 +60,12 @@ Esta matriz documenta la correspondencia biunívoca entre las exigencias oficial
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=6B0F1A"/>
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
 </p>
+<!-- DIVISOR:FIN -->
+
 
 ## 2. Decisiones Arquitectónicas Formalizadas
 
@@ -71,9 +77,12 @@ Esta matriz documenta la correspondencia biunívoca entre las exigencias oficial
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=6B0F1A"/>
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
 </p>
+<!-- DIVISOR:FIN -->
+
 
 ## 3. Cobertura Documental de los 16 Puntos del PDF
 

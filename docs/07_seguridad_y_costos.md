@@ -30,6 +30,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-7.1: AUTENTICACIÓN, AUTORIZACIÓN Y MATRIZ RBAC (PDF pág. 4, 12)
 
 Para proteger las operaciones que involucran EIA Coins y credenciales de usuario, se diseña un esquema de seguridad perimetral basado en estándares de la industria:
@@ -52,6 +58,12 @@ Para proteger las operaciones que involucran EIA Coins y credenciales de usuario
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-7.2: PROTECCIÓN DE APIS, LIMITACIÓN DE TASA (RATE LIMITING) Y ANTI-BOT
 
 En la final de la Copa Intersemestral, el pico de 10.000 apuestas/s puede ser agravado por scripts maliciosos o usuarios recargando compulsivamente. Se establecen mecanismos de protección perimetral en el API Gateway:
@@ -64,6 +76,12 @@ En la final de la Copa Intersemestral, el pico de 10.000 apuestas/s puede ser ag
    - Bloqueo preventivo de múltiples cuentas autenticadas operando concurrentemente desde una misma IP en los últimos 10 segundos antes del corte.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-7.3: GESTIÓN DE CIFRADO Y CREDENCIALES
 
@@ -78,6 +96,12 @@ En la final de la Copa Intersemestral, el pico de 10.000 apuestas/s puede ser ag
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-7.4: REGISTRO DE ACCIONES ADMINISTRATIVAS Y AUDITORÍA FORENSE (PDF pág. 12)
 
 Toda mutación administrativa u operativa que afecte saldos, usuarios o estados de carrera genera una traza obligatoria:
@@ -85,6 +109,12 @@ Toda mutación administrativa u operativa que afecte saldos, usuarios o estados 
 - **Inalterabilidad de la Traza:** La inserción de la auditoría administrativa ocurre en la misma transacción local o se despacha hacia el log seguro append-only. Ningún usuario, incluido el Administrador, cuenta con privilegios SQL de `UPDATE` o `DELETE` sobre las tablas de auditoría.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-7.5: SEGMENTACIÓN DE RED: COMPONENTES PÚBLICOS VS. PRIVADOS (PDF pág. 12)
 
@@ -118,6 +148,12 @@ Toda mutación administrativa u operativa que afecte saldos, usuarios o estados 
 - **Componentes Privados:** Todas las instancias de cómputo (`core-api`, workers, analítica), el clúster de Kafka y las bases de datos transaccionales y analíticas residen en subredes privadas sin IP pública accesible.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-7.6 Y P1-7.7: GOBERNANZA DE COSTOS, SERVICIOS ADMINISTRADOS Y JUSTIFICACIÓN (PDF pág. 12-13)
 

@@ -30,6 +30,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-6.1 Y P1-6.2: ANÁLISIS DE CARGA MASIVA, CUELLOS DE BOTELLA Y ESCALAMIENTO
 
 ### 1. Perfil Cuantitativo de la Carga Extrema (PDF págs. 8, 15)
@@ -73,6 +79,12 @@ Bajo esta ráfaga masiva, los puntos críticos de saturación no se ubican en la
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-6.3: CUMPLIMIENTO DEL TIEMPO DE RESPUESTA EN MENOS DE UN SEGUNDO
 
 Para asegurar que el usuario conozca deterministamente si su jugada fue aceptada o rechazada en $< 1\text{ segundo}$ bajo ráfaga:
@@ -89,6 +101,12 @@ Para asegurar que el usuario conozca deterministamente si su jugada fue aceptada
    - Publicación asíncrona mediante Transactional Outbox: la escritura en Kafka no forma parte del ciclo de reloj de la petición HTTP del cliente.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-6.4: MECANISMO TÉCNICO PARA IMPEDIR ACEPTACIONES POSTERIORES AL CIERRE
 
@@ -109,6 +127,12 @@ Conforme a la regla del PDF (pág. 3: *"Una apuesta que llegue después del cier
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-6.5: CUMPLIMIENTO DEL PLAZO DE LIQUIDACIÓN (< 15 MINUTOS PARA > 1.000.000 DE APUESTAS)
 
 Para liquidar más de 1.000.000 de apuestas en menos de 15 minutos (900 segundos):
@@ -122,6 +146,12 @@ Para liquidar más de 1.000.000 de apuestas en menos de 15 minutos (900 segundos
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-6.6: DURABILIDAD ABSOLUTA Y RECUPERACIÓN ANTE DESASTRES
 
 Para dar cumplimiento formal al requisito `P1-REQ-008` (pérdida cero de apuestas aceptadas y movimientos de billetera):
@@ -132,6 +162,12 @@ Para dar cumplimiento formal al requisito `P1-REQ-008` (pérdida cero de apuesta
 3. **Respaldo Físico y Continuo:** Copias de seguridad completas diarias más archivado continuo de segmentos WAL (*Point-in-Time Recovery* - PITR) hacia almacenamiento de objetos redundante.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-6.7 Y P1-6.8: ANÁLISIS FORMAL DE ESCENARIOS DE FALLO (PDF pág. 16)
 
@@ -150,6 +186,12 @@ Para dar cumplimiento formal al requisito `P1-REQ-008` (pérdida cero de apuesta
   Mientras que las notificaciones son una capacidad informativa de **consistencia eventual** (cuya demora o pérdida temporal no altera el estado financiero de los participantes), la billetera gobierna la **consistencia fuerte y la integridad de fondos** de la plataforma. Admitir apuestas con la billetera inhabilitada obligaría a operar a crédito o a ciegas, derivando en saldos negativos incontrolados y violando las reglas fundamentales del modelo pari-mutuel.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-6.9: CASO C (OPCIONAL): CORRECCIÓN DE RESULTADOS TRAS FOTO DE LLEGADA MAL INTERPRETADA
 
@@ -185,6 +227,12 @@ Conforme al caso opcional del PDF (pág. 16): *Diez minutos después de publicad
    Se emite un evento inmutable `ResultadoRectificado` que ingresa a la cadena criptográfica de auditoría, documentando la identidad del operador, la marca de tiempo de la corrección y el impacto financiero exacto.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-6.10: PLAN CONCEPTUAL DE MÉTRICAS Y VALIDACIÓN ARQUITECTÓNICA
 

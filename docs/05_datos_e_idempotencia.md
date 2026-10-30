@@ -30,6 +30,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-5.1: ALMACENAMIENTO Y PROPIEDAD DE DATOS
 
 Para cumplir con la Decisión 9 del PDF (pág. 16), se definen los tipos de bases de datos, su propiedad y sus fronteras de acceso:
@@ -55,6 +61,12 @@ Para cumplir con la Decisión 9 del PDF (pág. 16), se definen los tipos de base
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-5.2: CONSISTENCIA FUERTE VS. CONSISTENCIA EVENTUAL
 
 Se clasifican formalmente los datos de la plataforma según su exigencia de consistencia:
@@ -68,6 +80,12 @@ Se clasifican formalmente los datos de la plataforma según su exigencia de cons
 | **Estadísticas y Analítica** | **Consistencia Eventual** | El PDF autoriza explícitamente retrasos de minutos para estadísticas generales y hasta un día para reportes premium (pág. 9). | Ingesta en micro-lotes hacia el almacén columnar OLAP. |
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-5.3: CONCURRENCIA Y PREVENCIÓN ABSOLUTA DE SALDO NEGATIVO
 
@@ -93,6 +111,12 @@ WHERE user_id = :user_id;
 - **Explicación del Mecanismo:** La cláusula `FOR UPDATE` serializa el acceso a la fila de saldo de ese usuario específico. Las solicitudes concurrentes del mismo usuario se encolan a nivel de base de datos y se evalúan secuencialmente. Si la primera apuesta agota el saldo, las tres siguientes leen el balance actualizado y son rechazadas atómicamente con error de saldo insuficiente, disparando `ROLLBACK`. La restricción física `CHECK (balance >= 0)` garantiza a nivel de motor que jamás se confirme un valor negativo.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-5.4: ESTRATEGIA DE IDEMPOTENCIA EN AL MENOS TRES OPERACIONES CRÍTICAS (PDF pág. 15)
 
@@ -132,6 +156,12 @@ Conforme a la Decisión 6 del PDF, se diseñan los mecanismos para garantizar id
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-5.5: DISTINCIÓN ENTRE REINTENTOS E INTENCIONES LEGÍTIMAS DE NUEVAS APUESTAS
 
 Para dar cumplimiento formal al requisito `P1-REQ-013` (un usuario puede apostar varias veces en la misma carrera, incluso por medianos distintos):
@@ -139,6 +169,12 @@ Para dar cumplimiento formal al requisito `P1-REQ-013` (un usuario puede apostar
 - **Reintento Duplicado:** Si la red falla y la aplicación cliente reenvía la petición con la **misma `Idempotency-Key`**, el sistema la trata como un reintento idempotente, retornando la confirmación de la primera sin descontar nuevamente los fondos.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-5.6: POLÍTICA DETERMINISTA DE REDONDEO MEDIANTE MAYORES RESTOS (`P1-DEC-003`)
 
@@ -215,6 +251,12 @@ Para dar cumplimiento formal al requisito `P1-REQ-013` (un usuario puede apostar
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-5.7: POLÍTICA ANTE AUSENCIA DE GANADORES (`P1-DEC-004`)
 
 > **Aclaración institucional:**  
@@ -237,6 +279,12 @@ Para dar cumplimiento formal al requisito `P1-REQ-013` (un usuario puede apostar
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-5.8: HISTÓRICO, ANALÍTICA Y AUDITORÍA INALTERABLE DE CINCO AÑOS
 
 1. **Separación de Ciclos de Vida:**  
@@ -252,6 +300,12 @@ Para dar cumplimiento formal al requisito `P1-REQ-013` (un usuario puede apostar
    - Para cualquier carrera histórica, el rol Auditor puede consultar el registro congelado: monto de la bolsa $B$, mediano ganador oficial certificado, masa $T_w$, cuota final $Q_w$, versión de política utilizada y lista exhaustiva de apuestas premiadas, reproduciendo exactamente el algoritmo de mayores restos para verificar la exactitud de cada EIA Coin distribuido.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-5.9: JUSTIFICACIÓN DE TRANSACCIONES LOCALES, OUTBOX Y SAGAS
 

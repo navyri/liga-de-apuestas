@@ -30,6 +30,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-1.1: ACTORES, ROLES Y CAPACIDADES DEL SISTEMA
 
 ### 1. Actores y Roles del Sistema
@@ -74,6 +80,12 @@ El PDF establece de forma numerada y taxativa exactamente **nueve capacidades pr
   El cierre de apuestas está fijado exactamente a la hora de inicio de la carrera según el **reloj del servidor** (PDF pág. 3). **No depende de una orden manual ni de un botón accionado por el Operador de Carrera**. Cualquier solicitud recibida tras la marca de tiempo de cierre del servidor es rechazada irrevocablemente, independientemente de la latencia del cliente o de cuándo fue despachada por el usuario.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-1.2: REGLAS DEL NEGOCIO Y CICLO DE CARRERA
 
@@ -126,6 +138,12 @@ El PDF define formalmente una máquina de estados determinista para cada carrera
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-1.3: PARÁMETROS CRÍTICOS DE CARGA, LATENCIA, DURABILIDAD, LIQUIDACIÓN Y RETENCIÓN
 
 Con base en la sección *"El problema de las cargas masivas"* (PDF pág. 8) y la tabla de *"Supuestos de diseño"* (PDF págs. 8-9), se consolidan los parámetros cuantitativos obligatorios del sistema:
@@ -142,6 +160,12 @@ Con base en la sección *"El problema de las cargas masivas"* (PDF pág. 8) y la
 | **Retención de Auditoría** | Conservación inalterable durante **al menos 5 años** | PDF pág. 9 | Almacenamiento histórico inmutable, optimizado para consulta de solo lectura por auditores. |
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-1.4: INVARIANTES DEL SISTEMA (SALDO, DUPLICACIÓN, CIERRE Y AUDITORÍA)
 
@@ -169,6 +193,12 @@ Los invariantes son condiciones formales de corrección que el sistema jamás pu
      - La protección física y lógica efectiva contra alteraciones (como firmas criptográficas, inmutabilidad a nivel de almacenamiento o políticas WORM) se diseñará y justificará formalmente en las etapas de persistencia y seguridad.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-1.5: IDENTIFICACIÓN DE AMBIGÜEDADES, PREGUNTAS ABIERTAS Y RIESGOS TÉCNICOS
 

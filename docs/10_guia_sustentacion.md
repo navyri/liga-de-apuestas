@@ -30,6 +30,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-10.1: BANCO DE PREGUNTAS Y RESPUESTAS PROBABLES DEL JURADO
 
 ### Pregunta 1: "¿Por qué no utilizaron una base de datos NoSQL como MongoDB o Cassandra para soportar el pico de 10.000 apuestas por segundo?"
@@ -46,6 +52,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-10.2: DEFENSA DE DECISIONES Y COMPROMISOS (TRADE-OFFS)
 
 | Decisión Defendida | Beneficio Principal Ganado | Compromiso / Sacrificio Asumido | Mitigación Implementada |
@@ -56,6 +68,12 @@
 | **Mayores Restos en Reparto de Bolsa** | Conservación matemática al centavo del 90% neta y 10% comisión. | Requiere calcular la bolsa completa antes de emitir los lotes. | Cálculo en memoria en worker que toma menos de 10 segundos para 1M apuestas. |
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-10.3: RESPUESTA AL CAMBIO DE REQUISITOS EN VIVO: APUESTAS EN VIVO DURANTE LA CARRERA
 
@@ -90,6 +108,12 @@ Si durante la exposición el docente formula: *"Dyllan decidió transmitir la ca
    - La transacción atómica local en la base de datos (validación de saldo, cobro en billetera e inserción de la apuesta en el núcleo modular) **se mantiene exactamente igual**, demostrando la robustez y extensibilidad del estilo híbrido adoptado.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-10.4: REVISIÓN DE COMPRENSIÓN Y COHERENCIA GLOBAL
 

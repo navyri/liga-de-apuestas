@@ -101,6 +101,7 @@ def extraer_mermaid(texto: str) -> str | None:
 def md_a_html(texto: str) -> str:
     # Bloque decorativo de banner (solo para Markdown en GitHub/Pages): se omite en el PDF consolidado
     texto = re.sub(r"<!-- BANNER:INICIO.*?<!-- BANNER:FIN -->\s*", "", texto, flags=re.S)
+    texto = re.sub(r"<!-- DIVISOR:INICIO.*?<!-- DIVISOR:FIN -->\s*", "", texto, flags=re.S)
     # Fórmulas: $$display$$ -> bloque centrado; $inline$ -> span (sin render LaTeX)
     texto = re.sub(r"\$\$(.+?)\$\$", lambda m: f"\n\n<p class='formula'>{m.group(1).strip()}</p>\n\n", texto, flags=re.S)
     texto = re.sub(r"\$([^$\n]+?)\$", lambda m: f"<span class='formula'>{m.group(1)}</span>", texto)

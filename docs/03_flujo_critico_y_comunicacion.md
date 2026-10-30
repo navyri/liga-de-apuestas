@@ -30,6 +30,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-3.1: FLUJO COMPLETO DE ACEPTACIÓN / RECHAZO DE UNA APUESTA
 
 El flujo de procesamiento de una apuesta representa la ruta transaccional más crítica del sistema, sujeta a la restricción de respuesta en menos de 1 segundo (PDF pág. 9, 15).
@@ -93,6 +99,12 @@ Apostador                API Gateway / Edge          Núcleo Modular (Core)     
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-3.2: COHERENCIA ESTRICTA ENTRE APUESTA Y DESCUENTO EN BILLETERA
 
 Al haber adoptado la Arquitectura Híbrida (`P1-DEC-001`), la coherencia entre la apuesta y el descuento se resuelve mediante **atomicidad transaccional local** en lugar de transacciones distribuidas:
@@ -100,6 +112,12 @@ Al haber adoptado la Arquitectura Híbrida (`P1-DEC-001`), la coherencia entre l
 - **Invariante Preservado:** La integridad contable queda garantizada por las propiedades ACID del motor de base de datos relacional. La propagación hacia componentes externos (analítica, notificaciones, cálculo de cuotas dinámicas) se realiza de forma asíncrona a través del patrón **Transactional Outbox**, garantizando que un evento hacia el broker solo se despache si la transacción local de BD hizo `COMMIT` exitoso.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-3.3: VALIDACIONES Y MECANISMO DE CIERRE ESTRICTO
 
@@ -124,6 +142,12 @@ Una apuesta **solo se considera aceptada por el sistema** en el instante exacto 
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-3.4: TABLA DE COMUNICACIONES SÍNCRONAS EXIGIDA (PDF pág. 14)
 
 Conforme a la estructura obligatoria requerida en la Decisión 3 del PDF, se identifican las comunicaciones que operan de forma estrictamente síncrona:
@@ -137,6 +161,12 @@ Conforme a la estructura obligatoria requerida en la Decisión 3 del PDF, se ide
 | **Cliente Auditor** | **Núcleo Modular / Réplica de Auditoría** | HTTPS / REST | Consulta de registros inalterables de apuestas, saldos y reconstrucción matemática de premios. | Operación de consulta interactiva para tareas de fiscalización y auditoría forense. | Timeout de 5 s. Lectura dirigida a réplica de lectura para no sobrecargar el nodo transaccional primario. |
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-3.5: GESTIÓN DE TIMEOUTS, REINTENTOS Y RESPUESTAS INCIERTAS
 

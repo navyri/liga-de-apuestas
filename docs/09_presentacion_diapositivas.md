@@ -30,6 +30,12 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-9.1 Y P1-9.2: RESPUESTA A LA PREGUNTA FINAL DEL ENUNCIADO (PDF pág. 20)
 
 > **Pregunta Oficial del PDF:**  
@@ -64,6 +70,12 @@ Si Salchipapa Maker Racing experimentara un crecimiento masivo de 100 veces, la 
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-9.3: CONCLUSIONES TÉCNICAS Y FILOSOFÍA DEL PROYECTO
 
 1. **La Complejidad debe Justificarse por Requisitos, no por Moda:**  
@@ -74,6 +86,12 @@ Si Salchipapa Maker Racing experimentara un crecimiento masivo de 100 veces, la 
    Separar físicamente los canales de notificación y el procesamiento analítico pesado de la ruta crítica de admisión de apuestas blinda la plataforma contra caídas de proveedores externos o lentitud en consultas agregadas.
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-9.4: PRESENTACIÓN EJECUTIVA COMPLETA (ESTRUCTURA DE 20 DIAPOSITIVAS)
 
@@ -107,6 +125,12 @@ Conforme a la restricción obligatoria del PDF (pág. 19: *"Extensión: presenta
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## P1-9.5: NOTAS Y GUÍA DE SUSTENTACIÓN PARA LOS ORADORES
 
 ### Recomendaciones Tácticas para la Exposición (4 y 5 de Noviembre):
@@ -121,6 +145,12 @@ Conforme a la restricción obligatoria del PDF (pág. 19: *"Extensión: presenta
    *Respuesta Clave:* "Operamos en centavos enteros mínimos evitando coma flotante. Truncamos la base y asignamos los centavos residuales a las apuestas con mayor resto fraccionario, usando el `bet_id` como desempate determinista. Esto garantiza por construcción matemática que comisión + premios sea idéntico al centavo a la bolsa recaudada".
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-9.6: VERIFICACIÓN CRUZADA DE LOS 16 PUNTOS DEL ENTREGABLE OFICIAL (PDF pág. 18)
 
@@ -144,6 +174,12 @@ Conforme a la restricción obligatoria del PDF (pág. 19: *"Extensión: presenta
 | **16. Conclusiones** | `09_presentacion_diapositivas.md` (P1-9.3) | **Completado** |
 
 ---
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## P1-9.7: REVISIÓN DE CUMPLIMIENTO FRENTE A LA RÚBRICA OFICIAL (PDF pág. 19)
 

@@ -283,9 +283,5 @@ liga-de-apuestas/
 - Cada push a `main` reconstruye el sitio (`docs/.nojekyll` evita el procesamiento de Jekyll).
 
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A"/>
-</p>
-
-<p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
 </p>
