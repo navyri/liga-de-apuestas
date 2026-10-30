@@ -110,3 +110,9 @@ graph TD
 ### Leyenda y Diferenciación Visual Exigida (PDF pág. 17):
 - **Línea Sólida (`===`):** **Comunicación Síncrona** en la ruta crítica del usuario y operaciones administrativas interactivas.
 - **Línea Punteada (`-.->`):** **Comunicación Asíncrona** basada en eventos a través de Apache Kafka y procesos en segundo plano.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

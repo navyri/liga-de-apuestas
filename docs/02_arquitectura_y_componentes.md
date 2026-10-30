@@ -178,3 +178,9 @@ Para evitar acoplamientos ocultos y respetar la regla de Dyllan, se formalizan l
   1. *Particionamiento lógico por usuario:* Las actualizaciones de saldo se bloquean estrictamente a nivel del registro individual de cada usuario (`SELECT FOR UPDATE` sobre la fila del usuario), evitando bloqueos de tabla. Como un usuario emite un número finito de apuestas, la contención ocurre por usuario y no globalmente.
   2. *Separación de lecturas y escrituras:* Las consultas masivas de cuotas estimadas, catálogo de medianos y perfiles de carreras son atendidas mediante réplicas de lectura y mecanismos de almacenamiento en caché en memoria, reservando el nodo primario de base de datos exclusivamente para inserciones de apuestas y débitos.
   3. *Aislamiento del Worker de Liquidación:* Durante la liquidación masiva posterior al cierre, el worker procesa las acreditaciones en bloques (*chunks*) con límites de concurrencia para no saturar las conexiones ni bloquear la base de datos transaccional si hay otra carrera abierta en paralelo.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

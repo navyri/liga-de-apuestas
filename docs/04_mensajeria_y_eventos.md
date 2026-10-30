@@ -283,3 +283,9 @@ Para desacoplar la persistencia en base de datos de la publicación en mensajer�
    - *(Aclaración crítica):* El patrón Outbox **no garantiza una entrega mágica e inmediata**. La publicación depende de la disponibilidad del broker y de la salud del proceso relay.
    - Si Kafka no está disponible, los eventos se acumulan de forma segura en la tabla `outbox_events` sin bloquear la admisión de apuestas; al restablecerse el broker, el relay drena los eventos pendientes en orden.
    - Se debe implementar monitoreo continuo sobre el retraso (*outbox lag*) y una alerta operativa si existen eventos en estado `PENDING` con una antigüedad superior a un umbral definido (por ejemplo, > 30 segundos).
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

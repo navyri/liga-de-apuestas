@@ -185,3 +185,9 @@ En sistemas transaccionales distribuidos de apuestas bajo alta concurrencia, es 
    La aplicación cliente retiene en memoria la misma `Idempotency-Key` (UUIDv4) generada originalmente. Al ejecutar un reintento automático o tras la acción del usuario, reenvía la misma clave. El servidor detectará si la transacción ya fue confirmada (retornando el estado final sin duplicar cobros) o si se encuentra en procesamiento.
 3. **Consulta de Estado Alternativa:**  
    Si persiste la incertidumbre, el cliente puede invocar el endpoint de lectura liviana `GET /api/v1/bets/by-key/{idempotency_key}` para inspeccionar el estado definitivo registrado en el servidor antes de permitir al usuario formular una nueva intención de apuesta.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

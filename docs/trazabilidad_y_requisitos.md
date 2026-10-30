@@ -102,3 +102,9 @@ Esta matriz documenta la correspondencia biunívoca entre las exigencias oficial
 14. **Registros ADR (3 formales):** En directorio [`08_diagramas_y_adrs/`](08_diagramas_y_adrs/).
 15. **Respuesta a la Pregunta Final (Hoy vs. 100x):** [`09_presentacion_diapositivas.md`](09_presentacion_diapositivas.md).
 16. **Conclusiones:** [`09_presentacion_diapositivas.md`](09_presentacion_diapositivas.md).
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

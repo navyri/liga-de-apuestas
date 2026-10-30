@@ -104,3 +104,9 @@ graph TD
     T4_P -.->|"Consumo Paralelo de Lotes"| CG_DISPERS
     CG_NOTIF -.->|"Fallo tras 3 Reintentos"| T6_P
 ```
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

@@ -120,3 +120,9 @@ Si durante la exposición el docente formula: *"Dyllan decidió transmitir la ca
 - Se ha verificado que **ningún concepto de la Parte 2 (CrediMarket)** haya sido introducido.
 - Se verificó que todas las afirmaciones técnicas corresponden a decisiones fundamentadas sin inventar capacidades mágicas de rendimiento.
 - Se ha comprobado la coherencia absoluta entre diagramas, tablas de contratos, ADRs y registro maestro.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

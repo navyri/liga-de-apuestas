@@ -164,3 +164,9 @@ El diseño arquitectónico adoptado erradica activamente la sobreingeniería:
 - **Servicios Administrados Justificados:**  
   Es razonable utilizar servicios administrados (ej. Base de Datos Administrada y Kafka Administrado) para transferir la carga de alta disponibilidad, parches de seguridad, conmutación por error y respaldos automáticos, reduciendo a cero la necesidad de un equipo de operaciones dedicado 24/7.
 - **Apagado y Elasticidad en Horas Valle:** La carga extrema solo ocurre durante torneos semestrales específicos. La infraestructura de cómputo escala a un mínimo económico (ej. 2 instancias pequeñas) en operación normal de 500 usuarios, y escala elásticamente solo durante los días de competencia de la Liga.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

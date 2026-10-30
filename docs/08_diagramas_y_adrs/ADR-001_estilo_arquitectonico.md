@@ -29,8 +29,20 @@
 
 ---
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## 1. Contexto y Problema
 Salchipapa Maker Racing S.A.S. requiere diseñar la arquitectura de la plataforma de apuestas mutuas sobre carreras de medianos. El sistema debe gestionar una carga base de 500 usuarios y absorber picos de hasta 100.000 usuarios concurrentes con ráfagas de 10.000 apuestas por segundo durante los 30 segundos previos al cierre. La solución debe informar la aceptación o rechazo de cada apuesta en menos de 1 segundo, garantizar que ningún saldo quede negativo ni se duplique un débito, asegurar el cierre estricto según el reloj del servidor y cumplir la regla directiva de Dyllan: *"No quiero pagar una infraestructura de Netflix para una carrera de cinco medianos"*.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## 2. Opciones Consideradas
 1. **Monolito Tradicional:** Sistema acoplado en un único proceso desplegable con base de datos compartida y sin fronteras modulares estrictas.
@@ -38,12 +50,30 @@ Salchipapa Maker Racing S.A.S. requiere diseñar la arquitectura de la plataform
 3. **Microservicios Puros:** Descomposición completa de las capacidades en 9 servicios autónomos con bases de datos privadas (*database-per-service*) y comunicación distribuida síncrona/asíncrona.
 4. **Arquitectura Híbrida (Núcleo Modular Transaccional + Servicios Asíncronos Desacoplados):** Núcleo modular replicable para el flujo transaccional cohesivo (usuarios, medianos, carreras, apuestas, billetera), complementado con servicios/workers autónomos para procesos asíncronos desacoplados (notificaciones, analítica masiva y liquidación de premios).
 
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
+
 ## 3. Decisión Tomada
 Se adopta la **Arquitectura Híbrida**. El flujo crítico de admisión y cobro se concentra en un Núcleo Modular Transaccional desplegado en instancias replicables, permitiendo diseñar la validación de saldo, el débito y el registro de la apuesta dentro de una misma transacción local atómica (ACID). Las capacidades de Notificaciones, Analítica/Estadísticas y Liquidación masiva se segregan en unidades y procesos especializados fuera de la ruta crítica de aceptación.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## 4. Justificación del Descarte de Alternativas
 - **Descarte de Microservicios Puros:** La separación física de apuestas y billetera impondría coordinación distribuida (patrón Saga con transacciones compensatorias) en la ruta crítica, aumentando la exposición a inconsistencias y saldos negativos bajo concurrencia masiva. Asimismo, la sobrecarga operativa y de infraestructura asociada contraviene la política de costo y simplicidad exigida por la dirección.
 - **Descarte del Monolito Tradicional:** La ausencia de límites físicos permitiría que la saturación en proveedores externos de notificación o la carga pesada de reportes analíticos degrade el hilo transaccional y bloquee la admisión de apuestas, violando el requisito de aislamiento de fallos.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
 
 ## 5. Consecuencias
 
@@ -56,3 +86,9 @@ Se adopta la **Arquitectura Híbrida**. El flujo crítico de admisión y cobro s
 ### Lo que se sacrifica y límites:
 - **Disciplina modular obligatoria:** Requiere control riguroso del código para impedir dependencias circulares o violaciones de encapsulamiento entre módulos del núcleo.
 - **Contención en almacenamiento compartido:** Al replicar el núcleo transaccional en múltiples instancias, el cuello de botella se traslada a la base de datos operativa, exigiendo particionamiento por usuario, bloqueos a nivel de fila y separación estricta de lecturas y escrituras que deberán validarse en las etapas de persistencia y escalabilidad.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

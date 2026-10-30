@@ -313,3 +313,9 @@ Para dar cumplimiento formal al requisito `P1-REQ-013` (un usuario puede apostar
 - **Transactional Outbox:** Se utiliza para la publicación confiable de eventos hacia Apache Kafka, garantizando que no existan eventos "fantasma" si la base de datos aborta la transacción, ni eventos perdidos si el broker sufre una interrupción transitoria.
 - **Descarte de Sagas en la Ruta Crítica:** Se justifica explícitamente no utilizar el patrón Saga para la aceptación de apuestas, dado que requeriría llamadas remotas asíncronas entre apuestas y billetera con transacciones de compensación que harían extremadamente complejo asegurar el límite de 1 segundo e impedir saldos negativos concurrentes.
 - **Saga Coreografiada para Liquidación de Premios:** La liquidación masiva adopta un flujo desacoplado por etapas fuera de la ruta crítica: `ResultadoPublicado` $\to$ `CalcularPremiosGlobal` $\to$ `DispersarLotes` $\to$ `ConfirmarLiquidacion`, con reintentos idempotentes y trazabilidad individualizada por apuesta.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

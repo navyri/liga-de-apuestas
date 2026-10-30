@@ -245,3 +245,9 @@ Para validar empíricamente que la arquitectura soporta las demandas cuantitativ
 | **Integridad de Saldo** | Conteo de saldos negativos | **Exactamente 0** bajo ráfaga concurrente | Verificación contable automatizada tras prueba de estrés. |
 | **Cierre Estricto** | Apuestas aceptadas con $t \ge T_{\text{cierre}}$ | **Exactamente 0** | Inyección de tráfico cruzando deliberadamente la marca de tiempo de corte. |
 | **Plazo de Liquidación** | Duración de liquidación masiva | $< 15\text{ minutos}$ para $1.000.000$ de apuestas simuladas | Medición de reloj entre evento `ResultadoOficialPublicado` y `CarreraLiquidada`. |
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

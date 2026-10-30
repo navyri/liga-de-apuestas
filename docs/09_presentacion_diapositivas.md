@@ -190,3 +190,9 @@ Conforme a la restricción obligatoria del PDF (pág. 19: *"Extensión: presenta
 - **Seguridad y costos (10%):** Cubierto con matriz RBAC, rate limiting, aislamiento DMZ vs VPC y optimización de infraestructura.
 - **Calidad de diagramas, ADR y documentos (10%):** Cubierto con 3 diagramas Mermaid profesionales y 3 ADRs en formato formal de 1 página.
 - **Sustentación (10%):** Cubierto con guion de 20 diapositivas y preparación para la defensa en vivo.
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

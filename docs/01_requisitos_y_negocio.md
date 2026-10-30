@@ -210,3 +210,9 @@ Para preservar la pureza metodológica, se formaliza la clasificación de elemen
 | **P1-PA-002** | Pregunta Abierta | **Escenario sin Ganadores:** El PDF no estipula el destino del 90% de la bolsa si ningún apostador eligió al mediano que cruzó la meta en primer lugar. | Vacío de negocio sobre retención o devolución. | **Propuesta técnica para P1-5:** Devolución íntegra (100%) a los apostadores participantes en esa carrera o acumulación (*rollover*) para la siguiente carrera. Se presentará a elección del usuario en P1-5. |
 | **P1-RIE-001** | Riesgo / Desafío Técnico | **Tensión Latencia vs Concurrencia Extrema:** Responder en menos de 1 segundo mientras ingresan 10.000 apuestas/s en 30 segundos. | Riesgo de contención en base de datos al validar saldo y debitar bajo concurrencia. | Mitigación en P1-3, P1-5 y P1-6 mediante particionamiento por usuario, estructuras en memoria para validación rápida y aislamiento de colas. |
 | **P1-RIE-002** | Riesgo de Conectividad | **Incertidumbre de Red en el Cliente:** Un timeout de red no significa que la apuesta no fue procesada. | Riesgo de que el usuario reintente creyendo que falló. | Mitigación mediante `idempotency-key` obligatoria generada por el cliente antes de despachar la solicitud. |
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->

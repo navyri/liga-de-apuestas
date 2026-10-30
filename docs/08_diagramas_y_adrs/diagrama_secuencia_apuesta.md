@@ -103,3 +103,9 @@ sequenceDiagram
     KAFKA--)NOTIF: Consumo por Consumer Group 'notificaciones'
     NOTIF-->>U: Notificación Push / Correo ("¡Apuesta aceptada!")
 ```
+
+<!-- DIVISOR:INICIO (bloque estetico; omitido en el PDF consolidado) -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+</p>
+<!-- DIVISOR:FIN -->
