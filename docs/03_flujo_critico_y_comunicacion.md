@@ -88,7 +88,7 @@ Apostador                API Gateway / Edge          Núcleo Modular (Core)     
 6. **Bloqueo Pesimista de Billetera:** Se ejecuta `SELECT balance FROM wallets WHERE user_id = :uid FOR UPDATE`. Este bloqueo a nivel de fila garantiza que si el usuario emite dos apuestas simultáneas desde dos dispositivos distintos, se procesen de forma estrictamente secuencial.
 7. **Validación de Saldo y Ejecución Atómica:**
    - Si `balance < amount`, la transacción se revierte (`ROLLBACK`) y se responde `HTTP 422 Unprocessable Entity / INSUFFICIENT_FUNDS`.
-   - Si `balance >= amount`, se actualiza el saldo contable (`balance = balance - amount`), se inserta el registro de la apuesta en la tabla `bets`, y se inserta un registro en la tabla transaccional `outbox` con el evento `BetPlaced` para su posterior difusión asíncrona.
+   - Si `balance >= amount`, se actualiza el saldo contable (`balance = balance - amount`), se inserta el registro de la apuesta en la tabla `bets`, y se inserta un registro en la tabla transaccional `outbox` con el evento `ApuestaAceptada` para su posterior difusión asíncrona.
 8. **Commit Local:** Se confirma la transacción atómica en la base de datos (`COMMIT`).
 9. **Confirmación Determinista al Apostador:** El servidor retorna `HTTP 201 Created` con el detalle de la apuesta aceptada y el saldo restante actualizado, completando el ciclo en decenas de milisegundos (holgadamente dentro del límite de 1 segundo).
 

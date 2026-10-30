@@ -57,9 +57,9 @@ Se adopta formalmente **Apache Kafka** como plataforma exclusiva de mensajería 
 #### C. Matización Rigurosa de Rendimiento y Rendimiento Asíncrono
 - **Distinción entre Apuestas/s y Eventos/s:**
   - El pico del negocio es de **10.000 apuestas por segundo** en la capa transaccional HTTP/BD durante 30 segundos.
-  - Cada apuesta aceptada produce un evento principal de dominio (`BetPlaced`). No obstante, si se emitieran eventos secundarios de auditoría o cuotas sin consolidación, la tasa de eventos podría multiplicarse. El diseño adopta **1 evento canónico por apuesta admitida**, resultando en una tasa asíncrona pico de ~10.000 eventos/s hacia Kafka.
+  - Cada apuesta aceptada produce un evento principal de dominio (`ApuestaAceptada`). No obstante, si se emitieran eventos secundarios de auditoría o cuotas sin consolidación, la tasa de eventos podría multiplicarse. El diseño adopta **1 evento canónico por apuesta admitida**, resultando en una tasa asíncrona pico de ~10.000 eventos/s hacia Kafka.
 - **Supuestos de Dimensionamiento:**
-  - Tamaño promedio de evento `BetPlaced` serializado en JSON/Avro: $\sim 500\text{ bytes}$.
+  - Tamaño promedio de evento `ApuestaAceptada` serializado en JSON/Avro: $\sim 500\text{ bytes}$.
   - Tasa de datos en pico: $10.000\text{ ev/s} \times 500\text{ bytes} \approx 5\text{ MB/s}$ de rendimiento de escritura sostenido durante 30 segundos ($\approx 150\text{ MB}$ totales por ráfaga), lo cual es absorbible por un clúster moderado de Kafka con particiones adecuadas sin representar una carga insalvable.
 - **Compromiso entre Paralelismo y Orden por Partición:**
   - En Kafka, el orden estricto de entrega solo se garantiza **dentro de una misma partición**.
