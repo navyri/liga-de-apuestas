@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Formato-Mermaid-540B13?style=flat-square&logoColor=white" alt="Formato: Mermaid"/>
   <img src="https://img.shields.io/badge/Estados-7-6B0F1A?style=flat-square&logoColor=white" alt="Estados: 7"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

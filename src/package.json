@@ -1,5 +1,5 @@
 {
-  "name": "herramientas-documentales-liga-de-apuestas",
+  "name": "generadores-documentales-liga-de-apuestas",
   "version": "1.0.0",
   "private": true,
   "description": "Herramientas de generación documental de la Parte 1 (diagramas Mermaid a SVG/PNG). No forma parte de la plataforma de apuestas: es soporte de documentación.",

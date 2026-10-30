@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Alcance-16%20puntos%20del%20PDF-540B13?style=flat-square&logoColor=white" alt="Alcance: 16 puntos del PDF"/>
   <img src="https://img.shields.io/badge/Mapeo-Requisito%20-%3E%20Documento-6B0F1A?style=flat-square&logoColor=white" alt="Mapeo: Requisito -> Documento"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

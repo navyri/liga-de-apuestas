@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Pico-10k%20apuestas%2Fs-540B13?style=flat-square&logoColor=white" alt="Pico: 10k apuestas/s"/>
   <img src="https://img.shields.io/badge/Liquidacion-%3C%2015%20min-6B0F1A?style=flat-square&logoColor=white" alt="Liquidacion: < 15 min"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

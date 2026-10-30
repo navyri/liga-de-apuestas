@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Diapositivas-20%20%28maximo%29-540B13?style=flat-square&logoColor=white" alt="Diapositivas: 20 (maximo)"/>
   <img src="https://img.shields.io/badge/Evolucion-Hoy%20vs%20100x-6B0F1A?style=flat-square&logoColor=white" alt="Evolucion: Hoy vs 100x"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

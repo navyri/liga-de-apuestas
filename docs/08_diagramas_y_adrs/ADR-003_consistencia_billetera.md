@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Estructura-Contexto%20%C2%B7%20Opciones%20%C2%B7%20Decision%20%C2%B7%20Consecuencias-540B13?style=flat-square&logoColor=white" alt="Estructura: Contexto · Opciones · Decision · Consecuencias"/>
   <img src="https://img.shields.io/badge/Maximo-1%20pagina-6B0F1A?style=flat-square&logoColor=white" alt="Maximo: 1 pagina"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

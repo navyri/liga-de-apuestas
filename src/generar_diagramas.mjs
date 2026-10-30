@@ -14,12 +14,12 @@
  *   docs/08_diagramas_y_adrs/exportados/<nombre>.png
  *
  * Uso:
- *   node herramientas/generar_diagramas.mjs
+ *   node src/generar_diagramas.mjs
  *
  * Requisitos (una sola vez):
  *   npm install @mermaid-js/mermaid-cli
- * El tema y el navegador se configuran en herramientas/tema_diagramas.json y
- * herramientas/puppeteer-config.json.
+ * El tema y el navegador se configuran en src/tema_diagramas.json y
+ * src/puppeteer-config.json.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -27,14 +27,14 @@ import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const carpetaHerramientas = dirname(fileURLToPath(import.meta.url));
-const raiz = resolve(carpetaHerramientas, '..');
+const carpetaSrc = dirname(fileURLToPath(import.meta.url));
+const raiz = resolve(carpetaSrc, '..');
 
-// Resuelve el binario mmdc instalado localmente (herramientas/node_modules/.bin).
+// Resuelve el binario mmdc instalado localmente (src/node_modules/.bin).
 function resolverMmdc() {
   const nombres = process.platform === 'win32' ? ['mmdc.cmd', 'mmdc'] : ['mmdc'];
   const bases = [
-    join(carpetaHerramientas, 'node_modules', '.bin'),
+    join(carpetaSrc, 'node_modules', '.bin'),
     join(raiz, 'node_modules', '.bin'),
   ];
   for (const base of bases) {
@@ -44,13 +44,13 @@ function resolverMmdc() {
     }
   }
   throw new Error(
-    'No se encontró mmdc. Ejecute "npm install" dentro de la carpeta herramientas/ antes de regenerar.'
+    'No se encontró mmdc. Ejecute "npm install" dentro de la carpeta src/ antes de regenerar.'
   );
 }
 const mmdcBin = resolverMmdc();
 const carpetaFuentes = join(raiz, 'docs', '08_diagramas_y_adrs');
 const carpetaSalida = join(carpetaFuentes, 'exportados');
-const carpetaTmp = join(raiz, 'herramientas', '.tmp_mermaid');
+const carpetaTmp = join(raiz, 'src', '.tmp_mermaid');
 
 const fuentes = [
   { md: 'diagrama_general.md', nombre: 'diagrama_general' },
@@ -59,8 +59,8 @@ const fuentes = [
   { md: 'ciclo_carrera.md', nombre: 'ciclo_carrera' },
 ];
 
-const tema = join(raiz, 'herramientas', 'tema_diagramas.json');
-const puppeteerCfg = join(raiz, 'herramientas', 'puppeteer-config.json');
+const tema = join(raiz, 'src', 'tema_diagramas.json');
+const puppeteerCfg = join(raiz, 'src', 'puppeteer-config.json');
 
 function extraerMermaid(contenido) {
   const bloques = [...contenido.matchAll(/```mermaid\r?\n([\s\S]*?)```/g)];

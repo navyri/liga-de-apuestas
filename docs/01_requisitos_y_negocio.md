@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/FSM-7%20estados-540B13?style=flat-square&logoColor=white" alt="FSM: 7 estados"/>
   <img src="https://img.shields.io/badge/Comision-10%25%20casa-6B0F1A?style=flat-square&logoColor=white" alt="Comision: 10% casa"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

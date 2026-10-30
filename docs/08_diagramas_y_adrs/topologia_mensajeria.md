@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Broker-Apache%20Kafka-540B13?style=flat-square&logoColor=white" alt="Broker: Apache Kafka"/>
   <img src="https://img.shields.io/badge/Entregable-Punto%207%20del%20enunciado-6B0F1A?style=flat-square&logoColor=white" alt="Entregable: Punto 7 del enunciado"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

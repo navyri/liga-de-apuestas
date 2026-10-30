@@ -4,11 +4,11 @@ Genera el documento técnico consolidado de la Parte 1 (HTML intermedio + PDF).
 
 Fuente de verdad: los Markdown temáticos y los ADR de la Parte 1.
 Salida:
-  herramientas/.tmp_doc_tecnico/documento_tecnico.html   (intermedio, no versionable)
+  src/.tmp_doc_tecnico/documento_tecnico.html   (intermedio, no versionable)
   docs/entregables/documento_tecnico.pdf (entregable)
 
 Uso:
-  python herramientas/generar_documento_tecnico.py
+  python src/generar_documento_tecnico.py
   (el PDF se produce con Chrome headless sobre el HTML intermedio)
 
 Nota: no es parte de la plataforma de apuestas; es soporte documental.
@@ -25,7 +25,7 @@ RAIZ = pathlib.Path(__file__).resolve().parents[1]
 ORIGEN = RAIZ / "docs"
 CARPETA_ADR = ORIGEN / "08_diagramas_y_adrs"
 EXPORTADOS = CARPETA_ADR / "exportados"
-TMP = RAIZ / "herramientas" / ".tmp_doc_tecnico"
+TMP = RAIZ / "src" / ".tmp_doc_tecnico"
 SALIDA_HTML = TMP / "documento_tecnico.html"
 PDF_ENTREGABLE = ORIGEN / "entregables" / "documento_tecnico.pdf"
 
@@ -127,7 +127,7 @@ def construir() -> pathlib.Path:
                 "<figure>"
                 f"<img src='{rel.as_posix()}' alt='Render del diagrama {ruta.stem}'>"
                 f"<figcaption>Render generado desde la fuente canónica <code>08_diagramas_y_adrs/{ruta.name}</code> "
-                "(Mermaid; regenerable con <code>node herramientas/generar_diagramas.mjs</code>).</figcaption>"
+                "(Mermaid; regenerable con <code>node src/generar_diagramas.mjs</code>).</figcaption>"
                 "</figure>"
             )
             cuerpo += "<h2>Render del diagrama</h2>" + render

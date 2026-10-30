@@ -172,8 +172,8 @@ footer b{color:#C9A3A9}
     <h2>Regenerar los entregables</h2>
     <p class="sub">Todo el material visual se genera desde fuentes versionadas en el repositorio</p>
     <div class="pasos">
-      <div class="paso"><b>1 · DIAGRAMAS</b><p><code>cd herramientas &amp;&amp; npm install</code><br><code>node herramientas/generar_diagramas.mjs</code><br>SVG + PNG en <code>exportados/</code>.</p></div>
-      <div class="paso"><b>2 · DOCUMENTO TÉCNICO</b><p><code>python herramientas/generar_documento_tecnico.py</code><br>y exportar el PDF con Chrome headless desde el HTML intermedio.</p></div>
+      <div class="paso"><b>1 · DIAGRAMAS</b><p><code>cd src &amp;&amp; npm install</code><br><code>node src/generar_diagramas.mjs</code><br>SVG + PNG en <code>exportados/</code>.</p></div>
+      <div class="paso"><b>2 · DOCUMENTO TÉCNICO</b><p><code>python src/generar_documento_tecnico.py</code><br>y exportar el PDF con Chrome headless desde el HTML intermedio.</p></div>
       <div class="paso"><b>3 · PRESENTACIÓN</b><p>Abrir <code>presentacion/index.html</code> en el navegador → Imprimir → Guardar como PDF (una página por slide).</p></div>
     </div>
   </section>

@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Estilo-Hibrido%20%28monolito%20modular%29-540B13?style=flat-square&logoColor=white" alt="Estilo: Hibrido (monolito modular)"/>
   <img src="https://img.shields.io/badge/Nucleo-core-api%20stateless-6B0F1A?style=flat-square&logoColor=white" alt="Nucleo: core-api stateless"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

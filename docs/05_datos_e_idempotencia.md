@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/ACID-SELECT%20FOR%20UPDATE-540B13?style=flat-square&logoColor=white" alt="ACID: SELECT FOR UPDATE"/>
   <img src="https://img.shields.io/badge/Garantia-Cero%20doble%20gasto-6B0F1A?style=flat-square&logoColor=white" alt="Garantia: Cero doble gasto"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

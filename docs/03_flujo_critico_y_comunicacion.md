@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Latencia-Objetivo%20%3C%201s-540B13?style=flat-square&logoColor=white" alt="Latencia: Objetivo < 1s"/>
   <img src="https://img.shields.io/badge/Patron-Transactional%20Outbox-6B0F1A?style=flat-square&logoColor=white" alt="Patron: Transactional Outbox"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

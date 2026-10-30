@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Panel-Preguntas%20del%20jurado-540B13?style=flat-square&logoColor=white" alt="Panel: Preguntas del jurado"/>
   <img src="https://img.shields.io/badge/En%20vivo-Live%20Betting-6B0F1A?style=flat-square&logoColor=white" alt="En vivo: Live Betting"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 

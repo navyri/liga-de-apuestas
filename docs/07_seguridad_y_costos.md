@@ -11,7 +11,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Perimetro-DMZ%20publica%20%2F%20VPC%20privada-540B13?style=flat-square&logoColor=white" alt="Perimetro: DMZ publica / VPC privada"/>
   <img src="https://img.shields.io/badge/Acceso-RBAC%20%2B%20JWT-6B0F1A?style=flat-square&logoColor=white" alt="Acceso: RBAC + JWT"/>
-  <img src="https://img.shields.io/badge/Universidad-EIA-8B1E2D?style=flat-square&logoColor=white" alt="Universidad: EIA"/>
 </p>
 
 
