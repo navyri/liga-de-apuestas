@@ -1,9 +1,13 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&height=210&color=6B0F1A&text=MEDIANOS%20EIA&fontColor=F4ECE4&fontSize=58&fontAlignY=32&desc=Dise%C3%B1o%20de%20Arquitectura%20Distribuida%20%C2%B7%20Salchipapa%20Maker%20Racing%20S.A.S.&descColor=E8B4B8&descAlignY=58"/>
+  <a href="https://navyri.github.io/liga-de-apuestas/presentacion/index.html">
+    <img src="https://capsule-render.vercel.app/api?type=waving&height=210&color=6B0F1A&text=MEDIANOS%20EIA&fontColor=F4ECE4&fontSize=58&fontAlignY=32&desc=Dise%C3%B1o%20de%20Arquitectura%20Distribuida%20%C2%B7%20Salchipapa%20Maker%20Racing%20S.A.S.&descColor=E8B4B8&descAlignY=58" alt="La Gran Liga de Apuestas de Medianos EIA — haz clic para abrir la presentación"/>
+  </a>
 </p>
 
 <p align="center">
-  <img src="https://64.media.tumblr.com/3254f08405664a04d3c5a65f765eb8c9/61bf168659dda322-50/s2048x3072/36c765a65bc72096e27e85823017367c0b9b48b2.pnj" alt="Ilustración conceptual de estrategia y competición" width="650"/>
+  <a href="https://navyri.github.io/liga-de-apuestas/presentacion/index.html">
+    <img src="https://64.media.tumblr.com/3254f08405664a04d3c5a65f765eb8c9/61bf168659dda322-50/s2048x3072/36c765a65bc72096e27e85823017367c0b9b48b2.pnj" alt="Ilustración conceptual de estrategia y competición — haz clic para abrir la presentación" width="650"/>
+  </a>
 </p>
 
 <p align="center">

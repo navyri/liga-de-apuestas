@@ -3,58 +3,93 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
 <title>Liga de Apuestas de Medianos EIA — Presentación Ejecutiva (Parte 1)</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--vino:#6B0F1A;--vino-osc:#540B13;--carm:#8B1E2D;--carm-al:#A82336;--acento:#E8B4B8;--fondo:#1E0A0F;--texto:#F4ECE4;--dorado:#C6A66B}
+:root{
+  --vino:#6B0F1A;--vino-osc:#540B13;--carm:#8B1E2D;--carm-al:#A82336;
+  --acento:#E8B4B8;--texto:#F4ECE4;
+  --plata:#C9CED6;--rojo:#E01B3C;--rosa:#FF6B84;
+  --serif:"Cinzel",Georgia,"Times New Roman",serif;
+}
+/* barra de scroll personalizada (rojo casino) */
+html{scrollbar-width:thin;scrollbar-color:#8B1E2D #0A0508}
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:#12060A}
+::-webkit-scrollbar-thumb{background:linear-gradient(#A82336,#540B13);border:3px solid #12060A;border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(#E01B3C,#8B1E2D)}
+::-webkit-scrollbar-corner{background:#12060A}
 html,body{height:100%}
-body{background:radial-gradient(1200px 700px at 30% 20%,#2A0A10 0%,#14060A 70%);color:var(--texto);font-family:"Segoe UI",Arial,Helvetica,sans-serif;overflow:hidden}
-#escenario{position:relative;width:1280px;height:720px;margin:12px auto 0}
-.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:40px 54px 54px;background:linear-gradient(160deg,#22090E 0%,#180710 100%);border:1px solid rgba(138,30,45,.45);border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+body{
+  background:
+    radial-gradient(1300px 700px at 50% -15%,rgba(224,27,60,.20),transparent 62%),
+    radial-gradient(1000px 700px at 112% 112%,rgba(107,15,26,.35),transparent 60%),
+    #0A0508;
+  color:var(--texto);font-family:"Segoe UI",Arial,Helvetica,sans-serif;overflow:hidden;
+}
+/* trama sutil tipo fibra de carbono */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    repeating-linear-gradient(45deg,rgba(255,255,255,.022) 0 2px,transparent 2px 5px),
+    repeating-linear-gradient(-45deg,rgba(255,255,255,.022) 0 2px,transparent 2px 5px);
+}
+/* naip gigante de marca de agua */
+body::after{
+  content:"♠";position:fixed;right:-7vw;bottom:-16vh;font-size:56vh;line-height:1;
+  color:rgba(224,27,60,.05);transform:rotate(12deg);pointer-events:none;z-index:0;font-family:Georgia,serif;
+}
+#escenario{position:relative;z-index:1;width:1280px;height:720px;margin:12px auto 0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:40px 54px 54px;background:linear-gradient(160deg,#1B0A10 0%,#0E0508 100%);border:1px solid #6B1220;border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.65),0 0 40px rgba(224,27,60,.07)}
 .slide.activa{display:flex}
-h1.titulo{font-size:33px;font-weight:700;color:var(--acento);letter-spacing:.3px;border-left:8px solid var(--carm-al);padding-left:16px;margin-bottom:4px;line-height:1.15}
+h1.titulo{font-family:var(--serif);font-size:30px;font-weight:700;color:#fff;letter-spacing:2px;text-transform:uppercase;border-left:3px solid var(--rojo);padding-left:14px;margin-bottom:4px;line-height:1.15;text-shadow:0 0 18px rgba(224,27,60,.35)}
 .subtitulo{font-size:16.5px;color:#D9BFBF;margin-bottom:12px}
 .contenido{flex:1;min-height:0;overflow:hidden}
 a.abrir{display:flex;align-items:center;justify-content:center;flex:1;min-width:0;text-decoration:none}
-a.abrir:hover img{outline:2px solid var(--carm-al);outline-radius:6px}
+a.abrir:hover img{outline:2px solid var(--rojo);outline-radius:6px}
 p,li{font-size:20.5px;line-height:1.38}
 ul,ol{padding-left:26px}
 li{margin:6px 0}
 b,strong{color:var(--acento)}
 .mono{font-family:Consolas,"Courier New",monospace;font-size:.92em;color:#F0D9DC}
 table{width:100%;border-collapse:collapse;font-size:16px;margin-top:6px}
-th{background:var(--vino);color:var(--texto);padding:8px 11px;text-align:left;border:1px solid #7C1622}
-td{padding:7px 11px;border:1px solid #5A121B;background:#20090E;vertical-align:top}
-tr:nth-child(even) td{background:#260B12}
+th{background:linear-gradient(180deg,#3A0D15,#240A10);color:var(--acento);padding:8px 11px;text-align:left;border:1px solid #7C1622;font-family:var(--serif);letter-spacing:.5px}
+td{padding:7px 11px;border:1px solid #5A121B;background:#15070C;vertical-align:top}
+tr:nth-child(even) td{background:#1B0810}
+tbody tr:hover td{background:rgba(224,27,60,.06)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.card{background:#2A0C13;border:1px solid #7C1622;border-radius:8px;padding:13px 17px}
-.card h3{color:var(--acento);font-size:18.5px;margin-bottom:5px}
+.card{background:linear-gradient(180deg,rgba(26,10,16,.96),rgba(13,6,9,.96));border:1px solid #6B1220;border-radius:8px;padding:13px 17px}
+.card h3{font-family:var(--serif);color:var(--acento);font-size:18px;letter-spacing:.5px;margin-bottom:5px}
 .card p,.card li{font-size:16.5px}
-.kpi{background:linear-gradient(150deg,#6B0F1A,#540B13);border:1px solid var(--carm-al);border-radius:10px;padding:14px 10px;text-align:center}
-.kpi .num{font-size:27px;font-weight:700;color:#fff;display:block}
+.kpi{background:linear-gradient(150deg,#8B1E2D,#4D0D18);border:1px solid rgba(224,27,60,.65);border-radius:10px;padding:14px 10px;text-align:center;box-shadow:0 0 16px rgba(224,27,60,.18)}
+.kpi .num{font-size:27px;font-weight:700;color:#fff;display:block;font-family:var(--serif)}
 .kpi .lbl{font-size:14.5px;color:#F1D4D8;display:block;margin-top:3px}
-.chips span{display:inline-block;background:var(--carm);border-radius:20px;padding:4px 13px;margin:4px 6px 0 0;font-size:15.5px}
+.chips span{display:inline-block;background:rgba(42,10,16,.85);border:1px solid rgba(224,27,60,.55);border-radius:3px;padding:4px 13px;margin:4px 6px 0 0;font-size:15.5px;color:#F1D4D8}
 img.diagrama{display:block;margin:0 auto;max-width:100%;max-height:100%;object-fit:contain}
-.pie{position:absolute;left:54px;right:54px;bottom:16px;display:flex;justify-content:space-between;font-size:13px;color:#B98A93;border-top:1px solid rgba(138,30,45,.35);padding-top:7px}
-.cita{font-style:italic;color:var(--acento);font-size:19.5px;border-left:4px solid var(--dorado);padding:8px 14px;background:rgba(108,15,26,.28);border-radius:0 8px 8px 0}
-.ok{color:#9BD98F;font-weight:700}
-.bad{color:#F0A0A0;font-weight:700}
+.pie{position:absolute;left:54px;right:54px;bottom:16px;display:flex;justify-content:space-between;font-size:13px;color:#B98A93;border-top:1px solid rgba(138,30,45,.45);padding-top:7px}
+.cita{font-style:italic;color:var(--acento);font-size:19.5px;border-left:4px solid var(--rojo);padding:8px 14px;background:rgba(61,18,38,.45);border-radius:0 8px 8px 0}
+.ok{color:#8FD19E;font-weight:700}
+.bad{color:#FF8A97;font-weight:700}
 .fw{font-weight:700;color:var(--acento)}
-#indicador{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--carm),var(--acento));width:0;z-index:20;transition:width .25s}
-#contador{position:fixed;right:18px;top:10px;font-size:15px;color:#C89AA2;background:rgba(20,6,10,.75);padding:4px 12px;border-radius:14px;border:1px solid #5A121B;z-index:20}
+#indicador{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,#8B1E2D,var(--rojo),var(--rosa));width:0;z-index:20;transition:width .25s}
+#contador{position:fixed;right:18px;top:10px;font-size:15px;color:var(--plata);background:rgba(10,5,8,.85);padding:4px 12px;border-radius:4px;border:1px solid #5A121B;z-index:20;font-family:var(--serif);letter-spacing:1px}
 #controles{position:fixed;bottom:14px;right:18px;display:flex;gap:8px;z-index:20}
-#controles button{background:var(--vino);color:var(--texto);border:1px solid var(--carm-al);font-size:18px;width:42px;height:36px;border-radius:8px;cursor:pointer}
-#controles button:hover{background:var(--carm)}
-#panel-notas{position:fixed;left:0;right:0;bottom:0;max-height:34vh;overflow:auto;background:rgba(12,4,8,.97);border-top:3px solid var(--dorado);padding:12px 22px 16px;display:none;z-index:30;font-size:16px;color:#EBD8C8}
+#controles button{background:linear-gradient(135deg,#8B1E2D,#4D0D18);color:#fff;border:1px solid rgba(224,27,60,.65);font-size:18px;width:42px;height:36px;border-radius:6px;cursor:pointer}
+#controles button:hover{background:linear-gradient(135deg,#A82336,#6B0F1A);box-shadow:0 0 12px rgba(224,27,60,.4)}
+#panel-notas{position:fixed;left:0;right:0;bottom:0;max-height:34vh;overflow:auto;background:rgba(10,5,8,.97);border-top:3px solid var(--rojo);padding:12px 22px 16px;display:none;z-index:30;font-size:16px;color:#EBD8C8}
 #panel-notas.visible{display:block}
-#panel-notas h4{color:var(--dorado);margin-bottom:5px;font-size:14px;letter-spacing:1px}
+#panel-notas h4{color:var(--rosa);margin-bottom:5px;font-size:14px;letter-spacing:1px;text-transform:uppercase;font-family:var(--serif)}
 .nota{display:none}
 #pie-teclas{position:fixed;bottom:14px;left:18px;font-size:12.5px;color:#96707A;z-index:20}
 @media print{
   body{background:#fff;overflow:visible}
+  body::before,body::after{display:none!important}
   #indicador,#contador,#controles,#panel-notas,#pie-teclas,.nota{display:none!important}
-  #escenario{width:1280px;height:auto;margin:0}
+  #escenario{width:1280px;height:auto;margin:0;z-index:auto}
   .slide{display:flex!important;position:relative;inset:auto;width:1280px;height:720px;page-break-after:always;break-after:page;border:none;border-radius:0;box-shadow:none}
   .slide:last-child{page-break-after:auto;break-after:auto}
 }
@@ -72,9 +107,11 @@ img.diagrama{display:block;margin:0 auto;max-width:100%;max-height:100%;object-f
 <!-- ============ SLIDE 01: PORTADA ============ -->
 <section class="slide activa">
   <div class="contenido" style="display:flex;flex-direction:column;justify-content:center;text-align:center">
-    <div style="font-size:15px;letter-spacing:4px;color:#D9A7AE;text-transform:uppercase;margin-bottom:18px">Arquitectura de Software · Parte 1 · Sustentación</div>
-    <div style="font-size:64px;font-weight:800;color:#fff;line-height:1.08;text-shadow:0 4px 24px rgba(168,35,54,.55)">La Gran Liga de Apuestas<br>de Medianos EIA</div>
-    <div style="width:220px;height:5px;background:linear-gradient(90deg,#A82336,#E8B4B8);margin:24px auto"></div>
+    <div style="width:64px;height:64px;margin:0 auto 16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;color:#fff;font-family:Georgia,serif;background:radial-gradient(circle at 35% 30%,#A82336,#4D0D18 72%);border:2px solid rgba(244,236,228,.85);box-shadow:0 0 0 4px rgba(107,15,26,.9),0 0 26px rgba(224,27,60,.55)">♠</div>
+    <div style="font-size:14px;letter-spacing:5px;color:#D9A7AE;text-transform:uppercase;margin-bottom:16px;font-family:var(--serif)">Arquitectura de Software · Parte 1 · Sustentación</div>
+    <div style="font-family:var(--serif);font-size:60px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:1px;text-shadow:0 0 26px rgba(224,27,60,.5)">La Gran Liga de Apuestas<br>de Medianos EIA</div>
+    <div style="width:220px;height:3px;background:linear-gradient(90deg,transparent,#E01B3C,transparent);margin:18px auto 10px"></div>
+    <div style="font-size:17px;letter-spacing:20px;text-indent:20px;color:#E01B3C;margin-bottom:8px">♠<span style="color:#C9CED6">♥</span>♦<span style="color:#C9CED6">♣</span></div>
     <div style="font-size:21px;color:#E8CDD1">Salchipapa Maker Racing S.A.S.</div>
     <div style="font-size:17px;color:#C9A3A9;margin-top:8px;max-width:900px;margin-left:auto;margin-right:auto">Diseño arquitectónico de la plataforma de apuestas mutuas (Pari-Mutuel) sobre carreras de medianos</div>
     <div style="display:flex;gap:16px;justify-content:center;margin-top:34px">
