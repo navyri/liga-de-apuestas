@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo interactiva · Liga de Apuestas de Medianos EIA</title>
+<meta name="description" content="Simulación front-end del diseño documentado: pari-mutuel, cierre por reloj del servidor, idempotencia, Outbox→Kafka y liquidación por mayores restos. Sin backend, sin base de datos, sin broker.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--vino:#6B0F1A;--vino-osc:#540B13;--carm:#8B1E2D;--carm-al:#A82336;--acento:#E8B4B8;--fondo:#1E0A0F;--texto:#F4ECE4;--dorado:#C6A66B;--ok:#8FD19E;--err:#FF8A97;--warn:#F0C674}
+body{background:radial-gradient(1400px 800px at 25% 0%,#2A0A10 0%,#14060A 65%);color:var(--texto);font-family:"Segoe UI",Arial,Helvetica,sans-serif;line-height:1.55;min-height:100vh}
+.contenedor{max-width:1120px;margin:0 auto;padding:0 22px}
+a{color:var(--acento)}
+header{padding:44px 0 26px;text-align:center}
+.eyebrow{font-size:12.5px;letter-spacing:4px;text-transform:uppercase;color:#D9A7AE;margin-bottom:12px}
+h1{font-size:clamp(26px,4vw,42px);font-weight:800;color:#fff;text-shadow:0 4px 24px rgba(168,35,54,.5)}
+h1 .acento{color:var(--acento)}
+.barra{width:200px;height:5px;background:linear-gradient(90deg,var(--carm-al),var(--acento));margin:18px auto;border-radius:3px}
+.aviso{margin:14px auto 0;max-width:820px;font-size:13.5px;color:#B98A93;border:1px dashed rgba(198,166,107,.5);border-radius:8px;padding:9px 14px;background:rgba(42,10,16,.5)}
+.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.badge{font-size:11.5px;letter-spacing:1.2px;text-transform:uppercase;background:var(--carm);color:#F7E4E7;border-radius:14px;padding:4px 12px;border:1px solid var(--carm-al)}
+.badge.gold{background:transparent;border-color:var(--dorado);color:var(--dorado)}
+section{padding:26px 0}
+h2{font-size:23px;color:var(--acento);border-left:7px solid var(--carm-al);padding-left:14px;margin-bottom:6px}
+.sub{color:#C9A3A9;font-size:14.5px;margin-bottom:18px;padding-left:21px}
+.divisor{display:block;margin:6px auto 0;height:6px;max-width:100%;border:0}
+/* guia */
+.guia{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;counter-reset:paso}
+.paso{background:rgba(42,12,19,.7);border:1px solid #5A121B;border-radius:8px;padding:11px 14px;font-size:13.5px;color:#D6B9BE;counter-increment:paso;position:relative;padding-left:40px}
+.paso::before{content:counter(paso);position:absolute;left:12px;top:10px;width:20px;height:20px;border-radius:50%;background:var(--carm-al);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.paso b{color:var(--dorado)}
+/* paneles */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start}
+.panel{background:#2A0C13;border:1px solid #7C1622;border-radius:10px;padding:16px 18px}
+.panel h3{font-size:15.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dorado);margin-bottom:12px}
+.panel.full{grid-column:1/-1}
+.fila{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+label{font-size:13px;color:#C9A3A9}
+select,input{background:#1C070C;border:1px solid #7C1622;color:var(--texto);border-radius:7px;padding:9px 11px;font-size:14.5px;font-family:inherit}
+select:focus,input:focus{outline:none;border-color:var(--carm-al)}
+input[type=number]{width:120px}
+.btn{display:inline-block;padding:10px 18px;border-radius:8px;font-size:14.5px;font-weight:600;cursor:pointer;border:1px solid var(--carm-al);background:linear-gradient(135deg,var(--carm-al),var(--vino));color:#fff;font-family:inherit;transition:transform .1s,box-shadow .1s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.45)}
+.btn.ghost{background:transparent;color:var(--acento)}
+.btn.warn{background:transparent;border-color:var(--warn);color:var(--warn)}
+.btn.ok{background:linear-gradient(135deg,#2E7D4F,#1B5E37);border-color:var(--ok)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.chips{display:flex;gap:6px}
+.chip{font-size:12.5px;padding:4px 10px;border-radius:12px;border:1px solid #7C1622;background:#1C070C;color:#D6B9BE;cursor:pointer}
+.chip:hover{border-color:var(--carm-al);color:#fff}
+/* estado FSM */
+.fsm{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.est{font-size:11.5px;letter-spacing:1px;padding:4px 9px;border-radius:6px;border:1px solid #5A121B;background:#1C070C;color:#96707A}
+.est.on{background:var(--carm);border-color:var(--acento);color:#fff;font-weight:700}
+.est.done{border-color:var(--carm-al);color:var(--acento)}
+.chip-estado{display:inline-block;font-size:13px;font-weight:700;letter-spacing:1.5px;padding:5px 14px;border-radius:7px;border:1px solid #5A121B;background:#1C070C;color:#96707A}
+.chip-estado.ABIERTA{background:#134D2A;border-color:var(--ok);color:var(--ok)}
+.chip-estado.CERRADA{background:#4D3A12;border-color:var(--warn);color:var(--warn)}
+.chip-estado.EN_CURSO{background:#123456;border-color:#7FB3E8;color:#9FCBF5}
+.chip-estado.FINALIZADA{background:#3A1240;border-color:#C79FE8;color:#DDBDF5}
+.chip-estado.LIQUIDADA{background:#4D4212;border-color:var(--dorado);color:var(--dorado)}
+.chip-estado.CANCELADA{background:#4D121B;border-color:var(--err);color:var(--err)}
+.reloj{font-family:Consolas,"Courier New",monospace;font-size:15px;color:#fff;background:#1C070C;border:1px solid #5A121B;border-radius:7px;padding:8px 12px;text-align:center}
+.reloj small{display:block;font-size:11px;color:#96707A;letter-spacing:1px}
+.cuenta{font-size:24px;font-weight:800;color:var(--acento);font-family:Consolas,monospace}
+.meta{font-size:12.5px;color:#96707A;font-family:Consolas,monospace;word-break:break-all}
+/* billetera */
+.saldo{font-size:34px;font-weight:800;color:#fff;text-shadow:0 2px 14px rgba(168,35,54,.55);font-family:Consolas,monospace}
+.saldo span{font-size:14px;color:var(--dorado);letter-spacing:2px}
+/* tablas */
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:#3A0D15;color:var(--acento);text-align:left;padding:8px 10px;font-size:12px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid #7C1622}
+td{padding:8px 10px;border-bottom:1px solid #5A121B;color:#E7D3D6;vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-family:Consolas,monospace}
+.mono{font-family:Consolas,"Courier New",monospace;font-size:12.5px}
+.vacio{color:#96707A;font-size:13.5px;text-align:center;padding:14px}
+/* medianos */
+.pools{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:12px}
+.pool{background:#1C070C;border:1px solid #5A121B;border-radius:8px;padding:8px 10px;text-align:center}
+.pool.win{border-color:var(--dorado);box-shadow:0 0 12px rgba(198,166,107,.35)}
+.pool b{display:block;color:#fff;font-size:14px}
+.pool .m{font-family:Consolas,monospace;color:var(--acento);font-size:14px}
+.pool .q{font-size:11.5px;color:#96707A}
+.pool .barra2{height:5px;border-radius:3px;background:#5A121B;margin-top:6px;overflow:hidden}
+.pool .barra2 i{display:block;height:100%;background:linear-gradient(90deg,var(--carm-al),var(--dorado))}
+/* mensajes */
+.msg{min-height:22px;font-size:13.5px;margin-top:8px;border-radius:7px;padding:7px 11px;display:none}
+.msg.ok{display:block;background:rgba(23,74,42,.55);border:1px solid var(--ok);color:var(--ok)}
+.msg.err{display:block;background:rgba(93,18,30,.55);border:1px solid var(--err);color:var(--err)}
+.msg.warn{display:block;background:rgba(93,70,18,.5);border:1px solid var(--warn);color:var(--warn)}
+.msg.info{display:block;background:rgba(30,45,80,.45);border:1px solid #7FB3E8;color:#9FCBF5}
+/* clave */
+.clave{font-family:Consolas,monospace;font-size:13px;background:#1C070C;border:1px dashed var(--dorado);border-radius:7px;padding:8px 11px;color:var(--dorado);word-break:break-all}
+/* eventos */
+.bitacora{background:#12060A;border:1px solid #5A121B;border-radius:8px;max-height:330px;overflow-y:auto;padding:10px 12px;font-family:Consolas,"Courier New",monospace;font-size:12.5px}
+.ev{display:flex;gap:10px;flex-wrap:wrap;padding:6px 4px;border-bottom:1px dashed #3A0D15;align-items:baseline}
+.ev:last-child{border-bottom:0}
+.ev .t{color:#96707A}
+.ev .tipo{color:var(--ok);font-weight:700}
+.ev .topico{background:#3A0D15;border:1px solid var(--carm-al);border-radius:10px;padding:1px 8px;color:var(--acento);font-size:11.5px}
+.ev .k{color:var(--dorado)}
+.ev .d{color:#C7A5AB;flex-basis:100%}
+/* liquidacion */
+.calc{background:#1C070C;border:1px solid #5A121B;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-family:Consolas,monospace;font-size:13px;color:#E7D3D6;line-height:1.8}
+.calc b{color:var(--dorado)}
+.calc .okc{color:var(--ok);font-weight:700}
+.pill{display:inline-block;font-size:11px;letter-spacing:1px;background:var(--vino-osc);border:1px solid var(--carm-al);color:var(--acento);border-radius:12px;padding:2px 10px;font-family:Consolas,monospace}
+.pill.gold{border-color:var(--dorado);color:var(--dorado)}
+.total{font-weight:800;color:#fff}
+/* mapeo */
+.mapa{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.map{background:rgba(42,12,19,.7);border:1px solid #5A121B;border-radius:8px;padding:13px 15px}
+.map b{color:var(--acento);display:block;margin-bottom:4px;font-size:14.5px}
+.map span{font-size:13.5px;color:#D6B9BE}
+.map code{font-family:Consolas,monospace;font-size:12.5px;color:var(--dorado);background:#1C070C;padding:1px 6px;border-radius:4px}
+footer{border-top:1px solid rgba(138,30,45,.45);margin-top:30px;padding:22px 0 40px;text-align:center;font-size:13.5px;color:#96707A}
+@media (max-width:700px){.grid{grid-template-columns:1fr}.fila{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+
+<header class="contenedor">
+  <div class="eyebrow">Salchipapa Maker Racing S.A.S. · Demo aprobada por el docente</div>
+  <h1>Demo interactiva <span class="acento">· La Gran Liga de Medianos EIA</span></h1>
+  <div class="barra"></div>
+  <div class="badges">
+    <span class="badge">Front-end puro</span>
+    <span class="badge">Sin backend · Sin BD · Sin broker</span>
+    <span class="badge">Datos en memoria</span>
+    <span class="badge gold">EIA Coins ficticios</span>
+  </div>
+  <p class="aviso">⚠️ Esta demo <b>simula en tu navegador</b> las reglas del diseño documentado: pari-mutuel con comisión del 10%, cierre por <b>reloj del servidor</b>, idempotencia por <code class="mono">Idempotency-Key</code>, eventos canónicos del Outbox→Kafka y liquidación por <b>mayores restos</b> (misma política <code class="mono">HAMILTON_LARGEST_REMAINDER_V1</code> del doc 05). No hay servidor: todo vive en memoria y se borra al recargar.</p>
+</header>
+
+<main class="contenedor">
+
+  <section>
+    <h2>Guion rápido de la demo</h2>
+    <p class="sub">Sigue los 7 pasos en vivo (≈2 minutos) para recorrer todo el ciclo de vida del sistema.</p>
+    <div class="guia">
+      <div class="paso"><b>Abrir la carrera</b> → estado <span class="mono">ABIERTA</span> con T_inicio a 45 s.</div>
+      <div class="paso"><b>Apostar 4 veces con la MISMA clave</b> → solo 1 débito (idempotencia).</div>
+      <div class="paso"><b>Clave nueva</b> → apostar a otro mediano; ver cuotas dinámicas.</div>
+      <div class="paso"><b>Esperar el cierre automático</b>: el operador NO puede cerrar a mano.</div>
+      <div class="paso"><b>Simular la carrera</b> y <b>publicar el resultado oficial</b>.</div>
+      <div class="paso"><b>Liquidar</b> → tabla de mayores restos al centavo + conservación de la bolsa.</div>
+      <div class="paso"><b>Bitácora Kafka</b> → revisar los eventos y reiniciar para repetir.</div>
+    </div>
+  </section>
+
+  <img class="divisor" src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+
+  <section>
+    <h2>Simulación en vivo</h2>
+    <p class="sub">Máquina de estados de carrera · billetera · apuestas · liquidación · bitácora de eventos.</p>
+
+    <div class="grid">
+
+      <!-- CARRERA -->
+      <div class="panel">
+        <h3>Carrera · FSM</h3>
+        <div class="fsm" id="fsm"></div>
+        <div class="fila" style="justify-content:space-between">
+          <span class="chip-estado" id="chip">PROGRAMADA</span>
+          <span class="reloj" style="flex:1"><small>RELOJ DEL SERVIDOR (simulado)</small><span id="reloj">--:--:--</span></span>
+        </div>
+        <div class="fila" style="justify-content:space-between;margin-top:8px">
+          <span class="meta" id="raceId"></span>
+          <span class="cuenta" id="cuenta">—</span>
+        </div>
+        <div class="meta" id="tinicio" style="margin-bottom:10px"></div>
+        <div class="fila" id="filaAbrir">
+          <button class="btn" id="btnAbrir">▶ ABRIR APUESTAS</button>
+          <span class="meta">PROGRAMADA → ABIERTA</span>
+        </div>
+        <div class="meta" id="notaCierre" style="display:none;margin-bottom:10px;color:var(--warn)">🔒 El cierre es <b>solo por reloj del servidor</b>: el operador no tiene botón de cerrar (regla del enunciado).</div>
+        <div class="fila" id="filaCurso" style="display:none">
+          <button class="btn" id="btnCurso">🏁 SIMULAR CARRERA</button>
+          <span class="meta">CERRADA → EN_CURSO</span>
+        </div>
+        <div class="fila" id="filaFin" style="display:none">
+          <button class="btn" id="btnFin">🏁 FIN DE CARRERA</button>
+          <span class="meta">EN_CURSO → FINALIZADA</span>
+        </div>
+        <div id="filaResultado" style="display:none">
+          <label>Resultado oficial — mediano ganador:</label>
+          <div class="fila" id="ganadorRadios"></div>
+          <button class="btn" id="btnPublicar">📋 PUBLICAR RESULTADO OFICIAL</button>
+        </div>
+        <div class="fila" id="filaLiquidar" style="display:none">
+          <button class="btn ok" id="btnLiquidar">💰 LIQUIDAR (mayores restos)</button>
+          <span class="meta">FINALIZADA → LIQUIDADA</span>
+        </div>
+        <div class="fila" style="margin-top:10px;border-top:1px dashed #5A121B;padding-top:10px">
+          <button class="btn warn" id="btnCancelar">⛔ CANCELAR CARRERA</button>
+          <button class="btn ghost" id="btnReiniciar">🔄 Reiniciar demo</button>
+        </div>
+        <div class="msg" id="msgCarrera"></div>
+      </div>
+
+      <!-- BILLETERA -->
+      <div class="panel">
+        <h3>Billetera · EIA Coins</h3>
+        <div class="saldo" id="saldo">1.000,00 <span>EIA</span></div>
+        <div class="meta" id="usuario" style="margin-bottom:10px"></div>
+        <table>
+          <thead><tr><th>Hora</th><th>Movimiento</th><th class="num">Monto</th></tr></thead>
+          <tbody id="ledger"><tr><td colspan="3" class="vacio">Sin movimientos: la billetera parte con 1.000,00 EIA ficticios.</td></tr></tbody>
+        </table>
+        <div class="meta" style="margin-top:8px">Invariante: <code>CHECK (balance &gt;= 0)</code> — jamás saldo negativo.</div>
+      </div>
+
+      <!-- APOSTAR -->
+      <div class="panel">
+        <h3>Apostar</h3>
+        <div class="fila">
+          <label for="mediano">Mediano</label>
+          <select id="mediano"></select>
+        </div>
+        <div class="fila">
+          <label for="monto">Monto</label>
+          <input type="number" id="monto" min="0.01" step="0.01" value="25">
+          <div class="chips">
+            <button class="chip" data-m="10">10</button>
+            <button class="chip" data-m="25">25</button>
+            <button class="chip" data-m="50">50</button>
+            <button class="chip" data-m="100">100</button>
+          </div>
+        </div>
+        <div class="fila" style="align-items:flex-start;flex-direction:column">
+          <label>Idempotency-Key de la intención actual:</label>
+          <div class="clave" id="clave"></div>
+          <button class="btn ghost" id="btnClave" style="margin-top:8px">🔑 Generar clave nueva</button>
+        </div>
+        <button class="btn" id="btnApostar" style="width:100%;margin-top:10px">🎯 APOSTAR</button>
+        <div class="msg" id="msgApostar"></div>
+        <div class="meta" style="margin-top:8px">Prueba la idempotencia: pulsa <b>APOSTAR 4 veces seguidas</b> sin cambiar la clave → un solo débito.</div>
+      </div>
+
+      <!-- APUESTAS -->
+      <div class="panel full">
+        <h3>Apuestas de la carrera · cuotas dinámicas</h3>
+        <div class="pools" id="pools"></div>
+        <table>
+          <thead><tr><th>bet_id</th><th>Mediano</th><th class="num">Monto</th><th>Clave</th><th>Hora</th><th>Estado</th></tr></thead>
+          <tbody id="tablaApuestas"><tr><td colspan="6" class="vacio">Aún no hay apuestas. Abre la carrera y apuesta.</td></tr></tbody>
+        </table>
+      </div>
+
+      <!-- LIQUIDACION -->
+      <div class="panel full" id="panelLiquidacion">
+        <h3>Liquidación · algoritmo de mayores restos</h3>
+        <div class="vacio" id="liqVacio">La liquidación aparece aquí tras publicar el resultado oficial y pulsar LIQUIDAR.</div>
+        <div id="liqCuerpo" style="display:none"></div>
+      </div>
+
+      <!-- BITACORA -->
+      <div class="panel full">
+        <h3>Bitácora de eventos · Transactional Outbox → Kafka</h3>
+        <div class="meta" style="margin-bottom:8px">Contrato: <code>eventId · eventType · schemaVersion · timestamp (UTC) · producer · data</code> — catálogo del doc 04 (5 topics, un solo idioma).</div>
+        <div class="bitacora" id="bitacora"><div class="vacio">Sin eventos: el Outbox publica conforme ocurren los hechos de negocio.</div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <img class="divisor" src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+
+  <section>
+    <h2>Qué demuestra cada mecánica</h2>
+    <p class="sub">La demo ejecuta en el navegador exactamente las reglas documentadas — sin backend.</p>
+    <div class="mapa">
+      <div class="map"><b>Cierre estricto por reloj del servidor</b><span>T_inicio se fija al abrir; a los 45 s el estado pasa a <code>CERRADA</code> automáticamente. No existe botón de cierre manual para el operador.</span></div>
+      <div class="map"><b>Idempotencia por clave</b><span><code>UNIQUE(user_id, idempotency_key)</code>: la colisión devuelve la respuesta almacenada sin generar un segundo efecto contable.</span></div>
+      <div class="map"><b>Saldo nunca negativo</b><span>Validación previa <code>balance &gt;= 0</code> (el <code>CHECK</code> físico sería la última línea de defensa en el OLTP).</span></div>
+      <div class="map"><b>Outbox → Kafka</b><span>Cada hecho emite un evento canónico en español con su topic y clave de partición, como lo haría el relay.</span></div>
+      <div class="map"><b>Mayores restos (Hamilton)</b><span>Comisión 10% con <code>ROUND_HALF_EVEN</code>, piso por apuesta y centavos restantes por mayor residuo, con desempate por <code>bet_id</code>.</span></div>
+      <div class="map"><b>Conservación exacta de la bolsa</b><span><code>B_neta + R = B</code> al centavo; sin ganadores o cancelación → reembolso del 100% sin comisión.</span></div>
+    </div>
+  </section>
+
+  <img class="divisor" src="https://capsule-render.vercel.app/api?type=rect&height=6&color=6B0F1A" alt=""/>
+
+  <section style="text-align:center">
+    <a class="btn ghost" href="../index.html">← Volver al portal de entrega</a>
+    &nbsp;
+    <a class="btn ghost" href="https://github.com/navyri/liga-de-apuestas" target="_blank" rel="noopener">Repositorio en GitHub</a>
+  </section>
+
+</main>
+
+<img class="divisor" src="https://capsule-render.vercel.app/api?type=waving&height=120&section=footer&color=6B0F1A" alt=""/>
+
+<footer>
+  Arquitectura de Software · Parte 1 · Simulación académica sin backend · EIA Coins ficticios sin valor real
+</footer>
+
+<script>
+'use strict';
+/* ============================================================
+   Demo front-end: replica las reglas del diseño documentado.
+   Sin backend, sin BD, sin broker: todo el estado vive aquí.
+   ============================================================ */
+
+const MEDIANOS = ['Chispa', 'Trueno', 'Relámpago', 'Sombra', 'Pelusa'];
+const PRODUCTOR = 'core-api-demo';
+const SCHEMA_V = '1.0';
+const POLICY = 'HAMILTON_LARGEST_REMAINDER_V1';
+const USR = 'usr_1042';
+const CIERRE_MS = 45000; // T_inicio = apertura + 45 s
+
+const $ = id => document.getElementById(id);
+const fmtMoney = c => (c / 100).toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtHora = ms => new Date(ms).toLocaleTimeString('es-CO', { hour12: false });
+const uuid = () => (window.crypto && crypto.randomUUID)
+  ? crypto.randomUUID()
+  : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); });
+
+/* ---------- estado ---------- */
+let S = null;
+
+function nuevoEstado() {
+  return {
+    raceId: 'RACE-2026-' + Math.floor(1000 + Math.random() * 9000),
+    status: 'PROGRAMADA',
+    tInicio: null,
+    resultadoPublicado: false,
+    winner: null,
+    balance: 100000,          // centavos = 1.000,00 EIA
+    bets: [],                 // {betId, mediano, cents, key, ts}
+    keys: new Map(),          // idempotency_key -> betId (UNIQUE(user_id, key))
+    ledger: [],               // {ts, tipo, cents(+/-), nota}
+    events: [],               // catálogo canónico doc 04
+    settlement: null,
+    batchId: null,
+    seq: 0,
+    key: uuid(),
+  };
+}
+
+/* ---------- eventos (catálogo doc 04) ---------- */
+function emit(eventType, topic, key, data) {
+  const ev = {
+    eventId: 'evt-' + uuid().slice(0, 8),
+    eventType, topic, key, data,
+    schemaVersion: SCHEMA_V,
+    ts: Date.now(),
+    producer: PRODUCTOR,
+  };
+  S.events.unshift(ev);
+  renderEventos();
+}
+
+/* ---------- utilidades de mensaje ---------- */
+let msgTimer = {};
+function flash(panel, tipo, texto) {
+  const el = $('msg' + panel);
+  el.className = 'msg ' + tipo;
+  el.textContent = texto;
+  clearTimeout(msgTimer[panel]);
+  msgTimer[panel] = setTimeout(() => { el.className = 'msg'; }, 6500);
+}
+
+/* ============================================================
+   NÚCLEO MATEMÁTICO — política HAMILTON_LARGEST_REMAINDER_V1
+   (idéntica a docs/05_datos_e_idempotencia.md, P1-5.6)
+   MARKER:MATH:INICIO
+   ============================================================ */
+
+/** Redondeo bancario estándar (ROUND_HALF_EVEN) de 0.10*B usando aritmética entera exacta. */
+function comisionRoundHalfEven(B) {
+  const q = Math.floor(B / 10);   // parte entera de B/10
+  const r = B % 10;               // residuo 0..9
+  if (r < 5) return q;
+  if (r > 5) return q + 1;
+  return (q % 2 === 0) ? q : q + 1; // .5 exacto → par más cercano
+}
+
+/**
+ * Calcula la liquidación completa.
+ * @param {Array<{betId:string,cents:number}>} bets  todas las apuestas de la carrera
+ * @param {string} winner mediano ganador
+ * @returns objeto con comisión, neto, filas por apuesta ganadora y verificación de conservación
+ */
+function calcularLiquidacion(bets, winner) {
+  const B = bets.reduce((a, b) => a + b.cents, 0);            // 1) bolsa bruta en centavos
+  const R = comisionRoundHalfEven(B);                          // 2) comisión ROUND_HALF_EVEN
+  const Bn = B - R;                                            // 3) bolsa neta (conservación Bn + R = B)
+  const ganadoras = bets.filter(b => b.mediano === winner);
+  const Tw = ganadoras.reduce((a, b) => a + b.cents, 0);       // masa total ganadora
+
+  if (ganadoras.length === 0) {
+    return { modo: 'sin_ganadores', B, R: 0, Bn: B, Tw: 0, filas: [], refunds: bets.slice() };
+  }
+
+  // 4)-6) teórico, piso y restos
+  const filas = ganadoras.map(b => {
+    const teorico = (Bn * b.cents) / Tw;
+    const base = Math.floor(teorico + 1e-9);                   // +eps anti-error de punto flotante
+    return { betId: b.betId, monto: b.cents, teorico, base, resto: teorico - base, extra: 0, premio: base };
+  });
+
+  // 7) centavos restantes → mayores restos, desempate por bet_id ascendente
+  const remanente = Bn - filas.reduce((a, f) => a + f.base, 0);
+  const orden = filas.slice().sort((a, b) =>
+    (b.resto - a.resto) || (a.betId < b.betId ? -1 : a.betId > b.betId ? 1 : 0));
+  for (let i = 0; i < remanente && i < orden.length; i++) { orden[i].extra = 1; orden[i].premio += 1; }
+
+  const sumaPremios = filas.reduce((a, f) => a + f.premio, 0);
+  return {
+    modo: 'mayores_restos', B, R, Bn, Tw, filas, remanente,
+    sumaPremios, ok: sumaPremios === Bn && (Bn + R) === B,
+    policy: POLICY,
+  };
+}
+/* MARKER:MATH:FIN */
+
+/* ============================================================
+   ACCIONES DE LA FSM
+   ============================================================ */
+function abrirCarrera() {
+  if (S.status !== 'PROGRAMADA') return flash('Carrera', 'err', 'Solo se abre desde PROGRAMADA.');
+  S.status = 'ABIERTA';
+  S.tInicio = Date.now() + CIERRE_MS;
+  flash('Carrera', 'ok', 'Carrera ABIERTA. T_inicio fijado por el reloj del servidor: 45 s para apostar.');
+  renderAll();
+}
+
+function simularCarrera() {
+  if (S.status !== 'CERRADA') return flash('Carrera', 'err', 'Se simula recién desde CERRADA.');
+  S.status = 'EN_CURSO';
+  emit('CarreraIniciada', 'carreras.eventos', 'race_id=' + S.raceId, { race_id: S.raceId, participantes: MEDIANOS.slice() });
+  flash('Carrera', 'ok', 'Carrera EN_CURSO (CarreraIniciada publicado).');
+  renderAll();
+}
+
+function finCarrera() {
+  if (S.status !== 'EN_CURSO') return flash('Carrera', 'err', 'Se finaliza recién desde EN_CURSO.');
+  S.status = 'FINALIZADA';
+  emit('CarreraFinalizada', 'carreras.eventos', 'race_id=' + S.raceId, { race_id: S.raceId });
+  flash('Carrera', 'ok', 'Carrera FINALIZADA. Ahora el operador captura el resultado oficial.');
+  renderAll();
+}
+
+function publicarResultado() {
+  if (S.status !== 'FINALIZADA' || S.resultadoPublicado) return flash('Carrera', 'err', 'Se publica una vez, desde FINALIZADA.');
+  if (!S.winner) return flash('Carrera', 'err', 'Selecciona el mediano ganador primero.');
+  S.resultadoPublicado = true;
+  emit('ResultadoOficialPublicado', 'carreras.resultados', 'race_id=' + S.raceId,
+    { race_id: S.raceId, mediano_ganador: S.winner, foto_llegada: 'llegada_oficial.jpg' });
+  flash('Carrera', 'ok', 'Resultado oficial publicado (sellado por el operador).');
+  renderAll();
+}
+
+function liquidar() {
+  if (!S.resultadoPublicado || S.settlement) return flash('Carrera', 'err', 'Primero publica el resultado oficial.');
+  const liq = calcularLiquidacion(S.bets, S.winner);
+  S.settlement = liq;
+
+  if (liq.modo === 'sin_ganadores') {
+    // P1-DEC-004: sin ganadores → reembolso íntegro del 100% sin comisión
+    S.batchId = 'LOT-' + S.raceId.slice(-4) + '-S';
+    emit('LoteLiquidacionGenerado', 'liquidacion.lotes', 'batch_id=' + S.batchId,
+      { batch_id: S.batchId, tipo: 'REEMBOLSO_TOTAL', apuestas: liq.refunds.length });
+    for (const b of liq.refunds) {
+      S.balance += b.cents;
+      S.ledger.unshift({ ts: Date.now(), tipo: 'REEMBOLSO', cents: +b.cents, nota: 'sin ganadores' });
+      emit('DevolucionAcreditada', 'billetera.movimientos', 'user_id=' + USR,
+        { bet_id: b.betId, monto_cents: b.cents, motivo: 'SIN_APUESTAS_GANADORAS', unique: "bet_id + 'REFUND_NO_WINNERS'" });
+      b.resultado = 'REEMBOLSADA';
+    }
+    flash('Carrera', 'warn', 'Sin apostadores en el ganador: reembolso del 100% sin comisión (P1-DEC-004).');
+  } else {
+    S.batchId = 'LOT-' + S.raceId.slice(-4) + '-01';
+    emit('LoteLiquidacionGenerado', 'liquidacion.lotes', 'batch_id=' + S.batchId,
+      { batch_id: S.batchId, premios: liq.filas.length, policy: POLICY });
+    const porBet = new Map(liq.filas.map(f => [f.betId, f]));
+    // acreditación idempotente por apuesta, en orden determinista por bet_id
+    for (const b of S.bets.slice().sort((x, y) => x.betId < y.betId ? -1 : 1)) {
+      const f = porBet.get(b.betId);
+      if (f) {
+        S.balance += f.premio;
+        S.ledger.unshift({ ts: Date.now(), tipo: 'PREMIO', cents: +f.premio, nota: b.betId });
+        emit('PremioAcreditado', 'billetera.movimientos', 'user_id=' + USR,
+          { bet_id: b.betId, monto_cents: f.premio, batch_id: S.batchId });
+        b.resultado = 'PREMIADA';
+      } else {
+        b.resultado = 'SIN_PREMIO';
+      }
+    }
+    flash('Carrera', 'ok', 'Liquidación completa: ' + fmtMoney(liq.sumaPremios) + ' EIA repartidos al centavo.');
+  }
+  S.status = 'LIQUIDADA';
+  renderAll();
+}
+
+function cancelarCarrera() {
+  const estados = ['PROGRAMADA', 'ABIERTA', 'CERRADA', 'EN_CURSO'];
+  if (!estados.includes(S.status)) return flash('Carrera', 'err', 'Cancelación solo desde estados previos a FINALIZADA.');
+  const refundes = S.bets.filter(b => b.resultado !== 'REEMBOLSADA');
+  emit('CarreraCancelada', 'carreras.eventos', 'race_id=' + S.raceId,
+    { race_id: S.raceId, motivo: 'CANCELACION_OPERATIVA' });
+  for (const b of refundes) {
+    S.balance += b.cents;
+    S.ledger.unshift({ ts: Date.now(), tipo: 'REEMBOLSO', cents: +b.cents, nota: 'cancelación' });
+    emit('DevolucionAcreditada', 'billetera.movimientos', 'user_id=' + USR,
+      { bet_id: b.betId, monto_cents: b.cents, motivo: 'CARRERA_CANCELADA' });
+    b.resultado = 'REEMBOLSADA';
+  }
+  S.status = 'CANCELADA';
+  flash('Carrera', 'warn', 'Carrera CANCELADA: reembolso del 100% de las apuestas previas.');
+  renderAll();
+}
+
+/* ---------- apuesta ---------- */
+function apostar() {
+  const mediano = $('mediano').value;
+  const cents = Math.round(parseFloat($('monto').value) * 100);
+  const key = S.key;
+
+  if (!isFinite(cents) || cents <= 0) return flash('Apostar', 'err', 'Monto inválido: usa un valor mayor que cero.');
+
+  // 1) idempotencia: la colisión retorna la respuesta almacenada (efecto único)
+  if (S.keys.has(key)) {
+    const prev = S.bets.find(b => b.betId === S.keys.get(key));
+    return flash('Apostar', 'warn',
+      '⚠ Colisión de Idempotency-Key → respuesta almacenada devuelta (' + prev.betId +
+      ' · ' + fmtMoney(prev.cents) + ' EIA). Ningún efecto contable adicional.');
+  }
+  // 2) estado y reloj del servidor
+  if (S.status !== 'ABIERTA') return flash('Apostar', 'err', 'RECHAZADA: la carrera está en ' + S.status + ' (solo acepta en ABIERTA).');
+  if (Date.now() >= S.tInicio) return flash('Apostar', 'err', 'RECHAZADA: apuesta posterior al cierre (reloj del servidor ≥ T_inicio).');
+  // 3) mediano participante
+  if (!MEDIANOS.includes(mediano)) return flash('Apostar', 'err', 'RECHAZADA: mediano no participante.');
+  // 4) integridad de saldo
+  if (S.balance < cents) return flash('Apostar', 'err', 'RECHAZADA: saldo insuficiente (CHECK balance >= 0). Débito cancelado: transacción completa o nada.');
+
+  // transacción atómica simulada: débito + registro de apuesta + evento
+  S.seq++;
+  const betId = 'BET-' + String(S.seq).padStart(4, '0');
+  const bet = { betId, mediano, cents, key, ts: Date.now() };
+  S.bets.push(bet);
+  S.keys.set(key, betId);
+  S.balance -= cents;
+  S.ledger.unshift({ ts: Date.now(), tipo: 'APUESTA', cents: -cents, nota: betId + ' · ' + mediano });
+  emit('ApuestaAceptada', 'apuestas.aceptadas', 'user_id=' + USR,
+    { bet_id: betId, race_id: S.raceId, mediano, monto_cents: cents, idempotency_key: key });
+  flash('Apostar', 'ok', '✅ Aceptada ' + betId + ': −' + fmtMoney(cents) + ' EIA (transacción única, sin Kafka en la ruta crítica).');
+  renderAll();
+}
+
+function reiniciar() {
+  S = nuevoEstado();
+  flash('Carrera', 'info', 'Demo reiniciada: nueva carrera PROGRAMADA con 1.000,00 EIA.');
+  renderAll();
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const FSM_ORDER = ['PROGRAMADA', 'ABIERTA', 'CERRADA', 'EN_CURSO', 'FINALIZADA', 'LIQUIDADA'];
+
+function renderCarrera() {
+  $('chip').textContent = S.status;
+  $('chip').className = 'chip-estado ' + S.status;
+  $('raceId').textContent = 'race_id: ' + S.raceId;
+  $('usuario').textContent = 'user_id: ' + USR + ' · saldo en centavos exactos';
+
+  const idx = FSM_ORDER.indexOf(S.status);
+  $('fsm').innerHTML = FSM_ORDER.map((e, i) =>
+    '<span class="est ' + (e === S.status ? 'on' : (S.status === 'CANCELADA' ? '' : (i < idx ? 'done' : ''))) + '">' + e + '</span>'
+  ).join('') + (S.status === 'CANCELADA' ? '<span class="est on">CANCELADA</span>' : '');
+
+  $('filaAbrir').style.display = S.status === 'PROGRAMADA' ? 'flex' : 'none';
+  $('notaCierre').style.display = (S.status === 'ABIERTA' || S.status === 'CERRADA') ? 'block' : 'none';
+  $('filaCurso').style.display = S.status === 'CERRADA' ? 'flex' : 'none';
+  $('filaFin').style.display = S.status === 'EN_CURSO' ? 'flex' : 'none';
+  $('filaResultado').style.display = (S.status === 'FINALIZADA' && !S.resultadoPublicado) ? 'block' : 'none';
+  $('filaLiquidar').style.display = (S.resultadoPublicado && !S.settlement && S.status !== 'CANCELADA') ? 'flex' : 'none';
+
+  $('ganadorRadios').innerHTML = MEDIANOS.map((m, i) =>
+    '<label class="chip" style="cursor:pointer"><input type="radio" name="ganador" value="' + m + '"' +
+    (S.winner === m ? ' checked' : '') + '> ' + m + '</label>').join('');
+
+  $('saldo').innerHTML = fmtMoney(S.balance) + ' <span>EIA</span>';
+
+  // reloj + cuenta regresiva
+  const now = Date.now();
+  $('reloj').textContent = fmtHora(now);
+  if (S.status === 'ABIERTA') {
+    const rest = Math.max(0, S.tInicio - now);
+    $('cuenta').textContent = '00:' + String(Math.ceil(rest / 1000)).padStart(2, '0');
+    $('tinicio').textContent = 'T_inicio = ' + fmtHora(S.tInicio) + ' · cierre estricto por reloj del servidor';
+  } else if (S.status === 'PROGRAMADA') {
+    $('cuenta').textContent = '—';
+    $('tinicio').textContent = 'T_inicio se fija al abrir la carrera.';
+  } else {
+    $('cuenta').textContent = 'cerrada';
+    $('tinicio').textContent = S.tInicio ? 'T_inicio fue ' + fmtHora(S.tInicio) + ': toda apuesta posterior se rechaza.' : '';
+  }
+
+  // ledger
+  $('ledger').innerHTML = S.ledger.length
+    ? S.ledger.slice(0, 12).map(m =>
+        '<tr><td class="mono">' + fmtHora(m.ts) + '</td><td>' + m.tipo +
+        '<div class="meta">' + m.nota + '</div></td><td class="num" style="color:' +
+        (m.cents < 0 ? 'var(--err)' : 'var(--ok)') + '">' + (m.cents < 0 ? '' : '+') +
+        fmtMoney(m.cents) + '</td></tr>').join('')
+    : '<tr><td colspan="3" class="vacio">Sin movimientos: la billetera parte con 1.000,00 EIA ficticios.</td></tr>';
+}
+
+function renderApuestas() {
+  // pools + cuotas dinámicas (pari-mutuel: la casa retiene 10%)
+  const total = S.bets.reduce((a, b) => a + b.cents, 0);
+  const max = Math.max(1, ...MEDIANOS.map(m => S.bets.filter(b => b.mediano === m).reduce((a, b) => a + b.cents, 0)));
+  $('pools').innerHTML = MEDIANOS.map(m => {
+    const pool = S.bets.filter(b => b.mediano === m).reduce((a, b) => a + b.cents, 0);
+    const cuota = pool > 0 && total > 0 ? ((total * 0.9) / pool) : null;
+    const win = S.winner === m && S.status === 'LIQUIDADA';
+    return '<div class="pool' + (win ? ' win' : '') + '"><b>' + m + '</b>' +
+      '<span class="m">' + fmtMoney(pool) + '</span>' +
+      '<span class="q">' + (cuota ? 'cuota ≈ ' + cuota.toFixed(2) + '×' : 'sin apuestas') + '</span>' +
+      '<span class="barra2"><i style="width:' + Math.round(pool / max * 100) + '%"></i></span></div>';
+  }).join('');
+
+  // select de medianos con cuota
+  const sel = $('mediano');
+  const actual = sel.value;
+  sel.innerHTML = MEDIANOS.map(m => {
+    const pool = S.bets.filter(b => b.mediano === m).reduce((a, b) => a + b.cents, 0);
+    const cuota = pool > 0 && total > 0 ? ' — cuota ≈ ' + ((total * 0.9) / pool).toFixed(2) + '×' : '';
+    return '<option value="' + m + '">' + m + cuota + '</option>';
+  }).join('');
+  if (MEDIANOS.includes(actual)) sel.value = actual;
+
+  // tabla de apuestas
+  $('tablaApuestas').innerHTML = S.bets.length
+    ? S.bets.map(b =>
+        '<tr><td class="mono">' + b.betId + '</td><td>' + b.mediano + '</td>' +
+        '<td class="num">' + fmtMoney(b.cents) + '</td>' +
+        '<td class="mono">' + b.key.slice(0, 12) + '…</td>' +
+        '<td class="mono">' + fmtHora(b.ts) + '</td>' +
+        '<td>' + (b.resultado || 'ACEPTADA') + '</td></tr>').join('')
+    : '<tr><td colspan="6" class="vacio">Aún no hay apuestas. Abre la carrera y apuesta.</td></tr>';
+
+  $('clave').textContent = S.key;
+}
+
+function renderEventos() {
+  $('bitacora').innerHTML = S.events.length
+    ? S.events.map(e =>
+        '<div class="ev"><span class="t">' + fmtHora(e.ts) + '</span>' +
+        '<span class="tipo">' + e.eventType + '</span>' +
+        '<span class="topico">' + e.topic + '</span>' +
+        '<span class="k">key: ' + e.key + '</span>' +
+        '<span class="d">{' + Object.entries(e.data).map(([k, v]) => k + '=' + v).join(', ') + '}</span></div>').join('')
+    : '<div class="vacio">Sin eventos: el Outbox publica conforme ocurren los hechos de negocio.</div>';
+}
+
+function renderLiquidacion() {
+  const liq = S.settlement;
+  if (!liq) {
+    $('liqVacio').style.display = 'block';
+    $('liqCuerpo').style.display = 'none';
+    return;
+  }
+  $('liqVacio').style.display = 'none';
+  $('liqCuerpo').style.display = 'block';
+
+  if (liq.modo === 'sin_ganadores') {
+    $('liqCuerpo').innerHTML =
+      '<div class="calc"><b>Motivo:</b> ningún apostador eligió al mediano ganador (' + S.winner + ').<br>' +
+      '<b>Política:</b> P1-DEC-004 → reembolso íntegro del <b>100% sin comisión</b> (única clave <code>UNIQUE(bet_id, \'REFUND_NO_WINNERS\')</code>).<br>' +
+      '<span class="okc">✓ ' + liq.refunds.length + ' reembolsos acreditados por ' + fmtMoney(liq.B) + ' EIA.</span></div>';
+    return;
+  }
+
+  const filas = liq.filas.slice().sort((a, b) => a.betId < b.betId ? -1 : 1);
+  $('liqCuerpo').innerHTML =
+    '<div class="calc">' +
+    '<b>B</b> (bolsa bruta) = ' + fmtMoney(liq.B) + ' EIA &nbsp;·&nbsp; ' +
+    '<b>R</b> (comisión 10%, ROUND_HALF_EVEN) = ' + fmtMoney(liq.R) + ' EIA &nbsp;·&nbsp; ' +
+    '<b>B_neta</b> = B − R = <b>' + fmtMoney(liq.Bn) + '</b> EIA<br>' +
+    '<b>T_w</b> (masa ganadora) = ' + fmtMoney(liq.Tw) + ' EIA · centavos remanentes = ' + liq.remanente + '<br>' +
+    '<span class="okc">✓ Conservación: B_neta + R = B → ' + fmtMoney(liq.Bn) + ' + ' + fmtMoney(liq.R) + ' = ' + fmtMoney(liq.B) + '</span>' +
+    ' &nbsp;<span class="pill gold">' + liq.policy + '</span> &nbsp;<span class="pill">batch_id: ' + S.batchId + '</span>' +
+    '</div>' +
+    '<table><thead><tr><th>bet_id</th><th class="num">Monto</th><th class="num">Teórico</th><th class="num">Base ⌊⌋</th><th class="num">Resto</th><th class="num">+¢</th><th class="num">Premio final</th></tr></thead><tbody>' +
+    filas.map(f =>
+      '<tr><td class="mono">' + f.betId + '</td><td class="num">' + fmtMoney(f.monto) + '</td>' +
+      '<td class="num">' + f.teorico.toFixed(4) + '</td><td class="num">' + fmtMoney(f.base) + '</td>' +
+      '<td class="num">' + f.resto.toFixed(4) + '</td>' +
+      '<td class="num" style="color:' + (f.extra ? 'var(--dorado)' : 'inherit') + '">' + (f.extra ? '+1' : '—') + '</td>' +
+      '<td class="num total">' + fmtMoney(f.premio) + '</td></tr>').join('') +
+    '<tr><td class="total">Suma de premios</td><td colspan="5"></td><td class="num total">' + fmtMoney(liq.sumaPremios) + ' ✓</td></tr>' +
+    '</tbody></table>';
+}
+
+function renderAll() { renderCarrera(); renderApuestas(); renderEventos(); renderLiquidacion(); }
+
+/* ============================================================
+   EVENTOS DE INTERFAZ
+   ============================================================ */
+$('btnAbrir').onclick = abrirCarrera;
+$('btnCurso').onclick = simularCarrera;
+$('btnFin').onclick = finCarrera;
+$('btnPublicar').onclick = publicarResultado;
+$('btnLiquidar').onclick = liquidar;
+$('btnCancelar').onclick = cancelarCarrera;
+$('btnReiniciar').onclick = reiniciar;
+$('btnApostar').onclick = apostar;
+$('btnClave').onclick = () => { S.key = uuid(); renderApuestas(); flash('Apostar', 'info', 'Nueva Idempotency-Key generada (nueva intención).'); };
+document.querySelectorAll('.chip[data-m]').forEach(c => c.onclick = () => { $('monto').value = c.dataset.m; });
+document.addEventListener('change', e => { if (e.target.name === 'ganador') { S.winner = e.target.value; } });
+
+/* reloj del servidor + cierre automático (sin botón manual) */
+setInterval(() => {
+  if (S.status === 'ABIERTA' && Date.now() >= S.tInicio) {
+    S.status = 'CERRADA';
+    flash('Carrera', 'warn', '🔒 Cierre estricto aplicado por el reloj del servidor (T_inicio alcanzado). No se aceptan más apuestas.');
+    renderAll();
+    return;
+  }
+  if (S.status === 'ABIERTA') {
+    const rest = Math.max(0, S.tInicio - Date.now());
+    $('cuenta').textContent = '00:' + String(Math.ceil(rest / 1000)).padStart(2, '0');
+  }
+  $('reloj').textContent = fmtHora(Date.now());
+}, 250);
+
+/* arranque */
+S = nuevoEstado();
+renderAll();
+</script>
+</body>
+</html>

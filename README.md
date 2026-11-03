@@ -240,6 +240,7 @@ liga-de-apuestas/
     ├── 08_diagramas_y_adrs/                # Fuentes Mermaid, renders y los 3 ADR
     ├── 09_presentacion_diapositivas.md     # Guion de 20 diapositivas y pregunta final
     ├── 10_guia_sustentacion.md             # Preguntas del jurado y Live Betting
+    ├── demo/index.html                     # Demo interactiva front-end (sin backend)
     ├── presentacion/index.html             # Presentación ejecutiva (20 slides)
     └── entregables/
         ├── presentacion.pdf                # 20 páginas, una diapositiva por página
@@ -273,6 +274,7 @@ liga-de-apuestas/
 
 | Entregable | Ubicación |
 |---|---|
+| Demo interactiva (ciclo de apuestas, sin backend) | [docs/demo/index.html](docs/demo/index.html) |
 | Presentación HTML (20 slides, notas del orador con `N`) | [docs/presentacion/index.html](docs/presentacion/index.html) |
 | Presentación PDF (20 páginas) | [docs/entregables/presentacion.pdf](docs/entregables/presentacion.pdf) |
 | Documento técnico consolidado (PDF) | [docs/entregables/documento_tecnico.pdf](docs/entregables/documento_tecnico.pdf) |
@@ -280,6 +282,7 @@ liga-de-apuestas/
 **Sitio publicado (GitHub Pages, rama `main` → `/docs`):** https://navyri.github.io/liga-de-apuestas/
 
 - Presentación en vivo: https://navyri.github.io/liga-de-apuestas/presentacion/index.html
+- Demo interactiva: https://navyri.github.io/liga-de-apuestas/demo/index.html
 - Cada push a `main` reconstruye el sitio (`docs/.nojekyll` evita el procesamiento de Jekyll).
 
 <p align="center">
