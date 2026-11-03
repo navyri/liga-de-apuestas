@@ -77,12 +77,21 @@ h2{font-family:var(--serif);font-size:20px;letter-spacing:3px;text-transform:upp
 .paso::before{content:counter(paso);position:absolute;left:12px;top:10px;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#E01B3C,#8B1E2D);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(224,27,60,.45)}
 .paso b{color:var(--acento)}
 /* paneles */
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start}
-.panel{background:linear-gradient(180deg,rgba(26,10,16,.96),rgba(13,6,9,.96));border:1px solid #6B1220;border-radius:10px;padding:16px 18px;box-shadow:0 12px 28px rgba(0,0,0,.38)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;align-items:stretch}
+.panel{display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(26,10,16,.96),rgba(13,6,9,.96));border:1px solid #6B1220;border-radius:10px;padding:16px 18px;box-shadow:0 12px 28px rgba(0,0,0,.38)}
 .panel h3{font-family:var(--serif);font-size:14px;letter-spacing:2.5px;text-transform:uppercase;color:var(--plata);margin-bottom:12px}
 .panel h3::before{content:"♦ ";color:var(--rojo)}
 .panel.full{grid-column:1/-1}
 .fila{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+/* filas de accion: boton arriba, meta debajo, mismo ancho */
+.fila.accion{flex-direction:column;align-items:stretch;gap:5px}
+.fila.accion .btn{width:100%;text-align:center}
+.fila.accion .meta{text-align:center}
+/* pie de acciones: pegado al fondo del panel para igualar alturas */
+.pie-acciones{margin-top:auto;margin-bottom:0;flex-direction:column;align-items:stretch;padding-top:12px;border-top:1px dashed #5A121B;gap:8px}
+.pie-acciones .btn{width:100%;text-align:center}
+#filaResultado{margin-bottom:10px}
+#filaResultado .btn{width:100%;text-align:center}
 label{font-size:13px;color:#C9A3A9}
 select,input{background:#0E0508;border:1px solid #6B1220;color:var(--texto);border-radius:6px;padding:9px 11px;font-size:14.5px;font-family:inherit}
 select:focus,input:focus{outline:none;border-color:var(--rojo);box-shadow:0 0 0 3px rgba(224,27,60,.25)}
@@ -237,16 +246,16 @@ footer{border-top:1px solid rgba(138,30,45,.45);margin-top:30px;padding:22px 0 4
           <span class="cuenta" id="cuenta">—</span>
         </div>
         <div class="meta" id="tinicio" style="margin-bottom:10px"></div>
-        <div class="fila" id="filaAbrir">
+        <div class="fila accion" id="filaAbrir">
           <button class="btn" id="btnAbrir">▶ ABRIR APUESTAS</button>
           <span class="meta">PROGRAMADA → ABIERTA</span>
         </div>
         <div class="meta" id="notaCierre" style="display:none;margin-bottom:10px;color:var(--warn)">El cierre es <b>solo por reloj del servidor</b>: el operador no tiene botón de cerrar (regla del enunciado).</div>
-        <div class="fila" id="filaCurso" style="display:none">
+        <div class="fila accion" id="filaCurso" style="display:none">
           <button class="btn" id="btnCurso">SIMULAR CARRERA</button>
           <span class="meta">CERRADA → EN_CURSO</span>
         </div>
-        <div class="fila" id="filaFin" style="display:none">
+        <div class="fila accion" id="filaFin" style="display:none">
           <button class="btn" id="btnFin">FIN DE CARRERA</button>
           <span class="meta">EN_CURSO → FINALIZADA</span>
         </div>
@@ -255,15 +264,15 @@ footer{border-top:1px solid rgba(138,30,45,.45);margin-top:30px;padding:22px 0 4
           <div class="fila" id="ganadorRadios"></div>
           <button class="btn" id="btnPublicar">PUBLICAR RESULTADO OFICIAL</button>
         </div>
-        <div class="fila" id="filaLiquidar" style="display:none">
+        <div class="fila accion" id="filaLiquidar" style="display:none">
           <button class="btn ok" id="btnLiquidar">LIQUIDAR (mayores restos)</button>
           <span class="meta">FINALIZADA → LIQUIDADA</span>
         </div>
-        <div class="fila" style="margin-top:10px;border-top:1px dashed #5A121B;padding-top:10px">
+        <div class="msg" id="msgCarrera"></div>
+        <div class="fila pie-acciones">
           <button class="btn warn" id="btnCancelar">CANCELAR CARRERA</button>
           <button class="btn ghost" id="btnReiniciar">Reiniciar demo</button>
         </div>
-        <div class="msg" id="msgCarrera"></div>
       </div>
 
       <!-- BILLETERA -->
@@ -298,7 +307,7 @@ footer{border-top:1px solid rgba(138,30,45,.45);margin-top:30px;padding:22px 0 4
         <div class="fila" style="align-items:flex-start;flex-direction:column">
           <label>Idempotency-Key de la intención actual:</label>
           <div class="clave" id="clave"></div>
-          <button class="btn ghost" id="btnClave" style="margin-top:8px">Generar clave nueva</button>
+          <button class="btn ghost" id="btnClave" style="margin-top:8px;width:100%">Generar clave nueva</button>
         </div>
         <button class="btn" id="btnApostar" style="width:100%;margin-top:10px">APOSTAR</button>
         <div class="msg" id="msgApostar"></div>
