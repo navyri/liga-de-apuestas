@@ -38,14 +38,14 @@ graph TD
     classDef consumerStyle fill:#3D080E,stroke:#F4ECE4,stroke-width:1px,color:#F4ECE4;
 
     %% Productores
-    subgraph PRODUCTORES ["🚀 PRODUCTORES (PRODUCERS)"]
+    subgraph PRODUCTORES ["PRODUCTORES (PRODUCERS)"]
         P_CORE["Núcleo Modular / Outbox Relay<br/>(Transactional Outbox)"]:::prodStyle
         P_SETTLE["Worker de Liquidación<br/>(Generador de Lotes)"]:::prodStyle
         P_DISPERS["Pool de Dispersores de Premios<br/>(Acreditación en Billetera)"]:::prodStyle
     end
 
     %% Tópicos y Particiones
-    subgraph TOPICS ["⚡ CLÚSTER DE APACHE KAFKA (TOPICS & PARTITIONS)"]
+    subgraph TOPICS ["CLÚSTER DE APACHE KAFKA (TOPICS & PARTITIONS)"]
         subgraph T1 ["Topic: apuestas.aceptadas (8 Particiones | Key: user_id)"]
             T1_P["P0 | P1 | P2 | P3 | P4 | P5 | P6 | P7"]:::topicStyle
         end
@@ -67,7 +67,7 @@ graph TD
     end
 
     %% Grupos de Consumidores
-    subgraph GRUPOS ["👥 GRUPOS DE CONSUMIDORES (CONSUMER GROUPS)"]
+    subgraph GRUPOS ["GRUPOS DE CONSUMIDORES (CONSUMER GROUPS)"]
         subgraph CG_CUOTAS ["Group: cuotas-dinamicas-workers"]
             C_CUOTAS["Workers de Cálculo de Cuotas en Vivo<br/>(Lectura secuencial por carrera)"]:::consumerStyle
         end

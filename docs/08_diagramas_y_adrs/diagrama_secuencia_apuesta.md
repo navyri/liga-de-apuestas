@@ -32,13 +32,13 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as 👤 Apostador (Cliente)
-    participant GW as 🛡️ API Gateway / WAF
-    participant CORE as 🏛️ Núcleo Modular (core-api)
-    participant DB as 💾 Base de Datos OLTP (PostgreSQL)
-    participant RELAY as ⚙️ Outbox Relay
-    participant KAFKA as ⚡ Apache Kafka
-    participant NOTIF as 📬 Servicio Notificaciones
+    actor U as Apostador (Cliente)
+    participant GW as API Gateway / WAF
+    participant CORE as Núcleo Modular (core-api)
+    participant DB as Base de Datos OLTP (PostgreSQL)
+    participant RELAY as Outbox Relay
+    participant KAFKA as Apache Kafka
+    participant NOTIF as Servicio Notificaciones
 
     %% 1. Inicio de la Petición
     U->>+GW: POST /api/v1/bets<br/>{raceId, racerId, amount}<br/>Header: Idempotency-Key
